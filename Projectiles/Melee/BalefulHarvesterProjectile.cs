@@ -73,21 +73,19 @@ namespace CalamityMod.Projectiles.Melee
                 else
                 {
                     float homingRange = 1000f;
-                    int inc;
-                    for (int i = 0; i < Main.maxNPCs; i = inc + 1)
+                    foreach (NPC n in Main.ActiveNPCs)
                     {
-                        if (Main.npc[i].CanBeChasedBy(Projectile, false))
+                        if (n.CanBeChasedBy(Projectile, false))
                         {
-                            float npcX = Main.npc[i].position.X + (float)(Main.npc[i].width / 2);
-                            float npcY = Main.npc[i].position.Y + (float)(Main.npc[i].height / 2);
+                            float npcX = n.position.X + (float)(n.width / 2);
+                            float npcY = n.position.Y + (float)(n.height / 2);
                             float npcDist = Math.Abs(Projectile.position.X + (float)(Projectile.width / 2) - npcX) + Math.Abs(Projectile.position.Y + (float)(Projectile.height / 2) - npcY);
-                            if (npcDist < homingRange && Collision.CanHit(Projectile.position, Projectile.width, Projectile.height, Main.npc[i].position, Main.npc[i].width, Main.npc[i].height))
+                            if (npcDist < homingRange && Collision.CanHit(Projectile.position, Projectile.width, Projectile.height, n.position, n.width, n.height))
                             {
                                 homingRange = npcDist;
-                                Projectile.ai[0] = (float)i;
+                                Projectile.ai[0] = (float)n.whoAmI;
                             }
                         }
-                        inc = i;
                     }
                 }
 

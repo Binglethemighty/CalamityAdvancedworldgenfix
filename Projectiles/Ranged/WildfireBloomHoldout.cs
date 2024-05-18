@@ -1,12 +1,10 @@
-﻿using CalamityMod.Items.Weapons.Ranged;
+﻿using System.IO;
+using CalamityMod.Items.Weapons.Ranged;
 using CalamityMod.Projectiles.BaseProjectiles;
 using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Graphics;
-using ReLogic.Content;
 using Terraria;
 using Terraria.Audio;
 using Terraria.DataStructures;
-using Terraria.GameContent;
 using Terraria.ID;
 using Terraria.ModLoader;
 
@@ -22,19 +20,16 @@ namespace CalamityMod.Projectiles.Ranged
         public override float BaseOffsetY => -5f;
         public override float OffsetYDownwards => 5f;
 
-        private ref float ShotCooldown => ref Projectile.ai[0];
-        private ref float ShotsFired => ref Projectile.ai[1];
-        private ref float ShootTimer => ref Projectile.ai[2];
-        public int FireBlobs = 0;
+        public ref float ShotCooldown => ref Projectile.ai[0];
+        public ref float ShotsFired => ref Projectile.ai[1];
+        public ref float ShootTimer => ref Projectile.ai[2];
+        public int FireBlobs { get; set; }
 
         public override void KillHoldoutLogic()
         {
             base.KillHoldoutLogic();
             if (ShotsFired >= 16)
-            {
                 Projectile.Kill();
-                Projectile.netUpdate = true;
-            }
         }
 
         public override void HoldoutAI()
@@ -83,5 +78,9 @@ namespace CalamityMod.Projectiles.Ranged
             base.OnSpawn(source);
             SoundEngine.PlaySound(SoundID.Item73 with { Volume = 0.7f }, Projectile.Center);
         }
+
+        public override void SendExtraAIHoldout(BinaryWriter writer) => writer.Write(FireBlobs);
+
+        public override void ReceiveExtraAIHoldout(BinaryReader reader) => FireBlobs = reader.ReadInt32();
     }
 }

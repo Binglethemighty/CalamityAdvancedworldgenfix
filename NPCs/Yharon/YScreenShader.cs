@@ -23,15 +23,7 @@ namespace CalamityMod.NPCs.Yharon
             {
                 return;
             }
-            YIndex = -1;
-            for (int i = 0; i < Main.npc.Length; i++)
-            {
-                if (Main.npc[i].active && Main.npc[i].type == YType)
-                {
-                    YIndex = i;
-                    break;
-                }
-            }
+            YIndex = NPC.FindFirstNPC(YType);
         }
 
         public override void Update(GameTime gameTime)

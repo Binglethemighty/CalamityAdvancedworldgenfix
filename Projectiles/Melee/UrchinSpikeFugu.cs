@@ -29,15 +29,14 @@ namespace CalamityMod.Projectiles.Melee
             {
                 float maxRange = Projectile.ai[1] == 1f ? 256f : 100f; // Increased homing range for Lionfish
                 int npcIndex = -1;
-                for (int i = 0; i < Main.maxNPCs; i++)
+                foreach (NPC npc in Main.ActiveNPCs)
                 {
-                    NPC npc = Main.npc[i];
                     if (npc.CanBeChasedBy(Projectile, false) && Collision.CanHit(Projectile.position, Projectile.width, Projectile.height, npc.position, npc.width, npc.height))
                     {
                         float targetDist = (npc.Center - Projectile.Center).Length();
                         if (targetDist < maxRange)
                         {
-                            npcIndex = i;
+                            npcIndex = npc.whoAmI;
                             maxRange = targetDist;
                         }
                     }

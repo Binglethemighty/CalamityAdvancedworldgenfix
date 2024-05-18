@@ -155,7 +155,11 @@ namespace CalamityMod.NPCs.Abyss
                 NPC.alpha = 0;
 
             if (Vector2.Distance(Main.player[NPC.target].Center, NPC.Center) > 5600f)
-                NPC.active = false;
+            {
+                NPC.TargetClosest(false);
+                if (Vector2.Distance(Main.player[NPC.target].Center, NPC.Center) > 5600f)
+                    NPC.active = false;
+            }
 
             float currentSpeed = speed;
             float currentTurnSpeed = turnSpeed;

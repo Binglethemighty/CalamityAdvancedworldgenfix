@@ -13,11 +13,11 @@ namespace CalamityMod.Projectiles.Melee
     {
         public new string LocalizationCategory => "Projectiles.Melee";
 
-        private const int TimeLeft = 300;
+        private const int TimeLeft = 180;
 
         private const int TimeToFall = TimeLeft / 2;
 
-        private const int TotalSplits = 30;
+        private const int TotalSplits = 6;
 
         private const int SplitTime = TimeLeft / TotalSplits;
 

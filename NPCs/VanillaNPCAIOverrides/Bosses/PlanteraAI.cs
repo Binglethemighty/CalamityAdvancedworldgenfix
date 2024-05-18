@@ -107,13 +107,13 @@ namespace CalamityMod.NPCs.VanillaNPCAIOverrides.Bosses
             float hookPositionX = 0f;
             float hookPositionY = 0f;
             int numHooksSpawned = 0;
-            for (int i = 0; i < Main.maxNPCs; i++)
+            foreach (NPC n in Main.ActiveNPCs)
             {
-                if (Main.npc[i].active && Main.npc[i].aiStyle == NPCAIStyleID.PlanteraHook)
+                if (n.aiStyle == NPCAIStyleID.PlanteraHook)
                 {
-                    hookPositionX += Main.npc[i].Center.X;
-                    hookPositionY += Main.npc[i].Center.Y;
-                    hookArray[numHooksSpawned] = i;
+                    hookPositionX += n.Center.X;
+                    hookPositionY += n.Center.Y;
+                    hookArray[numHooksSpawned] = n.whoAmI;
 
                     numHooksSpawned++;
                     if (numHooksSpawned >= maxHooks)
@@ -146,6 +146,7 @@ namespace CalamityMod.NPCs.VanillaNPCAIOverrides.Bosses
             float maxVelocityX = Main.player[npc.target].Center.X - npcCenterAccountingForHooks.X;
             float maxVelocityY = Main.player[npc.target].Center.Y - npcCenterAccountingForHooks.Y;
             bool phase1MoveAway = !phase2 && Vector2.Distance(Main.player[npc.target].Center, npc.Center) < 480f && Collision.CanHit(npc.Center, 1, 1, Main.player[npc.target].position, Main.player[npc.target].width, Main.player[npc.target].height);
+            bool adjustProjectileShootLocation = Vector2.Distance(Main.player[npc.target].Center, npc.Center) < 80f;
             if (despawn)
             {
                 maxVelocityY *= -1f;
@@ -238,7 +239,7 @@ namespace CalamityMod.NPCs.VanillaNPCAIOverrides.Bosses
 
                         if (Main.netMode != NetmodeID.MultiplayerClient)
                         {
-                            int proj = Projectile.NewProjectile(npc.GetSource_FromAI(), spawnOffset, projectileVelocity * projectileSpeed, projectileType, damage, 0f, Main.myPlayer);
+                            int proj = Projectile.NewProjectile(npc.GetSource_FromAI(), adjustProjectileShootLocation ? npc.Center : spawnOffset, projectileVelocity * projectileSpeed, projectileType, damage, 0f, Main.myPlayer);
                             if (projectileType == ProjectileID.ThornBall && (Main.rand.NextBool() || !Main.zenithWorld))
                                 Main.projectile[proj].tileCollide = false;
                         }
@@ -296,7 +297,7 @@ namespace CalamityMod.NPCs.VanillaNPCAIOverrides.Bosses
 
                             float ai0 = Main.rand.Next(3);
                             if (Main.netMode != NetmodeID.MultiplayerClient)
-                                Projectile.NewProjectile(npc.GetSource_FromAI(), spawnOffset, projectileVelocity * randomSpeed, type, damage, 0f, Main.myPlayer, ai0);
+                                Projectile.NewProjectile(npc.GetSource_FromAI(), adjustProjectileShootLocation ? npc.Center : spawnOffset, projectileVelocity * randomSpeed, type, damage, 0f, Main.myPlayer, ai0);
                         }
                     }
 
@@ -355,7 +356,7 @@ namespace CalamityMod.NPCs.VanillaNPCAIOverrides.Bosses
                     }
 
                     if (Main.netMode != NetmodeID.MultiplayerClient)
-                        Projectile.NewProjectile(npc.GetSource_FromAI(), spawnOffset, projectileVelocity * projectileSpeed, projectileType, damage, 0f, Main.myPlayer);
+                        Projectile.NewProjectile(npc.GetSource_FromAI(), adjustProjectileShootLocation ? npc.Center : spawnOffset, projectileVelocity * projectileSpeed, projectileType, damage, 0f, Main.myPlayer);
                 }
             }
 
@@ -639,7 +640,7 @@ namespace CalamityMod.NPCs.VanillaNPCAIOverrides.Bosses
                         }
 
                         if (Main.netMode != NetmodeID.MultiplayerClient)
-                            Projectile.NewProjectile(npc.GetSource_FromAI(), spawnOffset, projectileVelocity * projectileSpeed, projectileType, damage, 0f, Main.myPlayer);
+                            Projectile.NewProjectile(npc.GetSource_FromAI(), adjustProjectileShootLocation ? npc.Center : spawnOffset, projectileVelocity * projectileSpeed, projectileType, damage, 0f, Main.myPlayer);
                     }
                 }
             }
@@ -679,14 +680,14 @@ namespace CalamityMod.NPCs.VanillaNPCAIOverrides.Bosses
 
                         if (Main.getGoodWorld)
                         {
-                            for (int i = 0; i < Main.maxNPCs; i++)
+                            foreach (NPC n in Main.ActiveNPCs)
                             {
-                                if (Main.npc[i].active && Main.npc[i].aiStyle == NPCAIStyleID.PlanteraHook)
+                                if (n.aiStyle == NPCAIStyleID.PlanteraHook)
                                 {
                                     for (int j = 0; j < totalTentacles / 2 - 1; j++)
                                     {
                                         int hookIndex = NPC.NewNPC(npc.GetSource_FromAI(), (int)npc.Center.X, (int)npc.Center.Y, NPCID.PlanterasTentacle, npc.whoAmI);
-                                        Main.npc[hookIndex].ai[3] = i + 1;
+                                        Main.npc[hookIndex].ai[3] = n.whoAmI + 1;
                                     }
                                 }
                             }
@@ -947,9 +948,9 @@ namespace CalamityMod.NPCs.VanillaNPCAIOverrides.Bosses
                 // Set timer to new amount if a different hook is currently moving
                 if (!despawn && npc.localAI[0] <= 0f && npc.ai[0] != 0f)
                 {
-                    for (int i = 0; i < Main.maxNPCs; i++)
+                    foreach (NPC n in Main.ActiveNPCs)
                     {
-                        if (i != npc.whoAmI && Main.npc[i].active && Main.npc[i].type == npc.type && (Main.npc[i].velocity.X != 0f || Main.npc[i].velocity.Y != 0f))
+                        if (n.whoAmI != npc.whoAmI && n.type == npc.type && (n.velocity.X != 0f || n.velocity.Y != 0f))
                             npc.localAI[0] = Main.rand.Next(60, 301);
                     }
                 }
@@ -1286,6 +1287,7 @@ namespace CalamityMod.NPCs.VanillaNPCAIOverrides.Bosses
             float num781 = Main.player[npc.target].Center.X - vector97.X;
             float num782 = Main.player[npc.target].Center.Y - vector97.Y;
             bool phase1MoveAway = npc.life > npc.lifeMax / 2 && Vector2.Distance(Main.player[npc.target].Center, npc.Center) < 480f && Collision.CanHit(npc.Center, 1, 1, Main.player[npc.target].position, Main.player[npc.target].width, Main.player[npc.target].height);
+            bool adjustProjectileShootLocation = Vector2.Distance(Main.player[npc.target].Center, npc.Center) < 80f;
             if (flag40)
             {
                 num782 *= -1f;
@@ -1467,7 +1469,7 @@ namespace CalamityMod.NPCs.VanillaNPCAIOverrides.Bosses
                         damage *= 2;
 
                     Vector2 projectileVelocity = new Vector2(num789, num790);
-                    int num794 = Projectile.NewProjectile(npc.GetSource_FromAI(), vector99 + projectileVelocity.SafeNormalize(Vector2.UnitY) * 70f, projectileVelocity, type, damage, 0f, Main.myPlayer);
+                    int num794 = Projectile.NewProjectile(npc.GetSource_FromAI(), adjustProjectileShootLocation ? vector99 : vector99 + projectileVelocity.SafeNormalize(Vector2.UnitY) * 70f, projectileVelocity, type, damage, 0f, Main.myPlayer);
                     if (type != ProjectileID.ThornBall)
                         Main.projectile[num794].timeLeft = 300;
                 }

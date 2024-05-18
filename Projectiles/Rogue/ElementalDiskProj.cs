@@ -116,9 +116,8 @@ namespace CalamityMod.Projectiles.Rogue
             float maxDistance = 300f;
             bool homeIn = false;
 
-            for (int i = 0; i < Main.maxNPCs; i++)
+            foreach (NPC npc in Main.ActiveNPCs)
             {
-                NPC npc = Main.npc[i];
                 if (npc.CanBeChasedBy(Projectile, false))
                 {
                     float extraDistance = npc.width / 2 + npc.height / 2;

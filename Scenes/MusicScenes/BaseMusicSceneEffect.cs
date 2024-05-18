@@ -38,12 +38,12 @@ namespace CalamityMod.Systems
 
             // You can't even edit music if the game has Otherworld toggle on lol.  Have fun with Boss 1
             /*
-			FieldInfo swapMusicField = typeof(Main).GetField("swapMusic", BindingFlags.Static | BindingFlags.NonPublic);
-			bool musicSwapped = (bool)swapMusicField.GetValue(null);
-			bool playingOtherworld = (!Main.drunkWorld && musicSwapped) || (Main.drunkWorld && !musicSwapped);
-			// Main.swapMusic is private.  Todo: bug tmod devs to avoid reflection
-			return playingOtherworld ? OtherworldMusic : VanillaMusic;
-			*/
+            FieldInfo swapMusicField = typeof(Main).GetField("swapMusic", BindingFlags.Static | BindingFlags.NonPublic);
+            bool musicSwapped = (bool)swapMusicField.GetValue(null);
+            bool playingOtherworld = (!Main.drunkWorld && musicSwapped) || (Main.drunkWorld && !musicSwapped);
+            // Main.swapMusic is private.  Todo: bug tmod devs to avoid reflection
+            return playingOtherworld ? OtherworldMusic : VanillaMusic;
+            */
         }
 
         public virtual bool SetSceneEffect(Player player)
@@ -55,28 +55,24 @@ namespace CalamityMod.Systems
                 return false;
 
             /*
-			// You can't even edit music if the game has Otherworld toggle on lol.
-			// Theoretically, reflection would only occur if the music mod is disabled
-			if (MusicModMusic is null)
-			{
-				FieldInfo swapMusicField = typeof(Main).GetField("swapMusic", BindingFlags.Static | BindingFlags.NonPublic);
-				bool musicSwapped = (bool)swapMusicField.GetValue(null);
-				bool playingOtherworld = (!Main.drunkWorld && musicSwapped) || (Main.drunkWorld && !musicSwapped);
-				if (VanillaMusic == -1 && !playingOtherworld)
-					return false;
-				if (OtherworldMusic == -1 && playingOtherworld)
-					return false;
-			}
-			*/
+            // You can't even edit music if the game has Otherworld toggle on lol.
+            // Theoretically, reflection would only occur if the music mod is disabled
+            if (MusicModMusic is null)
+            {
+                FieldInfo swapMusicField = typeof(Main).GetField("swapMusic", BindingFlags.Static | BindingFlags.NonPublic);
+                bool musicSwapped = (bool)swapMusicField.GetValue(null);
+                bool playingOtherworld = (!Main.drunkWorld && musicSwapped) || (Main.drunkWorld && !musicSwapped);
+                if (VanillaMusic == -1 && !playingOtherworld)
+                    return false;
+                if (OtherworldMusic == -1 && playingOtherworld)
+                    return false;
+            }
+            */
 
             Rectangle screenRect = new Rectangle((int)Main.screenPosition.X, (int)Main.screenPosition.Y, Main.screenWidth, Main.screenHeight);
             int musicDistance = MusicDistance * 2;
-            for (int j = 0; j < Main.maxNPCs; j++)
+            foreach (NPC npc in Main.ActiveNPCs)
             {
-                NPC npc = Main.npc[j];
-                if (!npc.active)
-                    continue;
-
                 bool inList = false;
                 if (npc.type == NPCType)
                 {

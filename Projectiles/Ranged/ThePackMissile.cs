@@ -36,11 +36,11 @@ namespace CalamityMod.Projectiles.Ranged
             Vector2 targetCenter = Projectile.Center;
             float minTargetDistance = 2500f;
             bool homeIn = false;
-            for (int i = 0; i < Main.maxNPCs; i++)
+            foreach (NPC n in Main.ActiveNPCs)
             {
-                if (Main.npc[i].CanBeChasedBy(Projectile, false) && Collision.CanHit(Projectile.Center, 1, 1, Main.npc[i].Center, 1, 1))
+                if (n.CanBeChasedBy(Projectile, false) && Collision.CanHit(Projectile.Center, 1, 1, n.Center, 1, 1))
                 {
-                    float distanceFromTarget = Projectile.Center.ManhattanDistance(Main.npc[i].Center);
+                    float distanceFromTarget = Projectile.Center.ManhattanDistance(n.Center);
                     if (distanceFromTarget < 200f)
                     {
                         if (Projectile.owner == Main.myPlayer)
@@ -58,7 +58,7 @@ namespace CalamityMod.Projectiles.Ranged
                     else if (distanceFromTarget < minTargetDistance)
                     {
                         minTargetDistance = distanceFromTarget;
-                        targetCenter = Main.npc[i].Center;
+                        targetCenter = n.Center;
                         homeIn = true;
                     }
                 }

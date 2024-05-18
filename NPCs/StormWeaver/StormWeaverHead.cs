@@ -300,13 +300,13 @@ namespace CalamityMod.NPCs.StormWeaver
 
                 if ((double)NPC.position.Y < Main.topWorld + 16f)
                 {
-                    for (int j = 0; j < Main.maxNPCs; j++)
+                    foreach (NPC n in Main.ActiveNPCs)
                     {
-                        if (Main.npc[j].active && (Main.npc[j].type == ModContent.NPCType<StormWeaverBody>()
-                            || Main.npc[j].type == ModContent.NPCType<StormWeaverHead>()
-                            || Main.npc[j].type == ModContent.NPCType<StormWeaverTail>()))
+                        if ((n.type == ModContent.NPCType<StormWeaverBody>()
+                            || n.type == ModContent.NPCType<StormWeaverHead>()
+                            || n.type == ModContent.NPCType<StormWeaverTail>()))
                         {
-                            Main.npc[j].active = false;
+                            n.active = false;
                         }
                     }
                 }
@@ -314,13 +314,13 @@ namespace CalamityMod.NPCs.StormWeaver
 
             if (Vector2.Distance(Main.player[NPC.target].Center, NPC.Center) > 10000f && NPC.life > 0)
             {
-                for (int j = 0; j < Main.maxNPCs; j++)
+                foreach (NPC n in Main.ActiveNPCs)
                 {
-                    if (Main.npc[j].type == ModContent.NPCType<StormWeaverBody>()
-                       || Main.npc[j].type == ModContent.NPCType<StormWeaverHead>()
-                       || Main.npc[j].type == ModContent.NPCType<StormWeaverTail>())
+                    if (n.type == ModContent.NPCType<StormWeaverBody>()
+                       || n.type == ModContent.NPCType<StormWeaverHead>()
+                       || n.type == ModContent.NPCType<StormWeaverTail>())
                     {
-                        Main.npc[j].active = false;
+                        n.active = false;
                     }
                 }
             }

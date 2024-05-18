@@ -198,7 +198,7 @@ namespace CalamityMod.NPCs.TownNPCs
         }
         public override void AddShops()
         {
-            Condition downedOldDuke = new(CalamityUtils.GetText("Condition.PostOD"), () => DownedBossSystem.downedBoomerDuke);
+            Condition downedOldDuke = CalamityConditions.DownedOldDuke;
 
             NPCShop shop = new(Type);
             shop.Add(ModContent.ItemType<Shellshooter>())
@@ -210,7 +210,7 @@ namespace CalamityMod.NPCs.TownNPCs
                 .Add(ModContent.ItemType<AmidiasTrident>())
                 .Add(ModContent.ItemType<EnchantedConch>())
                 .Add(ModContent.ItemType<PolypLauncher>())
-                .AddWithCustomValue(ItemID.TruffleWorm, Item.buyPrice(gold: 10), Condition.Hardmode)
+                .AddWithCustomValue(ItemID.TruffleWorm, Item.buyPrice(gold: 15), Condition.Hardmode)
                 .AddWithCustomValue(ModContent.ItemType<BloodwormItem>(), Item.buyPrice(2), downedOldDuke)
                 .AddWithCustomValue(ItemID.ShrimpPoBoy, Item.buyPrice(gold: 2, silver: 50), Condition.HappyEnough, Condition.InBeach)
                 .AddWithCustomValue(ItemID.Fries, Item.buyPrice(gold: 2), Condition.HappyEnough, Condition.InBeach, Condition.DownedEyeOfCthulhu)

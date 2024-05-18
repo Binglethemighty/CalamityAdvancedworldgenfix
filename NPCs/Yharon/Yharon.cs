@@ -596,9 +596,6 @@ namespace CalamityMod.NPCs.Yharon
 
                     if (aiState == 1)
                     {
-                        // Set damage
-                        NPC.damage = setDamage;
-
                         NPC.ai[0] = 1f;
                         NPC.ai[1] = 0f;
                         NPC.ai[2] = 0f;
@@ -640,9 +637,6 @@ namespace CalamityMod.NPCs.Yharon
                     }
                     else if (aiState == 5)
                     {
-                        // Set damage
-                        NPC.damage = setDamage;
-
                         if (playFastChargeRoarSound)
                             RoarSoundSlot = SoundEngine.PlaySound(RoarSound, NPC.Center);
 
@@ -886,9 +880,6 @@ namespace CalamityMod.NPCs.Yharon
 
                     if (aiState == 1)
                     {
-                        // Set damage
-                        NPC.damage = setDamage;
-
                         NPC.ai[0] = 7f;
                         NPC.ai[1] = 0f;
                         NPC.ai[2] = 0f;
@@ -977,9 +968,6 @@ namespace CalamityMod.NPCs.Yharon
                     }
                     else if (aiState == 5)
                     {
-                        // Set damage
-                        NPC.damage = setDamage;
-
                         if (playFastChargeRoarSound)
                             RoarSoundSlot = SoundEngine.PlaySound(RoarSound, NPC.Center);
 
@@ -1263,9 +1251,6 @@ namespace CalamityMod.NPCs.Yharon
 
                     if (aiState == 1)
                     {
-                        // Set damage
-                        NPC.damage = setDamage;
-
                         NPC.ai[0] = 14f;
                         NPC.ai[1] = 0f;
                         NPC.ai[2] = 0f;
@@ -1354,9 +1339,6 @@ namespace CalamityMod.NPCs.Yharon
                     }
                     else if (aiState == 5)
                     {
-                        // Set damage
-                        NPC.damage = setDamage;
-
                         if (playFastChargeRoarSound)
                             RoarSoundSlot = SoundEngine.PlaySound(RoarSound, NPC.Center);
 
@@ -2015,9 +1997,6 @@ namespace CalamityMod.NPCs.Yharon
 
                     if (phase2AttackType == 5 && NPC.ai[1] < phaseSwitchTimer + teleportPhaseTimer)
                     {
-                        // Avoid cheap bullshit
-                        NPC.damage = 0;
-
                         float newRotation = NPC.AngleTo(targetData.Center);
                         float amount = 0.04f;
 
@@ -2082,9 +2061,6 @@ namespace CalamityMod.NPCs.Yharon
 
                     if (phase2AttackType == 7 && doFastChargeTelegraph)
                     {
-                        // Avoid cheap bullshit
-                        NPC.damage = 0;
-
                         float newRotation = NPC.AngleTo(targetData.Center);
                         float amount = 0.04f;
 
@@ -2161,9 +2137,6 @@ namespace CalamityMod.NPCs.Yharon
                     {
                         case 2: // Charge
                             {
-                                // Set damage
-                                NPC.damage = setDamage;
-
                                 Vector2 vector = NPC.SafeDirectionTo(targetData.Center, Vector2.UnitX * NPC.spriteDirection);
                                 NPC.spriteDirection = (vector.X > 0f) ? 1 : -1;
                                 NPC.rotation = vector.ToRotation();
@@ -2196,9 +2169,6 @@ namespace CalamityMod.NPCs.Yharon
 
                         case 7: // Fast charge
                             {
-                                // Set damage
-                                NPC.damage = setDamage;
-
                                 Vector2 vector = NPC.SafeDirectionTo(targetData.Center, Vector2.UnitX * NPC.spriteDirection);
                                 NPC.spriteDirection = (vector.X > 0f) ? 1 : -1;
                                 NPC.rotation = vector.ToRotation();

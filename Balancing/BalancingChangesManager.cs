@@ -410,6 +410,9 @@ namespace CalamityMod.Balancing
             // 50% resist to Tarragon Throwing Dart's thorns. (LOL)
             NPCSpecificBalancingChanges.AddRange(Bundle(CalamityLists.ThanatosIDs, Do(new ProjectileResistBalancingRule(0.5f, ProjectileType<TarraThornRight>()))));
 
+            // 50% resist to Omicron's beam.
+            NPCSpecificBalancingChanges.AddRange(Bundle(CalamityLists.ThanatosIDs, Do(new ProjectileResistBalancingRule(0.5f, ProjectileType<OmicronBeam>()))));
+
             // 50% resist to Vehemence's skulls.
             NPCSpecificBalancingChanges.AddRange(Bundle(CalamityLists.ThanatosIDs, Do(new ProjectileResistBalancingRule(0.5f, ProjectileType<VehemenceSkull>()))));
 

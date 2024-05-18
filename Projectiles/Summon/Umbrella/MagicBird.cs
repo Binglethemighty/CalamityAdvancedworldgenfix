@@ -88,18 +88,14 @@ namespace CalamityMod.Projectiles.Summon.Umbrella
             }
             if (!hasHomingTarget)
             {
-                for (int i = 0; i < Main.npc.Length; ++i)
+                foreach (NPC npc in Main.ActiveNPCs)
                 {
-                    NPC npc = Main.npc[i];
-                    if (npc is null || !npc.active)
-                        continue;
-
                     if (npc.CanBeChasedBy(Projectile, false))
                     {
                         float dist = (Projectile.Center - npc.Center).Length();
                         if (dist < maxHomingRange)
                         {
-                            targetIdx = i;
+                            targetIdx = npc.whoAmI;
                             maxHomingRange = dist;
                             hasHomingTarget = true;
                         }

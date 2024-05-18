@@ -554,22 +554,22 @@ namespace CalamityMod.NPCs.VanillaNPCAIOverrides.Bosses
             if (shadowHandTimer / shadowHandSpawnRate >= 3)
                 npc.localAI[2] = 0f;
 
-            for (int i = 0; i < Main.maxPlayers; i++)
+            foreach (Player player in Main.ActivePlayers)
             {
-                if (npc.Boss_CanShootExtraAt(i, rotation % 3, 3, 1200f, alwaysSkipMainTarget: false))
+                if (npc.Boss_CanShootExtraAt(player.whoAmI, rotation % 3, 3, 1200f, alwaysSkipMainTarget: false))
                 {
                     // Normal shadow hand spawn behavior
                     // Modified to make the shadow hand spawns fair
-                    RandomizeInsanityShadowFor(Main.player[i], death, isHostile: true, out var spawnPosition, out var spawnVelocity, out var ai, out var ai2);
+                    RandomizeInsanityShadowFor(player, death, isHostile: true, out var spawnPosition, out var spawnVelocity, out var ai, out var ai2);
 
                     // Spawn hands to cut the player off and force them back towards Deerclops
                     // This only happens if the player is triggering Deerclops' increased DR
                     float minShadowHandSpawnDistanceFromPlayer = 450f;
-                    float playerDistanceFromDeerclops = Vector2.Distance(npc.Center, Main.player[i].Center);
+                    float playerDistanceFromDeerclops = Vector2.Distance(npc.Center, player.Center);
                     if (playerDistanceFromDeerclops >= 450f)
                     {
-                        spawnPosition = (Main.player[i].Center - npc.Center).SafeNormalize(Vector2.UnitY) * (playerDistanceFromDeerclops + minShadowHandSpawnDistanceFromPlayer);
-                        spawnVelocity = (Main.player[i].Center - spawnPosition).SafeNormalize(Vector2.UnitY) * spawnVelocity.Length();
+                        spawnPosition = (player.Center - npc.Center).SafeNormalize(Vector2.UnitY) * (playerDistanceFromDeerclops + minShadowHandSpawnDistanceFromPlayer);
+                        spawnVelocity = (player.Center - spawnPosition).SafeNormalize(Vector2.UnitY) * spawnVelocity.Length();
                     }
 
                     Projectile.NewProjectile(npc.GetSource_FromAI(), spawnPosition, spawnVelocity, shadowHand, shadowHandDamage, 0f, Main.myPlayer, ai, ai2);
@@ -871,7 +871,7 @@ namespace CalamityMod.NPCs.VanillaNPCAIOverrides.Bosses
             {
                 npc.velocity.Y = MathHelper.Clamp(npc.velocity.Y + yVelocityIncrease, yVelocityMin, 0f);
             }
-            else if (npc.velocity.Y == 0f && moveUp)
+            else if (npc.velocity.Y == 0f && moveUp && npc.localAI[0] == 0f)
             {
                 npc.velocity.Y = yVelocity;
                 npc.localAI[0] = 1f;

@@ -66,10 +66,9 @@ namespace CalamityMod.Projectiles.Melee
         private Projectile FindParent()
         {
             Projectile parent = null;
-            for (int i = 0; i < Main.maxProjectiles; i++)
+            foreach (Projectile p in Main.ActiveProjectiles)
             {
-                Projectile p = Main.projectile[i];
-                if (p.identity == Projectile.ai[0] && p.active && p.type == ModContent.ProjectileType<MicrowaveYoyo>() && p.owner == Projectile.owner)
+                if (p.identity == Projectile.ai[0] && p.type == ModContent.ProjectileType<MicrowaveYoyo>() && p.owner == Projectile.owner)
                 {
                     parent = p;
                     break;

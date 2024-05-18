@@ -81,10 +81,9 @@ namespace CalamityMod.NPCs.NormalNPCs
                 else
                 {
                     // find a new npc to attatch to in gfb, it's not a bug, it's a feature:tm:
-                    for (int i = 0; i < Main.maxNPCs; i++)
+                    foreach (NPC host in Main.ActiveNPCs)
                     {
-                        NPC host = Main.npc[i];
-                        if (host.active && !host.friendly && !host.dontTakeDamage && host.type != ModContent.NPCType<ArmoredDiggerHead>() && host.type != ModContent.NPCType<ArmoredDiggerBody>() && host.type != ModContent.NPCType<ArmoredDiggerTail>())
+                        if (!host.friendly && !host.dontTakeDamage && host.type != ModContent.NPCType<ArmoredDiggerHead>() && host.type != ModContent.NPCType<ArmoredDiggerBody>() && host.type != ModContent.NPCType<ArmoredDiggerTail>())
                         {
                             NPC.ai[1] = host.whoAmI;
                             NPC.ai[3] = host.whoAmI;

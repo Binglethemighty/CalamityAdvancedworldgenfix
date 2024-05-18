@@ -22,6 +22,7 @@ namespace CalamityMod.Projectiles.Ranged
         public int fullRevShots = 50;
         public int windupAnim = 11;
         public int soundTimer = 0;
+        public bool discharging = false;
 
         public override void SetDefaults()
         {
@@ -31,6 +32,7 @@ namespace CalamityMod.Projectiles.Ranged
             Projectile.tileCollide = false;
             Projectile.DamageType = DamageClass.Ranged;
             Projectile.ignoreWater = true;
+            Projectile.alpha = 255;
         }
         public override void SetStaticDefaults()
         {
@@ -39,6 +41,10 @@ namespace CalamityMod.Projectiles.Ranged
         public override void AI()
         {
             Time++;
+
+            if (Time == 3)
+                Projectile.alpha = 0;
+
             if (Time % 2 == 0)
                 soundTimer++;
             Projectile.frameCounter++;
@@ -77,8 +83,9 @@ namespace CalamityMod.Projectiles.Ranged
             Owner.PickAmmo(Owner.ActiveItem(), out bulletAMMO, out float SpeedNoUse, out int bulletDamage, out float kBackNoUse, out int _);
 
             // Fire Auric Bullets if the owner stops channeling or otherwise cannot use the weapon.
-            if (Owner.CantUseHoldout())
+            if (Owner.CantUseHoldout() || discharging)
             {
+                discharging = true;
                 if (fullRev && fullRevShots > 0)
                 {
                     Projectile.timeLeft = 2;
@@ -93,6 +100,7 @@ namespace CalamityMod.Projectiles.Ranged
                     Owner.velocity += -Projectile.velocity * fullRevShots * (Main.zenithWorld ? 0.028f : 0.013f);
                     Projectile.NewProjectile(Projectile.GetSource_FromThis(), tipPosition + Projectile.velocity * 5 + Main.rand.NextVector2Circular(7, 7), shootVelocity.RotatedByRandom(MathHelper.ToRadians(4f)), ModContent.ProjectileType<AuricBullet>(), (int)(Projectile.damage * 0.9f), Projectile.knockBack, Projectile.owner);
                     SoundEngine.PlaySound(SoundID.Item40 with { PitchVariance = 0.4f }, Projectile.Center);
+                    Owner.channel = true;
                     //SoundEngine.PlaySound(Kingsbane.AuricFire with { PitchVariance = 0.4f }, Projectile.Center);
                     fullRevShots--;
                 }
@@ -137,9 +145,9 @@ namespace CalamityMod.Projectiles.Ranged
         {
             if (Main.myPlayer == Projectile.owner)
             {
-                float interpolant = Utils.GetLerpValue(5f, 55f, Projectile.Distance(Main.MouseWorld), true);
+                float interpolant = Utils.GetLerpValue(0f, 55f, Owner.Distance(Main.MouseWorld), true);
                 Vector2 oldVelocity = Projectile.velocity;
-                Projectile.velocity = Vector2.Lerp(Projectile.velocity, Projectile.SafeDirectionTo(Main.MouseWorld), interpolant);
+                Projectile.velocity = Vector2.Lerp(Projectile.velocity, Projectile.SafeDirectionTo(Main.MouseWorld), 0.185f).SafeNormalize(Vector2.UnitY);
                 if (Projectile.velocity != oldVelocity)
                 {
                     Projectile.netSpam = 0;
@@ -151,9 +159,9 @@ namespace CalamityMod.Projectiles.Ranged
             Projectile.spriteDirection = Projectile.direction;
 
             // Rumble
-            if (Owner.CantUseHoldout())
+            if (Owner.CantUseHoldout() || discharging)
             {
-                Projectile.position += Main.rand.NextVector2Circular(4.5f, 4.5f);
+                Projectile.Center += Main.rand.NextVector2Circular(4.5f, 4.5f);
             }
         }
 

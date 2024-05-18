@@ -30,9 +30,8 @@ namespace CalamityMod.Projectiles.Ranged
         {
             Projectile parent = Main.projectile[0];
             bool active = false;
-            for (int i = 0; i < Main.projectile.Length; i++)
+            foreach (Projectile p in Main.ActiveProjectiles)
             {
-                Projectile p = Main.projectile[i];
                 if (p.identity == Projectile.ai[0] && p.active && p.type == ModContent.ProjectileType<MagnomalyRocket>())
                 {
                     parent = p;

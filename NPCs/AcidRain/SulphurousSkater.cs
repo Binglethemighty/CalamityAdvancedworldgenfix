@@ -189,20 +189,20 @@ namespace CalamityMod.NPCs.AcidRain
             float minimumDistance = 2400f;
             Projectile closestBubble = null;
 
-            for (int i = 0; i < Main.maxProjectiles; i++)
+            foreach (Projectile p in Main.ActiveProjectiles)
             {
-                if (Main.projectile[i].type != bubbleType || !Main.projectile[i].active)
+                if (p.type != bubbleType)
                     continue;
 
-                if (Math.Abs(NPC.Center.X - Main.projectile[i].Center.X) >= minimumDistance ||
-                    Main.projectile[i].Center.Y <= NPC.Bottom.Y ||
-                    !Collision.CanHit(NPC.position, NPC.width, NPC.height, Main.projectile[i].position, Main.projectile[i].width, Main.projectile[i].height))
+                if (Math.Abs(NPC.Center.X - p.Center.X) >= minimumDistance ||
+                    p.Center.Y <= NPC.Bottom.Y ||
+                    !Collision.CanHit(NPC.position, NPC.width, NPC.height, p.position, p.width, p.height))
                 {
                     continue;
                 }
 
-                minimumDistance = NPC.Distance(Main.projectile[i].Center);
-                closestBubble = Main.projectile[i];
+                minimumDistance = NPC.Distance(p.Center);
+                closestBubble = p;
             }
 
             distanceToBubble = minimumDistance;

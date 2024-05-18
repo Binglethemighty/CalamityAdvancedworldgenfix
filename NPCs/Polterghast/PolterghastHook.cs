@@ -229,9 +229,9 @@ namespace CalamityMod.NPCs.Polterghast
 
                 if (!despawnBoost && NPC.localAI[0] <= 0f && NPC.ai[0] != 0f)
                 {
-                    for (int i = 0; i < Main.maxNPCs; i++)
+                    foreach (var n in Main.ActiveNPCs)
                     {
-                        if (i != NPC.whoAmI && Main.npc[i].active && Main.npc[i].type == NPC.type && (Main.npc[i].velocity.X != 0f || Main.npc[i].velocity.Y != 0f))
+                        if (n.whoAmI != NPC.whoAmI && n.type == NPC.type && (n.velocity.X != 0f || n.velocity.Y != 0f))
                             NPC.localAI[0] = 180f;
                     }
                 }

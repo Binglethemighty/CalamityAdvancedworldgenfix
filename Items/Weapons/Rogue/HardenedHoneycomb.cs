@@ -31,7 +31,7 @@ namespace CalamityMod.Items.Weapons.Rogue
             Item.value = 300;
             Item.rare = ItemRarityID.Orange;
             Item.shoot = ModContent.ProjectileType<Honeycomb>();
-            Item.shootSpeed = 10f;
+            Item.shootSpeed = 14f;
             Item.DamageType = RogueDamageClass.Instance;
         }
 

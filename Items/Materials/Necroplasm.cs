@@ -6,7 +6,7 @@ using Terraria.ModLoader;
 
 namespace CalamityMod.Items.Materials
 {
-    [LegacyName("Phantoplasm")]
+    [LegacyName("Phantoplasm", "Polterplasm")]
     public class Necroplasm : ModItem, ILocalizedModType
     {
         public new string LocalizationCategory => "Items.Materials";

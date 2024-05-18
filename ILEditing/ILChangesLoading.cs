@@ -13,6 +13,7 @@ using Terraria.GameContent.Liquid;
 using Terraria.GameContent.UI.Elements;
 using Terraria.GameContent.UI.States;
 using Terraria.Graphics.Light;
+using Terraria.Map;
 using Terraria.ModLoader;
 
 namespace CalamityMod.ILEditing
@@ -106,7 +107,7 @@ namespace CalamityMod.ILEditing
             IL_Player.UpdateJumpHeight += FixJumpHeightBoosts;
             IL_Player.Update += BaseJumpHeightAdjustment;
             IL_Player.Update += RunSpeedAdjustments;
-            IL_Player.Update += NerfSoaringInsigniaRunAcceleration;
+            IL_Player.Update += NerfOverpoweredRunAccelerationSources; // Soaring Insignia, Magiluminescence, and Shadow Armor
             IL_Player.WingMovement += RemoveSoaringInsigniaInfiniteWingTime;
 
             // Life regen balance
@@ -160,6 +161,9 @@ namespace CalamityMod.ILEditing
 
             // Fix vanilla not accounting for multiple bobbers when fishing with truffle worm
             IL_Player.ItemCheck_CheckFishingBobbers += FixTruffleWormFishing;
+            
+            // Allow specified walls to be visible through water on the map
+            IL_MapHelper.CreateMapTile += UseVisibleThroughWaterMapTile;
 
             //Additional detours that are in their own item files given they are only relevant to these specific items:
             //Rover drive detours on Player.DrawInfernoRings to draw its shield

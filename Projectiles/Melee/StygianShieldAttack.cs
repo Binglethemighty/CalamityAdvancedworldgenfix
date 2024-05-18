@@ -66,10 +66,9 @@ namespace CalamityMod.Projectiles.Melee
                 // Detach the owner from any mounts/hooks
                 if (Owner.mount != null)
                     Owner.mount.Dismount(Owner);
-                for (int i = 0; i < Main.projectile.Length; i++)
+                foreach (Projectile proj in Main.ActiveProjectiles)
                 {
-                    Projectile proj = Main.projectile[i];
-                    if (!proj.active || proj.owner != Owner.whoAmI || proj.aiStyle != ProjAIStyleID.Hook)
+                    if (proj.owner != Owner.whoAmI || proj.aiStyle != ProjAIStyleID.Hook)
                         continue;
                     if (proj.aiStyle == ProjAIStyleID.Hook)
                         proj.Kill();

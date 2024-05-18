@@ -153,7 +153,8 @@ namespace CalamityMod
                 // Rapiers, whips, and other specific vanilla weapons (ie. Zenith or Excalibur) are specifically excluded from this, so they get broadsword reforges despite not scaling with melee speed.
                 //
                 // 18FEB2024: Ozzatron: removed the (item.channel || item.noMelee) because vanilla lets Burning Sky get Legendary
-                else if (item.channel && item.useStyle != ItemUseStyleID.Rapier && !item.CountsAsClass<SummonMeleeSpeedDamageClass>() && !PrefixLegacy.ItemSets.SwordsHammersAxesPicks[item.type])
+                // 12MAY2024: Shade: added item.useStyle != ItemUseStyleID.Shoot because vanilla lets Sahara Slicers and Death's Ascension get Legendary
+                else if (item.channel && item.useStyle != ItemUseStyleID.Rapier && !item.CountsAsClass<SummonMeleeSpeedDamageClass>() && !PrefixLegacy.ItemSets.SwordsHammersAxesPicks[item.type] && item.useStyle != ItemUseStyleID.Shoot)
                 {
                     int[][] meleeNoSpeedReforgeTiers = new int[][]
                     {

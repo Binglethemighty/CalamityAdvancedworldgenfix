@@ -135,7 +135,7 @@ namespace CalamityMod.Projectiles.Ranged
                 }
 
                 ShootingTimer = 0f;
-                Projectile.netUpdate = true;
+
             }
 
             ShootingTimer++;

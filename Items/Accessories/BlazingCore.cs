@@ -67,7 +67,7 @@ namespace CalamityMod.Items.Accessories
                 for (int i = 0; i < chains; i++)
                 {
                     int projectileType = ModContent.ProjectileType<BlazingStarThatDoesNotHeal>();
-                    int dmgAmt = 90;
+                    int dmgAmt = 250;
                     if (!empowered && Main.rand.NextBool(5))
                     {
                         projectileType = ModContent.ProjectileType<BlazingStarHeal>();

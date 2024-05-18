@@ -18,15 +18,7 @@ namespace CalamityMod.Skies
             if (StormWeaverHeadIndex >= 0 && Main.npc[StormWeaverHeadIndex].active && Main.npc[StormWeaverHeadIndex].type == weaverType)
                 return;
 
-            StormWeaverHeadIndex = -1;
-            for (int i = 0; i < Main.npc.Length; i++)
-            {
-                if (Main.npc[i].active && Main.npc[i].type == weaverType)
-                {
-                    StormWeaverHeadIndex = i;
-                    break;
-                }
-            }
+            StormWeaverHeadIndex = NPC.FindFirstNPC(weaverType);
         }
 
         public override void Draw(SpriteBatch spriteBatch, float minDepth, float maxDepth)

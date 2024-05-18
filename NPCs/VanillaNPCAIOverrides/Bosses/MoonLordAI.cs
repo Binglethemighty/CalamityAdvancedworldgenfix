@@ -317,19 +317,17 @@ namespace CalamityMod.NPCs.VanillaNPCAIOverrides.Bosses
 
                     if (npc.ai[1] == 60f)
                     {
-                        for (int i = 0; i < Main.maxProjectiles; i++)
+                        foreach (Projectile projectile in Main.ActiveProjectiles)
                         {
-                            Projectile projectile = Main.projectile[i];
-                            if (projectile.active && (projectile.type == ProjectileID.MoonLeech || projectile.type == ProjectileID.PhantasmalBolt ||
+                            if ((projectile.type == ProjectileID.MoonLeech || projectile.type == ProjectileID.PhantasmalBolt ||
                                 projectile.type == ProjectileID.PhantasmalDeathray || projectile.type == ProjectileID.PhantasmalEye ||
                                 projectile.type == ProjectileID.PhantasmalSphere))
                                 projectile.Kill();
                         }
 
-                        for (int j = 0; j < Main.maxNPCs; j++)
+                        foreach (NPC nPC3 in Main.ActiveNPCs)
                         {
-                            NPC nPC3 = Main.npc[j];
-                            if (nPC3.active && nPC3.type == NPCID.MoonLordFreeEye)
+                            if (nPC3.type == NPCID.MoonLordFreeEye)
                             {
                                 nPC3.HitEffect(0, 9999.0);
                                 nPC3.active = false;
@@ -445,10 +443,9 @@ namespace CalamityMod.NPCs.VanillaNPCAIOverrides.Bosses
                         npc.HitEffect(0, 1337.0);
                         npc.checkDead();
 
-                        for (int i = 0; i < Main.maxNPCs; i++)
+                        foreach (NPC nPC5 in Main.ActiveNPCs)
                         {
-                            NPC nPC5 = Main.npc[i];
-                            if (nPC5.active && (nPC5.type == NPCID.MoonLordHand || nPC5.type == NPCID.MoonLordHead))
+                            if (nPC5.type == NPCID.MoonLordHand || nPC5.type == NPCID.MoonLordHead)
                             {
                                 nPC5.active = false;
                                 if (Main.netMode != NetmodeID.MultiplayerClient)
@@ -477,16 +474,15 @@ namespace CalamityMod.NPCs.VanillaNPCAIOverrides.Bosses
 
                     if (npc.ai[1] == 40f)
                     {
-                        for (int j = 0; j < Main.maxProjectiles; j++)
+                        foreach (Projectile projectile2 in Main.ActiveProjectiles)
                         {
-                            Projectile projectile2 = Main.projectile[j];
-                            if (projectile2.active && (projectile2.type == ProjectileID.MoonLeech || projectile2.type == ProjectileID.PhantasmalBolt ||
+                            if ((projectile2.type == ProjectileID.MoonLeech || projectile2.type == ProjectileID.PhantasmalBolt ||
                                 projectile2.type == ProjectileID.PhantasmalDeathray || projectile2.type == ProjectileID.PhantasmalEye ||
                                 projectile2.type == ProjectileID.PhantasmalSphere))
                             {
                                 projectile2.active = false;
                                 if (Main.netMode != NetmodeID.MultiplayerClient)
-                                    NetMessage.SendData(MessageID.SyncProjectile, -1, -1, null, j, 0f, 0f, 0f, 0, 0, 0);
+                                    NetMessage.SendData(MessageID.SyncProjectile, -1, -1, null, projectile2.whoAmI, 0f, 0f, 0f, 0, 0, 0);
                             }
                         }
 
@@ -511,10 +507,9 @@ namespace CalamityMod.NPCs.VanillaNPCAIOverrides.Bosses
 
                     if (npc.ai[1] >= 60f)
                     {
-                        for (int i = 0; i < Main.maxNPCs; i++)
+                        foreach (NPC nPC5 in Main.ActiveNPCs)
                         {
-                            NPC nPC5 = Main.npc[i];
-                            if (nPC5.active && (nPC5.type == NPCID.MoonLordFreeEye || nPC5.type == NPCID.MoonLordHand || nPC5.type == NPCID.MoonLordHead))
+                            if (nPC5.type == NPCID.MoonLordFreeEye || nPC5.type == NPCID.MoonLordHand || nPC5.type == NPCID.MoonLordHead)
                             {
                                 nPC5.active = false;
                                 if (Main.netMode != NetmodeID.MultiplayerClient)
@@ -586,13 +581,11 @@ namespace CalamityMod.NPCs.VanillaNPCAIOverrides.Bosses
                         Main.npc[(int)npc.localAI[2]].netUpdate = true;
                     }
 
-                    for (int i = 0; i < Main.maxNPCs; i++)
+                    foreach (NPC nPC7 in Main.ActiveNPCs)
                     {
-                        NPC nPC7 = Main.npc[i];
                         if (nPC7.active && nPC7.type == NPCID.MoonLordFreeEye)
                         {
-                            NPC nPC6 = nPC7;
-                            nPC6.position += value8;
+                            nPC7.position += value8;
                             nPC7.netUpdate = true;
                         }
                     }
@@ -844,32 +837,30 @@ namespace CalamityMod.NPCs.VanillaNPCAIOverrides.Bosses
                     if (attackTimer == 0f && Main.netMode != NetmodeID.MultiplayerClient)
                     {
                         Vector2 leechNPCCenter = npc.Center + leechCenterOffset;
-                        for (int i = 0; i < Main.maxPlayers; i++)
+                        foreach (Player player6 in Main.ActivePlayers)
                         {
-                            Player player6 = Main.player[i];
-                            if (player6.active && !player6.dead && Vector2.Distance(player6.Center, leechNPCCenter) <= 3000f)
+                            if (!player6.dead && Vector2.Distance(player6.Center, leechNPCCenter) <= 3000f)
                             {
                                 Vector2 targetLeechDist = Main.player[npc.target].Center - leechNPCCenter;
                                 if (targetLeechDist != Vector2.Zero)
                                     targetLeechDist.Normalize();
 
-                                Projectile.NewProjectile(npc.GetSource_FromAI(), leechNPCCenter.X, leechNPCCenter.Y, targetLeechDist.X, targetLeechDist.Y, ProjectileID.MoonLeech, 0, 0f, Main.myPlayer, npc.whoAmI + 1, i);
+                                Projectile.NewProjectile(npc.GetSource_FromAI(), leechNPCCenter.X, leechNPCCenter.Y, targetLeechDist.X, targetLeechDist.Y, ProjectileID.MoonLeech, 0, 0f, Main.myPlayer, npc.whoAmI + 1, player6.whoAmI);
                             }
                         }
                     }
 
                     if ((attackTimer == 120f || attackTimer == 150f || attackTimer == 180f || attackTimer == 210f || attackTimer == 240f) && Main.netMode != NetmodeID.MultiplayerClient)
                     {
-                        for (int j = 0; j < Main.maxProjectiles; j++)
+                        foreach (Projectile projectile6 in Main.ActiveProjectiles)
                         {
-                            Projectile projectile6 = Main.projectile[j];
-                            if (projectile6.active && projectile6.type == ProjectileID.MoonLeech && Main.player[(int)projectile6.ai[1]].FindBuffIndex(BuffID.MoonLeech) != -1)
+                            if (projectile6.type == ProjectileID.MoonLeech && Main.player[(int)projectile6.ai[1]].FindBuffIndex(BuffID.MoonLeech) != -1)
                             {
                                 Vector2 targetCenter = Main.player[npc.target].Center;
                                 int moonLeech = NPC.NewNPC(npc.GetSource_FromAI(), (int)targetCenter.X, (int)targetCenter.Y, NPCID.MoonLordLeechBlob);
                                 Main.npc[moonLeech].netUpdate = true;
                                 Main.npc[moonLeech].ai[0] = npc.whoAmI + 1;
-                                Main.npc[moonLeech].ai[1] = j;
+                                Main.npc[moonLeech].ai[1] = projectile6.whoAmI;
                             }
                         }
                     }
@@ -1391,10 +1382,9 @@ namespace CalamityMod.NPCs.VanillaNPCAIOverrides.Bosses
                             }
 
                             sphereVelocity *= velocity;
-                            for (int i = 0; i < Main.maxProjectiles; i++)
+                            foreach (Projectile currentProjectile in Main.ActiveProjectiles)
                             {
-                                Projectile currentProjectile = Main.projectile[i];
-                                if (currentProjectile.active && currentProjectile.type == ProjectileID.PhantasmalSphere && currentProjectile.ai[1] == npc.whoAmI && currentProjectile.ai[0] != -1f)
+                                if (currentProjectile.type == ProjectileID.PhantasmalSphere && currentProjectile.ai[1] == npc.whoAmI && currentProjectile.ai[0] != -1f)
                                 {
                                     currentProjectile.ai[0] = -1f;
                                     currentProjectile.velocity = sphereVelocity;
@@ -1597,26 +1587,23 @@ namespace CalamityMod.NPCs.VanillaNPCAIOverrides.Bosses
                     if (eyeCount > 1)
                     {
                         int eyesSynced = 1;
-                        for (int i = 0; i < Main.maxNPCs; i++)
+                        foreach (NPC n in Main.ActiveNPCs)
                         {
-                            if (Main.npc[i].active)
+                            if (n.whoAmI != npc.whoAmI && n.type == npc.type)
                             {
-                                if (i != npc.whoAmI && Main.npc[i].type == npc.type)
-                                {
-                                    Main.npc[i].ai[0] = 0f;
-                                    Main.npc[i].ai[1] = 0f;
-                                    Main.npc[i].ai[2] = 0f;
-                                    Main.npc[i].localAI[0] = 0f;
-                                    Main.npc[i].localAI[1] = 0f;
-                                    Main.npc[i].localAI[2] = 0f;
-                                    calamityGlobalNPC.newAI[0] = 1f;
-                                    calamityGlobalNPC.newAI[1] = 0f;
-                                    npc.netUpdate = true;
+                                n.ai[0] = 0f;
+                                n.ai[1] = 0f;
+                                n.ai[2] = 0f;
+                                n.localAI[0] = 0f;
+                                n.localAI[1] = 0f;
+                                n.localAI[2] = 0f;
+                                calamityGlobalNPC.newAI[0] = 1f;
+                                calamityGlobalNPC.newAI[1] = 0f;
+                                npc.netUpdate = true;
 
-                                    eyesSynced++;
-                                    if (eyesSynced >= eyeCount)
-                                        break;
-                                }
+                                eyesSynced++;
+                                if (eyesSynced >= eyeCount)
+                                    break;
                             }
                         }
                     }
@@ -1739,24 +1726,21 @@ namespace CalamityMod.NPCs.VanillaNPCAIOverrides.Bosses
 
                     // Fly towards Moon Lord Head and stay away from other True Eyes
                     float freeEyeAccel = 0.5f;
-                    for (int j = 0; j < Main.maxNPCs; j++)
+                    foreach (NPC n in Main.ActiveNPCs)
                     {
-                        if (Main.npc[j].active)
+                        if (n.whoAmI != npc.whoAmI && n.type == npc.type)
                         {
-                            if (j != npc.whoAmI && Main.npc[j].type == npc.type)
+                            if (Vector2.Distance(npc.Center, n.Center) < 150f)
                             {
-                                if (Vector2.Distance(npc.Center, Main.npc[j].Center) < 150f)
-                                {
-                                    if (npc.position.X < Main.npc[j].position.X)
-                                        npc.velocity.X = npc.velocity.X - freeEyeAccel;
-                                    else
-                                        npc.velocity.X = npc.velocity.X + freeEyeAccel;
-
-                                    if (npc.position.Y < Main.npc[j].position.Y)
-                                        npc.velocity.Y = npc.velocity.Y - freeEyeAccel;
-                                    else
-                                        npc.velocity.Y = npc.velocity.Y + freeEyeAccel;
-                                }
+                                if (npc.position.X < n.position.X)
+                                    npc.velocity.X = npc.velocity.X - freeEyeAccel;
+                                else
+                                    npc.velocity.X = npc.velocity.X + freeEyeAccel;
+                                
+                                if (npc.position.Y < n.position.Y)
+                                    npc.velocity.Y = npc.velocity.Y - freeEyeAccel;
+                                else
+                                    npc.velocity.Y = npc.velocity.Y + freeEyeAccel;
                             }
                         }
                     }
@@ -1905,13 +1889,11 @@ namespace CalamityMod.NPCs.VanillaNPCAIOverrides.Bosses
 
                                 npc.velocity = Vector2.UnitY * -7f;
 
-                                for (int i = 0; i < Main.maxProjectiles; i++)
+                                foreach (Projectile trueEyeSpheres in Main.ActiveProjectiles)
                                 {
-                                    Projectile trueEyeSpheres = Main.projectile[i];
-                                    if (trueEyeSpheres.active && trueEyeSpheres.type == type && trueEyeSpheres.ai[1] == npc.whoAmI && trueEyeSpheres.ai[0] != -1f)
+                                    if (trueEyeSpheres.type == type && trueEyeSpheres.ai[1] == npc.whoAmI && trueEyeSpheres.ai[0] != -1f)
                                     {
-                                        Projectile trueEyeSphereVel = trueEyeSpheres;
-                                        trueEyeSphereVel.velocity += npc.velocity;
+                                        trueEyeSpheres.velocity += npc.velocity;
                                         trueEyeSpheres.netUpdate = true;
                                     }
                                 }
@@ -1937,10 +1919,9 @@ namespace CalamityMod.NPCs.VanillaNPCAIOverrides.Bosses
                             Vector2 trueEyeSphereVelocity = (npc.ai[2] - MathHelper.PiOver2).ToRotationVector2() * velocity;
                             npc.velocity = trueEyeSphereVelocity * 2f;
 
-                            for (int i = 0; i < Main.maxProjectiles; i++)
+                            foreach (Projectile trueEyeSphereProj in Main.ActiveProjectiles)
                             {
-                                Projectile trueEyeSphereProj = Main.projectile[i];
-                                if (trueEyeSphereProj.active && trueEyeSphereProj.type == type && trueEyeSphereProj.ai[1] == npc.whoAmI && trueEyeSphereProj.ai[0] != -1f)
+                                if (trueEyeSphereProj.type == type && trueEyeSphereProj.ai[1] == npc.whoAmI && trueEyeSphereProj.ai[0] != -1f)
                                 {
                                     trueEyeSphereProj.ai[0] = -1f;
                                     trueEyeSphereProj.damage = damage;
@@ -2154,14 +2135,14 @@ namespace CalamityMod.NPCs.VanillaNPCAIOverrides.Bosses
                         int rightHandHeal = -1;
                         int headHeal = headNPCType;
 
-                        for (int i = 0; i < Main.maxNPCs; i++)
+                        foreach (NPC n in Main.ActiveNPCs)
                         {
-                            if (Main.npc[i].active && Main.npc[i].ai[3] == k)
+                            if (n.ai[3] == k)
                             {
-                                if (leftHandHeal == -1 && Main.npc[i].type == NPCID.MoonLordHand && Main.npc[i].ai[2] == 0f)
-                                    leftHandHeal = i;
-                                if (rightHandHeal == -1 && Main.npc[i].type == NPCID.MoonLordHand && Main.npc[i].ai[2] == 1f)
-                                    rightHandHeal = i;
+                                if (leftHandHeal == -1 && n.type == NPCID.MoonLordHand && n.ai[2] == 0f)
+                                    leftHandHeal = n.whoAmI;
+                                if (rightHandHeal == -1 && n.type == NPCID.MoonLordHand && n.ai[2] == 1f)
+                                    rightHandHeal = n.whoAmI;
                                 if (leftHandHeal != -1 && rightHandHeal != -1 && headHeal != -1)
                                     break;
                             }

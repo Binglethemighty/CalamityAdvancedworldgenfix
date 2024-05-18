@@ -43,13 +43,13 @@ namespace CalamityMod.Projectiles.Typeless
                 if (Main.netMode == NetmodeID.MultiplayerClient)
                 {
                     float closestPlayerDistance = (Main.LocalPlayer.Center - Projectile.Center).Length();
-                    for (int i = 0; i < Main.maxPlayers; i++)
+                    foreach (Player plr in Main.ActivePlayers)
                     {
-                        float newDistance = (Main.player[i].Center - Projectile.Center).Length();
+                        float newDistance = (plr.Center - Projectile.Center).Length();
                         if (newDistance < closestPlayerDistance)
                         {
                             closestPlayerDistance = newDistance;
-                            player = Main.player[i];
+                            player = plr;
                         }
                     }
                 }

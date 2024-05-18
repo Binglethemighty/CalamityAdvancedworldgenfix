@@ -250,10 +250,10 @@ namespace CalamityMod.CalPlayer
 
             if (hInferno)
             {
-                for (int x = 0; x < Main.maxNPCs; x++)
+                foreach (NPC n in Main.ActiveNPCs)
                 {
-                    if (Main.npc[x].active && Main.npc[x].type == ModContent.NPCType<Providence>())
-                        Main.npc[x].active = false;
+                    if (n.type == ModContent.NPCType<Providence>())
+                        n.active = false;
                 }
             }
 
@@ -489,6 +489,10 @@ namespace CalamityMod.CalPlayer
             // Leon Death Noise RE4
             if (Main.zenithWorld)
                 SoundEngine.PlaySound(LeonDeathNoiseRE4_ForGFB, Player.Center);
+
+            if (NorfleetCounter >= 3 && NorfleetCounter < 1000)
+                damageSource = PlayerDeathReason.ByCustomReason(CalamityUtils.GetText("Status.Death.Norfleet").Format(Player.name));
+            NorfleetCounter = 0;
 
             if (NPC.AnyNPCs(ModContent.NPCType<SupremeCalamitas>()))
             {
@@ -1469,15 +1473,13 @@ namespace CalamityMod.CalPlayer
             // This also strikes the NPCs as a side effect
             if (gSabatonFalling)
             {
-                for (int i = 0; i < Main.maxNPCs; i++)
+                foreach (NPC n in Main.ActiveNPCs)
                 {
-                    NPC n = Main.npc[i];
-
                     // Ignore critters with the Guide to Critter Companionship
                     if (Player.dontHurtCritters && NPCID.Sets.CountsAsCritter[n.type])
                         continue;
 
-                    if (n.active && !n.dontTakeDamage && !n.friendly && n.Calamity().dashImmunityTime[Player.whoAmI] <= 0)
+                    if (!n.dontTakeDamage && !n.friendly && n.Calamity().dashImmunityTime[Player.whoAmI] <= 0)
                     {
                         Rectangle npcHitbox = n.getRect();
                         if ((Player.getRect()).Intersects(npcHitbox) && (n.noTileCollide || Collision.CanHit(Player.position, Player.width, Player.height, n.position, n.width, n.height)))
@@ -1507,7 +1509,12 @@ namespace CalamityMod.CalPlayer
             // The dodges will only trigger if the player has taken greater than or equal to 5% of their max HP in damage
             double dodgeDamageGateValuePercent = 0.05;
             int dodgeDamageGateValue = (int)Math.Round(Player.statLifeMax2 * dodgeDamageGateValuePercent);
-            if (!Player.HasCooldown(GlobalDodge.ID) && info.Damage >= dodgeDamageGateValue)
+
+            // 14MAY2024: Ozzatron: Chalice of the Blood God now works with dodges
+            int actualDamageTaken = chaliceOfTheBloodGod ? chaliceHitOriginalDamage : info.Damage;
+            bool sufficientDamageForDodging = actualDamageTaken >= dodgeDamageGateValue;
+
+            if (!Player.HasCooldown(GlobalDodge.ID) && sufficientDamageForDodging)
             {
                 double maxCooldownDurationDamagePercent = 0.5;
                 int maxCooldownDurationDamageValue = (int)Math.Round(Player.statLifeMax2 * (maxCooldownDurationDamagePercent - dodgeDamageGateValuePercent));
@@ -1516,7 +1523,7 @@ namespace CalamityMod.CalPlayer
                 if (maxCooldownDurationDamageValue <= 0)
                     maxCooldownDurationDamageValue = 1;
 
-                float cooldownDurationScalar = MathHelper.Clamp((info.Damage - dodgeDamageGateValue) / (float)maxCooldownDurationDamageValue, 0f, 1f);
+                float cooldownDurationScalar = MathHelper.Clamp((actualDamageTaken - dodgeDamageGateValue) / (float)maxCooldownDurationDamageValue, 0f, 1f);
 
                 // Re-implementation of vanilla item Black Belt as a consumable dodge
                 if (Player.whoAmI == Main.myPlayer && Player.blackBelt)
@@ -1665,7 +1672,7 @@ namespace CalamityMod.CalPlayer
 
             if (blazingCoreParry > 0) //check for active parry
             {
-                if (blazingCoreParry >= 18) //only the first 12 frames (0.2 seconds) counts for a valid parry
+                if (blazingCoreParry >= 12) //only the first 18 frames (0.3 seconds) counts for a valid parry
                 {
                     if (!Player.HasCooldown(ParryCooldown.ID))
                     {
@@ -1689,7 +1696,7 @@ namespace CalamityMod.CalPlayer
             }
             else if (flameLickedShellParry > 0)
             {
-                if (flameLickedShellParry >= 18)
+                if (flameLickedShellParry >= 12)
                 {
                     if (!Player.HasCooldown(ParryCooldown.ID))
                     {
@@ -1967,22 +1974,14 @@ namespace CalamityMod.CalPlayer
             //
             // Chalice of the Blood God does nothing to a hit that was just fully blocked by shields.
             // Otherwise, it reduces the damage of any hit to 5, which allows for full iframes.
-            // It then applies the full hit (minus that 5 damage) to its own bleedout buffer.
+            // It then applies the full hit (minus that 5 damage) to its own bleedout buffer in OnHurt (see below).
             // Hits for less than 5 damage are ignored entirely and allowed to strike the player as normal.
             if (chaliceOfTheBloodGod && !shieldsFullyAbsorbedHit && info.Damage > ChaliceOfTheBloodGod.MinAllowedDamage)
             {
-                int bleedoutToApply = info.Damage - ChaliceOfTheBloodGod.MinAllowedDamage;
-                chaliceBleedoutBuffer += bleedoutToApply;
+                chaliceBleedoutToApplyOnHurt = info.Damage - ChaliceOfTheBloodGod.MinAllowedDamage;
+
                 chaliceHitOriginalDamage = info.Damage;
                 info.Damage = ChaliceOfTheBloodGod.MinAllowedDamage;
-
-                // Defense damage is applied here.
-                DealDefenseDamage(info, bleedoutToApply);
-
-                // Display text indicating that damage was transferred to bleedout.
-                string text = $"({-bleedoutToApply})";
-                Rectangle location = new Rectangle((int)Player.position.X + 4, (int)Player.position.Y - 3, Player.width - 4, Player.height - 4);
-                CombatText.NewText(location, ChaliceOfTheBloodGod.BleedoutBufferDamageTextColor, Language.GetTextValue(text), dot: true);
             }
         }
         #endregion
@@ -2004,7 +2003,7 @@ namespace CalamityMod.CalPlayer
             // This function will be ignored if the player is wearing Chalice, as it handles its defense damage elsewhere.
             bool hitCanApplyDefenseDamage = nextHitDealsDefenseDamage || bloodflareCore;
 
-            if (hitCanApplyDefenseDamage && !chaliceOfTheBloodGod && !hasIFrames && !Player.creativeGodMode)
+            if (hitCanApplyDefenseDamage && !hasIFrames && !Player.creativeGodMode)
             {
                 double halfDefense = Player.statDefense / 2.0;
                 int netMitigation = hurtInfo.SourceDamage - hurtInfo.Damage;
@@ -2035,11 +2034,35 @@ namespace CalamityMod.CalPlayer
                         Dust.CloneDust(d).velocity = dustVel.RotatedBy(MathHelper.Pi * 1.5f);
                     }
                 }
+
+                // Chalice of the Blood God has to compensate for the "mitigation" provided by its bleedout buffer
+                else if (chaliceOfTheBloodGod)
+                    DealDefenseDamage(hurtInfo, chaliceBleedoutToApplyOnHurt);
+
+                // Otherwise, just deal regular defense damage.
                 else
                     DealDefenseDamage(hurtInfo);
             }
 
             nextHitDealsDefenseDamage = false;
+            #endregion
+
+            #region Chalice of the Blood God Bleed Application
+            // This is handled in OnHurt so that Chalice hits can still be dodged based on their appropriate normal damage
+            // Defense damage based on the "total lethality of the hit" is applied immediately prior to this
+            // 
+            // 1 - Actually apply bleedout to the player based on the damage they would have taken
+            // 2 - Display an indicator of how much damage was dealt as bleedout instead of regular damage
+            if (chaliceOfTheBloodGod)
+            {
+                int bleedoutToApply = chaliceBleedoutToApplyOnHurt;
+                chaliceBleedoutBuffer += bleedoutToApply;
+
+                // Display text indicating that damage was transferred to bleedout.
+                string text = $"({-bleedoutToApply})";
+                Rectangle location = new Rectangle((int)Player.position.X + 4, (int)Player.position.Y - 3, Player.width - 4, Player.height - 4);
+                CombatText.NewText(location, ChaliceOfTheBloodGod.BleedoutBufferDamageTextColor, Language.GetTextValue(text), dot: true);
+            }
             #endregion
 
             #region Shattered Community Rage Gain
@@ -2265,10 +2288,9 @@ namespace CalamityMod.CalPlayer
                 if (fBarrier || (aquaticHeart && NPC.downedBoss3))
                 {
                     SoundEngine.PlaySound(SoundID.Item27, Player.Center);
-                    for (int m = 0; m < Main.maxNPCs; m++)
+                    foreach (NPC npc in Main.ActiveNPCs)
                     {
-                        NPC npc = Main.npc[m];
-                        if (!npc.active || npc.friendly || npc.dontTakeDamage)
+                        if (npc.friendly || npc.dontTakeDamage)
                             continue;
 
                         float npcDist = (npc.Center - Player.Center).Length();
@@ -2292,10 +2314,9 @@ namespace CalamityMod.CalPlayer
                 // and also doesn't have random chance (why does Brain of Confusion not guarantee confusion on hit)
                 if (aBrain || amalgam)
                 {
-                    for (int m = 0; m < Main.maxNPCs; m++)
+                    foreach (NPC npc in Main.ActiveNPCs)
                     {
-                        NPC npc = Main.npc[m];
-                        if (!npc.active || npc.friendly || npc.dontTakeDamage)
+                        if (npc.friendly || npc.dontTakeDamage)
                             continue;
 
                         float npcDist = (npc.Center - Player.Center).Length();
@@ -2330,11 +2351,11 @@ namespace CalamityMod.CalPlayer
 
             if (Player.ownedProjectileCounts[ModContent.ProjectileType<DrataliornusBow>()] != 0)
             {
-                for (int i = 0; i < Main.maxProjectiles; i++)
+                foreach(Projectile p in Main.ActiveProjectiles)
                 {
-                    if (Main.projectile[i].active && Main.projectile[i].type == ModContent.ProjectileType<DrataliornusBow>() && Main.projectile[i].owner == Player.whoAmI)
+                    if (p.type == ModContent.ProjectileType<DrataliornusBow>() && p.owner == Player.whoAmI)
                     {
-                        Main.projectile[i].Kill();
+                        p.Kill();
                         break;
                     }
                 }
@@ -2760,9 +2781,8 @@ namespace CalamityMod.CalPlayer
 
             // Under typical circumstances, defense damage scales with "net mitigation", aka how much damage the player DIDN'T take.
             // Thematically, this means it scales with how much damage the player's defense took instead of them.
-
-            CalamityPlayer modPlayer = Player.Calamity();
-
+            // Chalice of the Blood God makes you take much less direct damage than you should, which would catastrophically inflate defense damage.
+            //
             // Subtract the bleedout applied on this hit from the net mitigation.
             // This prevents Chalice from making the player take much more defense damage than intended.
             int netMitigation = hurtInfo.SourceDamage - (hurtInfo.Damage + bleedoutApplied);
@@ -2808,6 +2828,10 @@ namespace CalamityMod.CalPlayer
         // Actually applies defense damage. Cannot be called externally.
         private void ApplyDefenseDamageInternal(int defenseDamage, bool showVisuals = true)
         {
+            // If zero defense damage is being dealt, don't waste your time or display a grey 0.
+            if (defenseDamage <= 0)
+                return;
+            
             // Can be dynamically reduced by Adamantite set bonus and maybe other future effects.
             int defenseDamageTaken = defenseDamage;
 

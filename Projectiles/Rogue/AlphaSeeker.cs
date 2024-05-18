@@ -28,6 +28,7 @@ namespace CalamityMod.Projectiles.Rogue
             Projectile.penetrate = 1;
             Projectile.timeLeft = lifetime;
             Projectile.DamageType = RogueDamageClass.Instance;
+            Projectile.Calamity().CannotProc = true;
             Projectile.extraUpdates = 1;
         }
 
@@ -50,10 +51,9 @@ namespace CalamityMod.Projectiles.Rogue
 
                 Projectile parent = Main.projectile[0];
                 bool active = false;
-                for (int i = 0; i < Main.projectile.Length; i++)
+                foreach (Projectile p in Main.ActiveProjectiles)
                 {
-                    Projectile p = Main.projectile[i];
-                    if (p.identity == Projectile.ai[1] && p.active)
+                    if (p.identity == Projectile.ai[1])
                     {
                         parent = p;
                         active = true;
@@ -141,10 +141,9 @@ namespace CalamityMod.Projectiles.Rogue
         {
             int target = -1;
             float minDist = HomingStartRange;
-            for (int i = 0; i < Main.maxNPCs; ++i)
+            foreach (var npc in Main.ActiveNPCs)
             {
-                NPC npc = Main.npc[i];
-                if (!npc.active || npc.type == NPCID.TargetDummy)
+                if (npc.type == NPCID.TargetDummy)
                     continue;
 
                 if (npc.CanBeChasedBy(Projectile, false))
@@ -155,7 +154,7 @@ namespace CalamityMod.Projectiles.Rogue
                     if (distToNPC < minDist)
                     {
                         minDist = distToNPC;
-                        target = i;
+                        target = npc.whoAmI;
                     }
                 }
             }

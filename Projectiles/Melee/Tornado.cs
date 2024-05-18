@@ -82,9 +82,8 @@ namespace CalamityMod.Projectiles.Melee
             }
             float projX = Projectile.Center.X;
             float projY = Projectile.Center.Y;
-            for (int i = 0; i < Main.maxNPCs; i++)
+            foreach (NPC npc in Main.ActiveNPCs)
             {
-                NPC npc = Main.npc[i];
                 if (npc.CanBeChasedBy(Projectile, false) && Collision.CanHit(Projectile.Center, 1, 1, npc.Center, 1, 1) && !CalamityPlayer.areThereAnyDamnBosses)
                 {
                     float npcCenterX = npc.position.X + (float)(npc.width / 2);

@@ -32,10 +32,9 @@ namespace CalamityMod.Projectiles.Summon
             get
             {
                 int minionCount = 1;
-                for (int i = 0; i < Main.maxProjectiles; i++)
+                foreach (Projectile proj in Main.ActiveProjectiles)
                 {
-                    Projectile proj = Main.projectile[i];
-                    if (proj.active && proj.owner == Owner.whoAmI && proj.type == Type && proj.whoAmI != Projectile.whoAmI)
+                    if (proj.owner == Owner.whoAmI && proj.type == Type && proj.whoAmI != Projectile.whoAmI)
                     {
                         minionCount++;
                     }
@@ -315,14 +314,14 @@ namespace CalamityMod.Projectiles.Summon
 
                     if (Main.netMode == NetmodeID.MultiplayerClient && mouseDistanceToOwner > 120f)
                     {
-                        for (int i = 0; i < Main.maxPlayers; i++)
+                        foreach (Player p in Main.ActivePlayers)
                         {
-                            if (Main.player[i].active && !Main.player[i].dead && (Main.player[i].team == Owner.team || Main.player[i].team == 0))
+                            if (!p.dead && (p.team == Owner.team || p.team == 0))
                             {
-                                float mouseDistanceToPotentialTarget = (Main.player[i].MountedCenter - Owner.Calamity().mouseWorld).Length();
+                                float mouseDistanceToPotentialTarget = (p.MountedCenter - Owner.Calamity().mouseWorld).Length();
                                 if (mouseDistanceToPotentialTarget < 120f && mouseDistanceToOwner > mouseDistanceToPotentialTarget)
                                 {
-                                    playerToBuff = Main.player[i];
+                                    playerToBuff = p;
                                     mouseDistanceToOwner = mouseDistanceToPotentialTarget;
                                 }
                             }

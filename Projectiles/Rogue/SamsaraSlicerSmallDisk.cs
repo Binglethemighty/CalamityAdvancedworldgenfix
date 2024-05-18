@@ -47,10 +47,9 @@ namespace CalamityMod.Projectiles.Rogue
 
             Projectile parent = Main.projectile[0];
             bool active = false;
-            for (int i = 0; i < Main.maxProjectiles; i++)
+            foreach (Projectile p in Main.ActiveProjectiles)
             {
-                Projectile p = Main.projectile[i];
-                if (p.identity == Projectile.ai[0] && p.active && p.type == ModContent.ProjectileType<SamsaraSlicerProjectile>())
+                if (p.identity == Projectile.ai[0] && p.type == ModContent.ProjectileType<SamsaraSlicerProjectile>())
                 {
                     parent = p;
                     active = true;

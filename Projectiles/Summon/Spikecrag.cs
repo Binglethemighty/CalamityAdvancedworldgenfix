@@ -56,13 +56,13 @@ namespace CalamityMod.Projectiles.Summon
             float maxDistance = 1000f;
             bool homeIn = false;
 
-            for (int i = 0; i < Main.maxNPCs; i++)
+            foreach (NPC n in Main.ActiveNPCs)
             {
-                if (Main.npc[i].CanBeChasedBy(Projectile, false))
+                if (n.CanBeChasedBy(Projectile, false))
                 {
-                    float extraDistance = (float)(Main.npc[i].width / 2) + (Main.npc[i].height / 2);
+                    float extraDistance = (float)(n.width / 2) + (n.height / 2);
 
-                    if (Vector2.Distance(Main.npc[i].Center, Projectile.Center) < (maxDistance + extraDistance) && Collision.CanHit(Projectile.Center, Projectile.width, Projectile.height, Main.npc[i].Center, Main.npc[i].width, Main.npc[i].height))
+                    if (Vector2.Distance(n.Center, Projectile.Center) < (maxDistance + extraDistance) && Collision.CanHit(Projectile.Center, Projectile.width, Projectile.height, n.Center, n.width, n.height))
                     {
                         homeIn = true;
                         break;

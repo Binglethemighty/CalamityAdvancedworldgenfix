@@ -147,24 +147,21 @@ namespace CalamityMod.NPCs.OldDuke
             NPC.velocity.Y = (NPC.velocity.Y * inertia + targetYDist) / (inertia + 1f);
 
             float toothBallAccel = bossRush ? 0.65f : 0.5f;
-            for (int i = 0; i < Main.maxNPCs; i++)
+            foreach (var n in Main.ActiveNPCs)
             {
-                if (Main.npc[i].active)
+                if (n.whoAmI != NPC.whoAmI && n.type == NPC.type)
                 {
-                    if (i != NPC.whoAmI && Main.npc[i].type == NPC.type)
+                    if (Vector2.Distance(NPC.Center, n.Center) < 48f)
                     {
-                        if (Vector2.Distance(NPC.Center, Main.npc[i].Center) < 48f)
-                        {
-                            if (NPC.position.X < Main.npc[i].position.X)
-                                NPC.velocity.X -= toothBallAccel;
-                            else
-                                NPC.velocity.X += toothBallAccel;
+                        if (NPC.position.X < n.position.X)
+                            NPC.velocity.X -= toothBallAccel;
+                        else
+                            NPC.velocity.X += toothBallAccel;
 
-                            if (NPC.position.Y < Main.npc[i].position.Y)
-                                NPC.velocity.Y -= toothBallAccel;
-                            else
-                                NPC.velocity.Y += toothBallAccel;
-                        }
+                        if (NPC.position.Y < n.position.Y)
+                            NPC.velocity.Y -= toothBallAccel;
+                        else
+                            NPC.velocity.Y += toothBallAccel;
                     }
                 }
             }

@@ -132,9 +132,8 @@ namespace CalamityMod.Projectiles.Rogue
                     int whoAmI = -1;
                     Vector2 targetSpot = Projectile.Center;
                     float detectRange = 1000f;
-                    for (int i = 0; i < Main.maxNPCs; i++)
+                    foreach (NPC npc in Main.ActiveNPCs)
                     {
-                        NPC npc = Main.npc[i];
                         if (npc.CanBeChasedBy(Projectile, false))
                         {
                             float targetDist = Vector2.Distance(npc.Center, Projectile.Center);
@@ -142,7 +141,7 @@ namespace CalamityMod.Projectiles.Rogue
                             {
                                 detectRange = targetDist;
                                 targetSpot = npc.Center;
-                                whoAmI = i;
+                                whoAmI = npc.whoAmI;
                             }
                         }
                     }
@@ -304,10 +303,9 @@ namespace CalamityMod.Projectiles.Rogue
 
             int buffType = ModContent.BuffType<TimeDistortion>();
 
-            for (int i = 0; i < Main.maxNPCs; i++)
+            foreach (NPC npc in Main.ActiveNPCs)
             {
-                NPC npc = Main.npc[i];
-                if (npc.active && !npc.dontTakeDamage && !npc.buffImmune[buffType] && Vector2.Distance(Projectile.Center, npc.Center) <= radius)
+                if (!npc.dontTakeDamage && !npc.buffImmune[buffType] && Vector2.Distance(Projectile.Center, npc.Center) <= radius)
                 {
                     if (npc.FindBuffIndex(buffType) == -1)
                         npc.AddBuff(buffType, 60, false);

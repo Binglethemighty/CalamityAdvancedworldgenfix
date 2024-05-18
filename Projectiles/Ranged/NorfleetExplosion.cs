@@ -40,9 +40,13 @@ namespace CalamityMod.Projectiles.Ranged
                 Projectile.damage = 1;
         }
 
-        public override void OnKill(int timeLeft)
+        public override void AI()
         {
-            
+            if (Projectile.ai[2] == 1)
+            {
+                Projectile.friendly = false;
+                Projectile.hostile = true;
+            }
         }
 
         public override bool PreDraw(ref Color lightColor)

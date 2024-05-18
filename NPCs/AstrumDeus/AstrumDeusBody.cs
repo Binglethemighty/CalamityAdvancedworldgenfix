@@ -82,6 +82,7 @@ namespace CalamityMod.NPCs.AstrumDeus
 
         public override void SendExtraAI(BinaryWriter writer)
         {
+            writer.Write(NPC.localAI[3]);
             writer.Write(NPC.dontTakeDamage);
             for (int i = 0; i < 4; i++)
                 writer.Write(NPC.Calamity().newAI[i]);
@@ -89,6 +90,7 @@ namespace CalamityMod.NPCs.AstrumDeus
 
         public override void ReceiveExtraAI(BinaryReader reader)
         {
+            NPC.localAI[3] = reader.ReadSingle();
             NPC.dontTakeDamage = reader.ReadBoolean();
             for (int i = 0; i < 4; i++)
                 NPC.Calamity().newAI[i] = reader.ReadSingle();

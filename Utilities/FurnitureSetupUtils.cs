@@ -1396,8 +1396,8 @@ namespace CalamityMod
             Main.tileLavaDeath[mt.Type] = !lavaImmune;
             Main.tileWaterDeath[mt.Type] = false;
             TileID.Sets.CountsAsWaterSource[mt.Type] = water;
-            TileID.Sets.CountsAsHoneySource[mt.Type] = lava;
-            TileID.Sets.CountsAsLavaSource[mt.Type] = honey;
+            TileID.Sets.CountsAsLavaSource[mt.Type] = lava;
+            TileID.Sets.CountsAsHoneySource[mt.Type] = honey;
             TileObjectData.newTile.CopyFrom(TileObjectData.Style2x2);
             TileObjectData.newTile.LavaDeath = !lavaImmune;
             TileObjectData.newTile.LavaPlacement = lavaImmune ? LiquidPlacement.Allowed : LiquidPlacement.NotAllowed;

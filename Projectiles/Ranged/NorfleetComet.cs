@@ -39,15 +39,37 @@ namespace CalamityMod.Projectiles.Ranged
 
         public override void AI()
         {
+            Player player = Main.player[Projectile.owner];
             float rotationRando = Main.rand.NextFloat(-0.02f, 0.02f);
             Projectile.velocity = Projectile.velocity.RotatedBy(rotationRando);
             Projectile.rotation += 0.05f;
+            if (Projectile.ai[2] == 1)
+            {
+                Projectile.friendly = false;
+                if (time >= 75)
+                {
+                    Projectile.hostile = true;
+
+                    float distanceFromPlayer = Projectile.Distance(player.Center);
+
+                    // This is done instead of a Normalize or DirectionTo call because the variables needed are already present and calculating the square root again would be unnecessary.
+                    Vector2 idealVelocity = (player.Center - Projectile.Center) / distanceFromPlayer * 8f;
+
+                    Projectile.velocity.X += Math.Sign(idealVelocity.X - Projectile.velocity.X) * (0.0005f * time);
+                    Projectile.velocity.Y += Math.Sign(idealVelocity.Y - Projectile.velocity.Y) * (0.0005f * time);
+
+                    if (Projectile.Hitbox.Intersects(player.Hitbox))
+                        Projectile.Kill();
+
+                    Projectile.timeLeft = 5;
+                }
+            }
             if (time > 25)
             {
                 for (int i = 0; i < 2; i++)
                 {
                     Vector2 dustPos = Projectile.Center + (i * MathHelper.Pi + Projectile.rotation + MathHelper.PiOver2).ToRotationVector2() * 30f;
-                    Dust dust = Dust.NewDustPerfect(dustPos, Main.rand.NextBool(3) ? 272 : 86, (i * MathHelper.Pi + Projectile.rotation * Math.Sign(Projectile.velocity.X)).ToRotationVector2() * 3f);
+                    Dust dust = Dust.NewDustPerfect(dustPos, (Projectile.ai[2] == 1 ? 219 : Main.rand.NextBool(3) ? 272 : 86), (i * MathHelper.Pi + Projectile.rotation * Math.Sign(Projectile.velocity.X)).ToRotationVector2() * 3f);
                     dust.noGravity = true;
                     dust.scale = Main.rand.NextFloat(0.6f, 0.9f);
                 }
@@ -67,7 +89,7 @@ namespace CalamityMod.Projectiles.Ranged
 
         public override void OnKill(int timeLeft)
         {
-            Projectile.NewProjectileDirect(Projectile.GetSource_FromThis(), Projectile.Center, Vector2.Zero, ModContent.ProjectileType<NorfleetExplosion>(), Projectile.damage / 2, Projectile.knockBack, Projectile.owner, 0, Projectile.ai[1]);
+            Projectile.NewProjectileDirect(Projectile.GetSource_FromThis(), Projectile.Center, Vector2.Zero, ModContent.ProjectileType<NorfleetExplosion>(), Projectile.damage / 2, Projectile.knockBack, Projectile.owner, 0, Projectile.ai[1], Projectile.ai[2] == 1 ? 1 : 0);
 
             if (Projectile.ai[1] == 0)
             {

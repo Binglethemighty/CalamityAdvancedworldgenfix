@@ -56,10 +56,9 @@ namespace CalamityMod.NPCs.AcidRain
             NPC.velocity.X = xSpeed * NPC.ai[0];
             NPC.spriteDirection = (int)NPC.ai[0];
             bool flee = false;
-            for (int i = 0; i < Main.player.Length; i++)
+            foreach (Player player in Main.ActivePlayers)
             {
-                Player player = Main.player[i];
-                if (player.active && !player.dead && Vector2.Distance(player.Center, NPC.Center) <= 220f)
+                if (!player.dead && Vector2.Distance(player.Center, NPC.Center) <= 220f)
                 {
                     flee = true;
                     break;

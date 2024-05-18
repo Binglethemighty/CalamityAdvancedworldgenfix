@@ -171,11 +171,11 @@ namespace CalamityMod.Projectiles.Summon
                     int podID = ModContent.ProjectileType<AtlasMunitionsDropPod>();
                     int podUpperID = ModContent.ProjectileType<AtlasMunitionsDropPodUpper>();
                     int cannonID = ModContent.ProjectileType<AtlasMunitionsAutocannon>();
-                    for (int i = 0; i < Main.maxProjectiles; i++)
+                    foreach (Projectile p in Main.ActiveProjectiles)
                     {
-                        bool validID = Main.projectile[i].type == podID || Main.projectile[i].type == podUpperID || Main.projectile[i].type == cannonID;
-                        if (Main.projectile[i].active && validID && Main.projectile[i].owner == Projectile.owner)
-                            Main.projectile[i].Kill();
+                        bool validID = p.type == podID || p.type == podUpperID || p.type == cannonID;
+                        if (validID && p.owner == Projectile.owner)
+                            p.Kill();
                     }
 
                     Projectile.Kill();

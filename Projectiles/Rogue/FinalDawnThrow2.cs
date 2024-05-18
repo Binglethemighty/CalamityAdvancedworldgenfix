@@ -77,11 +77,9 @@ namespace CalamityMod.Projectiles.Rogue
             }
 
             // Kill any hooks from the projectile owner.
-            for (int i = 0; i < Main.projectile.Length; i++)
+            foreach (Projectile proj in Main.ActiveProjectiles)
             {
-                Projectile proj = Main.projectile[i];
-
-                if (!proj.active || proj.owner != player.whoAmI || proj.aiStyle != ProjAIStyleID.Hook)
+                if (proj.owner != player.whoAmI || proj.aiStyle != ProjAIStyleID.Hook)
                     continue;
 
                 if (proj.aiStyle == ProjAIStyleID.Hook)

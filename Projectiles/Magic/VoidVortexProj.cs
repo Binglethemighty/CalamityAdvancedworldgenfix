@@ -137,6 +137,7 @@ namespace CalamityMod.Projectiles.Magic
         }
         public override void OnKill(int timeLeft)
         {
+            Projectile.netUpdate = true;
             if (Projectile.ai[2] == 1)
             {
                 doDamage = true;

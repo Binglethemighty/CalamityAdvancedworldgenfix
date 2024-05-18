@@ -118,7 +118,6 @@ namespace CalamityMod.NPCs.Abyss
         public override void ModifyNPCLoot(NPCLoot npcLoot)
         {
             npcLoot.Add(ItemID.Flipper, 20);
-            npcLoot.Add(ItemDropRule.NormalvsExpert(ModContent.ItemType<DepthCrusher>(), 15, 10));
         }
 
         public override void HitEffect(NPC.HitInfo hit)

@@ -1,4 +1,5 @@
-﻿using CalamityMod.Dusts;
+﻿using System.Collections.Generic;
+using CalamityMod.Dusts;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Terraria;
@@ -9,10 +10,10 @@ using Terraria.ModLoader;
 namespace CalamityMod.Tiles.AstralDesert
 {
     [LegacyName("AstralFossil")]
-    public class CelestialRemains : ModTile
+    public class CelestialRemains : ModTile, IMergeableTile
     {
-        public byte[,] tileAdjacency;
-        public byte[,] secondTileAdjacency;
+        List<TileFraming.MergeFrameData> IMergeableTile.TileAdjacencies { get; } = [];
+        
         public override void SetStaticDefaults()
         {
             Main.tileSolid[Type] = true;
@@ -28,19 +29,8 @@ namespace CalamityMod.Tiles.AstralDesert
 
             TileID.Sets.ForAdvancedCollision.ForSandshark[Type] = true;
 
-            TileFraming.SetUpUniversalMerge(Type, ModContent.TileType<AstralSand>(), out tileAdjacency);
-            TileFraming.SetUpUniversalMerge(Type, ModContent.TileType<AstralSandstone>(), out secondTileAdjacency);
-        }
-        public override void PostDraw(int i, int j, SpriteBatch spriteBatch)
-        {
-            TileFraming.DrawUniversalMergeFrames(i, j, secondTileAdjacency, "CalamityMod/Tiles/Merges/AstralSandstoneMerge");
-            TileFraming.DrawUniversalMergeFrames(i, j, tileAdjacency, "CalamityMod/Tiles/Merges/AstralSandMerge");
-        }
-        public override bool TileFrame(int i, int j, ref bool resetFrame, ref bool noBreak)
-        {
-            TileFraming.GetAdjacencyData(i, j, ModContent.TileType<AstralSand>(), out tileAdjacency[i, j]);
-            TileFraming.GetAdjacencyData(i, j, ModContent.TileType<AstralSandstone>(), out secondTileAdjacency[i, j]);
-            return true;
+            this.RegisterUniversalMerge(ModContent.TileType<AstralSand>(), "CalamityMod/Tiles/Merges/AstralSandMerge");
+            this.RegisterUniversalMerge(ModContent.TileType<AstralSandstone>(), "CalamityMod/Tiles/Merges/AstralSandstoneMerge");
         }
 
         public override void NumDust(int i, int j, bool fail, ref int num)

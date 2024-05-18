@@ -199,11 +199,11 @@ namespace CalamityMod.NPCs.DevourerofGods
             else if (increaseSpeed)
                 velocityMult *= 2f;
 
-            for (int i = 0; i < Main.maxNPCs; i++)
+            foreach (NPC n in Main.ActiveNPCs)
             {
-                if (Main.npc[i].active && (Main.npc[i].type == NPC.type || Main.npc[i].type == ModContent.NPCType<DevourerofGodsHead>()) && i != NPC.whoAmI)
+                if ((n.type == NPC.type || n.type == ModContent.NPCType<DevourerofGodsHead>()) && n.whoAmI != NPC.whoAmI)
                 {
-                    Vector2 distFromHead = Main.npc[i].Center - NPC.Center;
+                    Vector2 distFromHead = n.Center - NPC.Center;
                     if (distFromHead.Length() < maxDistanceFromDoGHead)
                     {
                         distFromHead.Normalize();

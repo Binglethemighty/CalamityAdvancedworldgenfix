@@ -1,6 +1,4 @@
 ﻿using System;
-using System.Diagnostics.Metrics;
-using System.Security.Policy;
 using CalamityMod.Buffs.StatDebuffs;
 using Microsoft.Xna.Framework;
 using Terraria;
@@ -8,11 +6,11 @@ using Terraria.Audio;
 using Terraria.ID;
 using Terraria.ModLoader;
 
-namespace CalamityMod.Projectiles.Melee
+namespace CalamityMod.Projectiles.Magic
 {
     public class ChronoIcicleLarge : ModProjectile, ILocalizedModType
     {
-        public new string LocalizationCategory => "Projectiles.Melee";
+        public new string LocalizationCategory => "Projectiles.Magic";
         public static int HomingSpeed = 16;
         public static int IdleSpeedMax = 7;
         public override void SetDefaults()
@@ -23,7 +21,7 @@ namespace CalamityMod.Projectiles.Melee
             Projectile.coldDamage = true;
             Projectile.friendly = true;
             Projectile.penetrate = 1;
-            Projectile.DamageType = DamageClass.Melee;
+            Projectile.DamageType = DamageClass.Magic;
             Projectile.coldDamage = true;
             Projectile.tileCollide = false;
             Projectile.timeLeft = 180;

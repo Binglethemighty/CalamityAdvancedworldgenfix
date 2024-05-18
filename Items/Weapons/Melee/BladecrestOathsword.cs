@@ -35,12 +35,12 @@ namespace CalamityMod.Items.Weapons.Melee
         public override bool CanUseItem(Player player)
         {
             int bladeProjID = ModContent.ProjectileType<BladecrestOathswordProj>();
-            for (int i = 0; i < Main.maxProjectiles; i++)
+            foreach (Projectile p in Main.ActiveProjectiles)
             {
-                if (Main.projectile[i].type != bladeProjID || !Main.projectile[i].active || Main.projectile[i].owner != player.whoAmI)
+                if (p.type != bladeProjID || p.owner != player.whoAmI)
                     continue;
 
-                return Main.projectile[i].ModProjectile<BladecrestOathswordProj>().PostSwingRepositionDelay <= 0f;
+                return p.ModProjectile<BladecrestOathswordProj>().PostSwingRepositionDelay <= 0f;
             }
 
             return base.CanUseItem(player);

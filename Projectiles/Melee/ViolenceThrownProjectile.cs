@@ -215,7 +215,12 @@ namespace CalamityMod.Projectiles.Melee
                 drawPoints[i] -= (Projectile.oldRot[i] + MathHelper.PiOver4).ToRotationVector2() * Projectile.height * 0.5f;
 
             if (Time > Projectile.oldPos.Length)
-                PrimitiveRenderer.RenderTrail(drawPoints, new(PrimitiveWidthFunction, PrimitiveColorFunction, (_) => Projectile.Size * 0.5f, shader: GameShaders.Misc["CalamityMod:TrailStreak"]), 88);
+            {
+                // Violence trakcs 36 positions in oldPos.
+                // Provide all 36 points for smoothing, but only render 24.
+                int numPointsRendered = 24;
+                PrimitiveRenderer.RenderTrail(drawPoints, new(PrimitiveWidthFunction, PrimitiveColorFunction, (_) => Projectile.Size * 0.5f, shader: GameShaders.Misc["CalamityMod:TrailStreak"], smoothen: true), numPointsRendered);
+            }
 
             Vector2 drawPosition = Projectile.Center - Main.screenPosition;
             for (int i = 0; i < 6; i++)

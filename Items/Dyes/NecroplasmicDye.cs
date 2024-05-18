@@ -9,7 +9,7 @@ using Terraria.ModLoader;
 
 namespace CalamityMod.Items.Dyes
 {
-    [LegacyName("PhantoplasmDye")]
+    [LegacyName("PhantoplasmDye", "PolterplasmDye")]
     public class NecroplasmicDye : BaseDye
     {
         public override ArmorShaderData ShaderDataToBind => new ArmorShaderData(Mod.Assets.Request<Effect>("Effects/Dyes/NecroplasmicDyeShader"), "DyePass").

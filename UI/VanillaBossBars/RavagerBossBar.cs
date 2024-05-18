@@ -46,10 +46,9 @@ namespace CalamityMod.UI.VanillaBossBars
             }
 
             // Determine the current health of the parts
-            for (int i = 0; i < Main.maxNPCs; i++)
+            foreach (NPC part in Main.ActiveNPCs)
             {
-                NPC part = Main.npc[i];
-                if (part.active && RavagerParts.Contains(part.type))
+                if (RavagerParts.Contains(part.type))
                 {
                     life += part.life;
                 }
@@ -59,16 +58,8 @@ namespace CalamityMod.UI.VanillaBossBars
 
         public bool FindRavagerBody(ref BigProgressBarInfo info)
         {
-            for (int i = 0; i < Main.maxNPCs; i++)
-            {
-                NPC target = Main.npc[i];
-                if (target.active && target.type == NPCType<RavagerBody>())
-                {
-                    info.npcIndexToAimAt = i;
-                    return true;
-                }
-            }
-            return false;
+            info.npcIndexToAimAt = NPC.FindFirstNPC(ModContent.NPCType<RavagerBody>());
+            return info.npcIndexToAimAt != -1;
         }
     }
 }

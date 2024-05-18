@@ -122,13 +122,12 @@ namespace CalamityMod.Items.Weapons.Summon
             // If the player has any robots, kill them all.
             if (player.ownedProjectileCounts[Item.shoot] > 0)
             {
-                for (int i = 0; i < Main.projectile.Length; i++)
+                foreach (Projectile p in Main.ActiveProjectiles)
                 {
-                    if (Main.projectile[i].active &&
-                        Main.projectile[i].type == Item.shoot &&
-                        Main.projectile[i].owner == player.whoAmI)
+                    if (p.type == Item.shoot &&
+                        p.owner == player.whoAmI)
                     {
-                        Main.projectile[i].Kill();
+                        p.Kill();
                     }
                 }
                 if (CalamityPlayer.areThereAnyDamnBosses)
@@ -151,13 +150,12 @@ namespace CalamityMod.Items.Weapons.Summon
 
             int robotIndex = -1;
 
-            for (int i = 0; i < Main.projectile.Length; i++)
+            foreach (Projectile p in Main.ActiveProjectiles)
             {
-                if (Main.projectile[i].active &&
-                    Main.projectile[i].type == ModContent.ProjectileType<GiantIbanRobotOfDoom>() &&
-                    Main.projectile[i].owner == player.whoAmI)
+                if (p.type == ModContent.ProjectileType<GiantIbanRobotOfDoom>() &&
+                    p.owner == player.whoAmI)
                 {
-                    robotIndex = i;
+                    robotIndex = p.whoAmI;
                     break;
                 }
             }

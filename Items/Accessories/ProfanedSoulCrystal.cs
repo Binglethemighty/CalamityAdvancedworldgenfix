@@ -42,10 +42,9 @@ namespace CalamityMod.Items.Accessories
             get
             {
                 bool result = false;
-                for (int i = 0; i < Main.maxPlayers; i++)
+                foreach (Player player in Main.ActivePlayers)
                 {
-                    Player player = Main.player[i];
-                    if (player is null || !player.active || player.outOfRange || player.dead)
+                    if (player.outOfRange || player.dead)
                         continue;
 
                     CalamityPlayer modPlayer = player.Calamity();

@@ -83,13 +83,10 @@ namespace CalamityMod.World
             // Clients in multiplayer don't drop meteors.
             if (Main.netMode == NetmodeID.MultiplayerClient)
                 return;
-            for (int i = 0; i < 255; i++)
+            foreach (Player _ in Main.ActivePlayers)
             {
-                if (Main.player[i].active)
-                {
-                    meteorDropped = false;
-                    break;
-                }
+                meteorDropped = false;
+                break;
             }
 
             // Check whether there is already too much ore.
@@ -277,11 +274,11 @@ namespace CalamityMod.World
             }
             int avoidRectangleSize = 35;
             Rectangle rectangle = new Rectangle((i - avoidRectangleSize) * 16, (j - avoidRectangleSize) * 16, avoidRectangleSize * 2 * 16, avoidRectangleSize * 2 * 16);
-            for (int k = 0; k < Main.maxPlayers; k++)
+            foreach (Player player in Main.ActivePlayers)
             {
-                if (Main.player[k].active)
+                if (player.active)
                 {
-                    Rectangle value = new Rectangle((int)(Main.player[k].position.X + (float)(Main.player[k].width / 2) - (float)(NPC.sWidth / 2) - (float)NPC.safeRangeX), (int)(Main.player[k].position.Y + (float)(Main.player[k].height / 2) - (float)(NPC.sHeight / 2) - (float)NPC.safeRangeY), NPC.sWidth + NPC.safeRangeX * 2, NPC.sHeight + NPC.safeRangeY * 2);
+                    Rectangle value = new Rectangle((int)(player.position.X + (float)(player.width / 2) - (float)(NPC.sWidth / 2) - (float)NPC.safeRangeX), (int)(player.position.Y + (float)(player.height / 2) - (float)(NPC.sHeight / 2) - (float)NPC.safeRangeY), NPC.sWidth + NPC.safeRangeX * 2, NPC.sHeight + NPC.safeRangeY * 2);
                     if (rectangle.Intersects(value))
                     {
                         return false;

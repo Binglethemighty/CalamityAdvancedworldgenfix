@@ -60,15 +60,7 @@ namespace CalamityMod.NPCs.Signus
             {
                 return true;
             }
-            SignusIndex = -1;
-            for (int i = 0; i < Main.npc.Length; i++)
-            {
-                if (Main.npc[i].active && Main.npc[i].type == SignusType)
-                {
-                    SignusIndex = i;
-                    break;
-                }
-            }
+            SignusIndex = NPC.FindFirstNPC(SignusType);
             return SignusIndex != -1;
         }
 

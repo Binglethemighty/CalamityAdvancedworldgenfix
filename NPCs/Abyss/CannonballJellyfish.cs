@@ -272,8 +272,14 @@ namespace CalamityMod.NPCs.Abyss
             NPC.width = NPC.height;
             NPC.position -= NPC.Size * 0.5f; //hitbox expansion + adjustments
             SoundEngine.PlaySound(SoundID.Item14, NPC.Center); //bomb sound
-            foreach (Player player in Main.player.Where(player => player.active && !player.dead && NPC.Hitbox.Intersects(player.Hitbox)))
-                player.Hurt(PlayerDeathReason.ByNPC(NPC.whoAmI), NPC.damage * 3, NPC.direction); //Due to how slow the jelly is, this might catch you unaware, but then you'll never get hit by it again
+            foreach (Player player in Main.ActivePlayers)
+            {
+                if (player.dead || !NPC.Hitbox.Intersects(player.Hitbox))
+                    continue;
+
+                //Due to how slow the jelly is, this might catch you unaware, but then you'll never get hit by it again
+                player.Hurt(PlayerDeathReason.ByNPC(NPC.whoAmI), NPC.damage * 3, NPC.direction);
+            }
             for (int k = 0; k < 25; k++)
             {
                 int dust = Dust.NewDust(NPC.position, NPC.width, NPC.height, DustID.MoonBoulder, 0f, -1f, 0, default, 2f);

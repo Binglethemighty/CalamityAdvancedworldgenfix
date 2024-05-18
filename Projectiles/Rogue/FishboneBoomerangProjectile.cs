@@ -168,18 +168,18 @@ namespace CalamityMod.Projectiles.Rogue
                 float closestNPCDistance = 10000f;
                 float targettingDistance = 400f;
 
-                for (int i = 0; i < Main.maxNPCs; i++)
+                foreach (NPC n in Main.ActiveNPCs)
                 {
-                    if (i == target.whoAmI)
+                    if (n.whoAmI == target.whoAmI)
                         continue;
 
-                    if (Main.npc[i].CanBeChasedBy(Projectile))
+                    if (n.CanBeChasedBy(Projectile))
                     {
-                        float potentialNewDistance = (Projectile.Center - Main.npc[i].Center).Length();
+                        float potentialNewDistance = (Projectile.Center - n.Center).Length();
                         if (potentialNewDistance < targettingDistance && potentialNewDistance < closestNPCDistance)
                         {
                             closestNPCDistance = potentialNewDistance;
-                            newTarget = Main.npc[i];
+                            newTarget = n;
                         }
                     }
                 }

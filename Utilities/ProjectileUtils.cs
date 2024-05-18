@@ -22,29 +22,15 @@ namespace CalamityMod
         {
             // Efficiently loop through all projectiles, using a specially designed continue continue that attempts to minimize the amount of OR
             // checks per iteration.
-            for (int i = 0; i < Main.maxProjectiles; i++)
+            foreach (Projectile p in Main.ActiveProjectiles)
             {
-                Projectile p = Main.projectile[i];
-                if (p.type != projectileID || !p.active)
+                if (p.type != projectileID)
                     continue;
 
                 return true;
             }
 
             return false;
-        }
-
-        public static IEnumerable<Projectile> AllProjectilesByID(int projectileID)
-        {
-            // This uses the same efficient loop idea as AnyProjectiles.
-            for (int i = 0; i < Main.maxProjectiles; i++)
-            {
-                Projectile p = Main.projectile[i];
-                if (p.type != projectileID || !p.active)
-                    continue;
-
-                yield return p;
-            }
         }
 
         public static int CountProjectiles(int projectileID) => Main.projectile.Count(proj => proj.type == projectileID && proj.active);
@@ -71,12 +57,12 @@ namespace CalamityMod
             if (Main.netMode == NetmodeID.SinglePlayer)
                 return Main.projectile[identity];
 
-            for (int i = 0; i < Main.maxProjectiles; i++)
+            foreach (Projectile p in Main.ActiveProjectiles)
             {
-                if (Main.projectile[i].identity != identity || Main.projectile[i].owner != ownerIndex || !Main.projectile[i].active)
+                if (p.identity != identity || p.owner != ownerIndex)
                     continue;
 
-                return Main.projectile[i];
+                return p;
             }
             return null;
         }
@@ -109,17 +95,17 @@ namespace CalamityMod
             // Find the closest target.
             float npcDistCompare = 25000f; // Initializing the value to a large number so the first entry is basically guaranteed to replace it.
             int index = -1;
-            for (int i = 0; i < Main.maxNPCs; i++)
+            foreach (NPC n in Main.ActiveNPCs)
             {
-                float extraDistance = (Main.npc[i].width / 2) + (Main.npc[i].height / 2);
-                if (!Main.npc[i].CanBeChasedBy(projectile, false) || !projectile.WithinRange(Main.npc[i].Center, maxDistance + extraDistance))
+                float extraDistance = (n.width / 2) + (n.height / 2);
+                if (!n.CanBeChasedBy(projectile, false) || !projectile.WithinRange(n.Center, maxDistance + extraDistance))
                     continue;
 
-                float currentNPCDist = Vector2.Distance(Main.npc[i].Center, projectile.Center);
-                if ((currentNPCDist < npcDistCompare) && (ignoreTiles || Collision.CanHit(projectile.Center, 1, 1, Main.npc[i].Center, 1, 1)))
+                float currentNPCDist = Vector2.Distance(n.Center, projectile.Center);
+                if ((currentNPCDist < npcDistCompare) && (ignoreTiles || Collision.CanHit(projectile.Center, 1, 1, n.Center, 1, 1)))
                 {
                     npcDistCompare = currentNPCDist;
-                    index = i;
+                    index = n.whoAmI;
                 }
             }
             // If the index was never changed, don't do anything. Otherwise, tell the projectile where to home.
@@ -276,9 +262,8 @@ namespace CalamityMod
             int[] array = new int[Main.maxNPCs];
             int targetArrayA = 0;
             int targetArrayB = 0;
-            for (int i = 0; i < Main.maxNPCs; i++)
+            foreach (NPC npc in Main.ActiveNPCs)
             {
-                NPC npc = Main.npc[i];
                 if (npc.CanBeChasedBy(projectile, false))
                 {
                     float enemyDist = Vector2.Distance(projectile.Center, npc.Center);
@@ -286,12 +271,12 @@ namespace CalamityMod
                     {
                         if (Collision.CanHit(projectile.position, 1, 1, npc.position, npc.width, npc.height) && enemyDist > 50f)
                         {
-                            array[targetArrayB] = i;
+                            array[targetArrayB] = npc.whoAmI;
                             targetArrayB++;
                         }
                         else if (targetArrayB == 0)
                         {
-                            array[targetArrayA] = i;
+                            array[targetArrayA] = npc.whoAmI;
                             targetArrayA++;
                         }
                     }
@@ -322,21 +307,21 @@ namespace CalamityMod
                 int[] targetArray = new int[maxTargets];
                 int targetArrayIndex = 0;
 
-                for (int i = 0; i < Main.maxNPCs; i++)
+                foreach (NPC n in Main.ActiveNPCs)
                 {
-                    if (Main.npc[i].CanBeChasedBy(projectile, false))
+                    if (n.CanBeChasedBy(projectile, false))
                     {
-                        float extraDistance = (Main.npc[i].width / 2) + (Main.npc[i].height / 2);
+                        float extraDistance = (n.width / 2) + (n.height / 2);
 
                         bool canHit = true;
                         if (extraDistance < maxDistance)
-                            canHit = Collision.CanHit(projectile.Center, 1, 1, Main.npc[i].Center, 1, 1);
+                            canHit = Collision.CanHit(projectile.Center, 1, 1, n.Center, 1, 1);
 
-                        if (projectile.WithinRange(Main.npc[i].Center, maxDistance + extraDistance) && canHit)
+                        if (projectile.WithinRange(n.Center, maxDistance + extraDistance) && canHit)
                         {
                             if (targetArrayIndex < maxTargets)
                             {
-                                targetArray[targetArrayIndex] = i;
+                                targetArray[targetArrayIndex] = n.whoAmI;
                                 targetArrayIndex++;
                                 homeIn = true;
                             }
@@ -575,13 +560,12 @@ namespace CalamityMod
             int existingTurrets = player.ownedProjectileCounts[Type];
             if (existingTurrets > 0)
             {
-                for (int i = 0; i < Main.maxProjectiles; i++)
+                foreach (Projectile p in Main.ActiveProjectiles)
                 {
-                    if (Main.projectile[i].type == Type &&
-                        Main.projectile[i].owner == player.whoAmI &&
-                        Main.projectile[i].active)
+                    if (p.type == Type &&
+                        p.owner == player.whoAmI)
                     {
-                        Main.projectile[i].Kill();
+                        p.Kill();
                         existingTurrets--;
                         if (existingTurrets <= 0)
                             break;

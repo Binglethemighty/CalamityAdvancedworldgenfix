@@ -1,12 +1,13 @@
-﻿using CalamityMod.Items.Weapons.Magic;
+﻿using System.IO;
+using CalamityMod.Items.Weapons.Magic;
 using CalamityMod.Particles;
 using CalamityMod.Projectiles.BaseProjectiles;
 using Microsoft.Xna.Framework;
-using ReLogic.Utilities;
 using Terraria;
 using Terraria.Audio;
 using Terraria.ID;
 using Terraria.ModLoader;
+using static CalamityMod.Items.Weapons.Magic.Genesis;
 
 namespace CalamityMod.Projectiles.Magic
 {
@@ -19,78 +20,68 @@ namespace CalamityMod.Projectiles.Magic
         public override float BaseOffsetY => -5f;
         public override float OffsetYDownwards => 5f;
 
-        public Color StaticEffectsColor = Color.MediumSlateBlue;
+        public ref float ShootingTimer => ref Projectile.ai[0];
+        public ref float MaxFirerateShots => ref Projectile.ai[1];
+        public bool FireYBeam
+        {
+            get => Projectile.ai[2] == 1f;
+            set => Projectile.ai[2] = value == true ? 1f : 0f;
+        }
 
-        public float FiringTime = 15;
-        public float Windup = 60;
-        public bool WindingUp = false;
-        public int time = 0;
-        public bool fireYBeam = false;
-        public int maxFirerateShots = 0;
-
-        private ref float ShootingTimer => ref Projectile.ai[0];
+        public float Windup { get; set; } = StarterWindup;
+        public Color EffectsColor { get; set; } = Color.MediumSlateBlue;
 
         public override void KillHoldoutLogic()
         {
-            if (HeldItem.type != Owner.ActiveItem().type || Owner is null || !Owner.active || Owner.CCed || Owner.dead || Owner.noItems)
-            {
+            if (HeldItem.type != Owner.ActiveItem().type || Owner.CantUseHoldout())
                 Projectile.Kill();
-                Projectile.netUpdate = true;
-            }
         }
 
         public override void HoldoutAI()
         {
-            Item heldItem = Owner.ActiveItem();
-            // Fire if the owner stops channeling or otherwise cannot use the weapon.
-            if (Owner.CantUseHoldout())
+            if (ShootingTimer >= FireRate)
             {
-                Projectile.Kill();
-            }
-            else if (ShootingTimer >= FiringTime)
-            {
-                if (Owner.CheckMana(Owner.ActiveItem(), -1, true, false))
+                if (Owner.CheckMana(HeldItem, -1, true, false))
                 {
-                    maxFirerateShots++;
+                    MaxFirerateShots++;
 
-                    if (maxFirerateShots == 6)
+                    if (MaxFirerateShots == 6f)
                     {
-                        fireYBeam = true;
-                        Windup = 60;
+                        FireYBeam = true;
+                        Windup = 60f;
                     }
 
-                    if (fireYBeam)
-                    { 
-                        Shoot(heldItem, true);
-                        maxFirerateShots = 0;
+                    if (FireYBeam)
+                    {
+                        Shoot(true);
+                        MaxFirerateShots = 0f;
                     }
                     else
-                        Shoot(heldItem, false);
+                        Shoot(false);
 
-                    ShootingTimer = 0;
-                    
-                    if (Windup > 10)
+                    ShootingTimer = 0f;
+
+                    if (Windup > 10f)
                     {
-                        if (!fireYBeam)
-                            Windup -= 12;
+                        if (!FireYBeam)
+                            Windup -= 12f;
                     }
                     else
-                    {
-                        Windup = 10;
-                    }
+                        Windup = 10f;
 
-                    fireYBeam = false;
+                    FireYBeam = false;
                 }
                 else
                 {
                     SoundEngine.PlaySound(SoundID.MaxMana with { Pitch = -0.5f }, Projectile.Center);
                     Projectile.Kill();
                 }
-
             }
+
             ShootingTimer++;
         }
-        private void Shoot(Item item, bool yBeam)
+
+        public void Shoot(bool yBeam)
         {
             Vector2 shootDirection = Projectile.velocity.SafeNormalize(Vector2.Zero);
 
@@ -105,13 +96,14 @@ namespace CalamityMod.Projectiles.Magic
                 SoundStyle fire = new("CalamityMod/Sounds/Item/LanceofDestinyStrong");
                 SoundEngine.PlaySound(fire with { Volume = 0.35f, Pitch = 1f, PitchVariance = 0.15f }, Projectile.Center);
 
-                Projectile.NewProjectileDirect(Projectile.GetSource_FromThis(), GunTipPosition, firingVelocity3, ModContent.ProjectileType<GenesisBeam>(), Projectile.damage * 9, Projectile.knockBack, Projectile.owner, 0, 0);
+                if (Main.myPlayer == Projectile.owner)
+                    Projectile.NewProjectileDirect(Projectile.GetSource_FromThis(), GunTipPosition, firingVelocity3, ModContent.ProjectileType<GenesisBeam>(), Projectile.damage * 9, Projectile.knockBack, Projectile.owner, 0, 0);
 
-                Particle pulse3 = new GlowSparkParticle(GunTipPosition, shootDirection * 18, false, 6, 0.057f, StaticEffectsColor, new Vector2(1.7f, 0.8f), true);
+                Particle pulse3 = new GlowSparkParticle(GunTipPosition, shootDirection * 18, false, 6, 0.057f, EffectsColor, new Vector2(1.7f, 0.8f), true);
                 GeneralParticleHandler.SpawnParticle(pulse3);
                 for (int i = 0; i < 8; i++)
                 {
-                    SparkParticle spark2 = new SparkParticle(GunTipPosition + Main.rand.NextVector2Circular(10, 10), firingVelocity3 * Main.rand.NextFloat(0.7f, 1.3f), false, Main.rand.Next(20, 30), Main.rand.NextFloat(0.4f, 0.55f), StaticEffectsColor);
+                    SparkParticle spark2 = new SparkParticle(GunTipPosition + Main.rand.NextVector2Circular(10, 10), firingVelocity3 * Main.rand.NextFloat(0.7f, 1.3f), false, Main.rand.Next(20, 30), Main.rand.NextFloat(0.4f, 0.55f), EffectsColor);
                     GeneralParticleHandler.SpawnParticle(spark2);
                 }
             }
@@ -123,15 +115,19 @@ namespace CalamityMod.Projectiles.Magic
                 for (int i = 0; i < 4; i++)
                 {
                     firingVelocity3 = (shootDirection * 10).RotatedBy((0.05f * (i + 1)) * Utils.GetLerpValue(0, 55, Windup, true));
-                    Projectile.NewProjectileDirect(Projectile.GetSource_FromThis(), GunTipPosition, firingVelocity3 * (1 - i * 0.1f), ModContent.ProjectileType<WingmanShot>(), Projectile.damage, Projectile.knockBack, Projectile.owner, 0, 1);
+
+                    if (Main.myPlayer == Projectile.owner)
+                        Projectile.NewProjectileDirect(Projectile.GetSource_FromThis(), GunTipPosition, firingVelocity3 * (1 - i * 0.1f), ModContent.ProjectileType<WingmanShot>(), Projectile.damage, Projectile.knockBack, Projectile.owner, 0, 1);
                 }
                 for (int i = 0; i < 4; i++)
                 {
                     firingVelocity3 = (shootDirection * 10).RotatedBy((-0.05f * (i + 1)) * Utils.GetLerpValue(0, 55, Windup, true));
-                    Projectile.NewProjectileDirect(Projectile.GetSource_FromThis(), GunTipPosition, firingVelocity3 * (1 - i * 0.1f), ModContent.ProjectileType<WingmanShot>(), Projectile.damage, Projectile.knockBack, Projectile.owner, 0, 1);
+
+                    if (Main.myPlayer == Projectile.owner)
+                        Projectile.NewProjectileDirect(Projectile.GetSource_FromThis(), GunTipPosition, firingVelocity3 * (1 - i * 0.1f), ModContent.ProjectileType<WingmanShot>(), Projectile.damage, Projectile.knockBack, Projectile.owner, 0, 1);
                 }
 
-                Particle pulse3 = new GlowSparkParticle(GunTipPosition, shootDirection * 18, false, 6, 0.057f, StaticEffectsColor, new Vector2(1.7f, 0.8f), true);
+                Particle pulse3 = new GlowSparkParticle(GunTipPosition, shootDirection * 18, false, 6, 0.057f, EffectsColor, new Vector2(1.7f, 0.8f), true);
                 GeneralParticleHandler.SpawnParticle(pulse3);
             }
 
@@ -147,7 +143,7 @@ namespace CalamityMod.Projectiles.Magic
                 Dust dust2 = Dust.NewDustPerfect(GunTipPosition, Main.rand.NextBool(4) ? 267 : 66, shootVel);
                 dust2.scale = Main.rand.NextFloat(1.15f, 1.45f);
                 dust2.noGravity = true;
-                dust2.color = Main.rand.NextBool() ? Color.Lerp(StaticEffectsColor, Color.White, 0.5f) : StaticEffectsColor;
+                dust2.color = Main.rand.NextBool() ? Color.Lerp(EffectsColor, Color.White, 0.5f) : EffectsColor;
             }
 
             // By decreasing the offset length of the gun from the arms, we give an effect of recoil.
@@ -156,5 +152,9 @@ namespace CalamityMod.Projectiles.Magic
             else
                 OffsetLengthFromArm -= 5f;
         }
+
+        public override void SendExtraAIHoldout(BinaryWriter writer) => writer.Write(Windup);
+
+        public override void ReceiveExtraAIHoldout(BinaryReader reader) => Windup = reader.ReadSingle();
     }
 }

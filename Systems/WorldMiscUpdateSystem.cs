@@ -104,12 +104,12 @@ namespace CalamityMod.Systems
 
             // Attempt to summon lab critters manually since they refuse to exist when using vanilla's spawn methods.
             // This needs to check all players since the method only runs server-side.
-            for (int i = 0; i < Main.maxPlayers; i++)
+            foreach (Player p in Main.ActivePlayers)
             {
-                if (!Main.player[i].active || Main.player[i].dead)
+                if (p.dead)
                     continue;
 
-                CalamityGlobalNPC.AttemptToSpawnLabCritters(Main.player[i]);
+                CalamityGlobalNPC.AttemptToSpawnLabCritters(p);
             }
 
             // Make the cultist countdown happen much more quickly.

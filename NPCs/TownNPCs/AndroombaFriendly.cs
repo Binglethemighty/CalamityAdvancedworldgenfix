@@ -113,12 +113,8 @@ namespace CalamityMod.NPCs.TownNPCs
                     break;
             }
 
-            for (int i = 0; i < Main.maxPlayers; i++)
+            foreach (Player player in Main.ActivePlayers)
             {
-                Player player = Main.player[i];
-                if (player is null || !player.active)
-                    continue;
-
                 if (NPC.Hitbox.Intersects(player.HitboxForBestiaryNearbyCheck))
                 {
                     Main.BestiaryTracker.Chats.RegisterChatStartWith(NPC);
@@ -147,13 +143,13 @@ namespace CalamityMod.NPCs.TownNPCs
                         type = ConvertType.Crimson;
                         break;
                 }
-                AstralBiome.ConvertFromAstral(x - 2, x + 2, y - 2, y + 2, type);
+                World.AstralBiome.ConvertFromAstral(x - 2, x + 2, y - 2, y + 2, type);
                 WorldGen.Convert(x, y, conversionType, 2);
             }
             // Calamity solution(s)
             else if (conversionType == 8)
             {
-                AstralBiome.ConvertToAstral(x - 2, x + 2, y - 2, y + 2);
+                World.AstralBiome.ConvertToAstral(x - 2, x + 2, y - 2, y + 2);
             }
             // Solutions registered by other mods
             else

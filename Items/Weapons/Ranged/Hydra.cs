@@ -68,11 +68,11 @@ namespace CalamityMod.Items.Weapons.Ranged
             }
             else if (player.ActiveItem().type != Item.type || player.dead || !player.active)
             {
-                for (int i = 0; i < Main.maxProjectiles; i++)
+                foreach (Projectile p in Main.ActiveProjectiles)
                 {
                     //Destroy all heads
-                    if (Main.projectile[i].type == HeadID && Main.projectile[i].owner == player.whoAmI && Main.projectile[i].active)
-                        Main.projectile[i].Kill();
+                    if (p.type == HeadID && p.owner == player.whoAmI)
+                        p.Kill();
                 }
                 HeadSpawnTimer = 0;
             }
@@ -111,11 +111,11 @@ namespace CalamityMod.Items.Weapons.Ranged
                 Projectile.NewProjectile(source, newPos, spreadVelocity * spreadDirection, Item.shoot, damage, knockback, player.whoAmI);
             }
 
-            for (int i = 0; i < Main.maxProjectiles; i++)
+            foreach (Projectile p in Main.ActiveProjectiles)
             {
                 //Force all heads to shoot
-                if (Main.projectile[i].type == HeadID && Main.projectile[i].owner == player.whoAmI && Main.projectile[i].active)
-                    Main.projectile[i].ai[1] = 1f;
+                if (p.type == HeadID && p.owner == player.whoAmI)
+                    p.ai[1] = 1f;
             }
             return false;
         }

@@ -51,10 +51,9 @@ namespace CalamityMod.UI.VanillaBossBars
                 shieldMax = (int)(FalseNPCSegment.lifeMax * ExpectedBallsCounter * (1 - RatioToCombust));
                 shield -= (int)(FalseNPCSegment.lifeMax * ExpectedBallsCounter * RatioToCombust);
 
-                for (int i = 0; i < Main.maxNPCs; i++)
+                foreach (NPC part in Main.ActiveNPCs)
                 {
-                    NPC part = Main.npc[i];
-                    if (part.active && part.type == NPCType<DarkEnergy>())
+                    if (part.type == NPCType<DarkEnergy>())
                         shield += part.life;
                 }
             }

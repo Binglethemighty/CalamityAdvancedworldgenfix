@@ -24,19 +24,16 @@ namespace CalamityMod.Projectiles.Ranged
         public static float BulletSpeed = 12f;
         public SlotId NovaChargeSlot;
 
-        private ref float CurrentChargingFrames => ref Projectile.ai[0];
-        private ref float ShotsLoaded => ref Projectile.ai[1];
-        private ref float ShootRecoilTimer => ref Projectile.ai[2]; // Dual functions for rapid fire shooting cooldown and recoil
-        private bool ChargeLV1 => CurrentChargingFrames >= ArcNovaDiffuser.Charge1Frames;
-        private bool ChargeLV2 => CurrentChargingFrames >= ArcNovaDiffuser.Charge2Frames;
+        public ref float CurrentChargingFrames => ref Projectile.ai[0];
+        public ref float ShotsLoaded => ref Projectile.ai[1];
+        public ref float ShootRecoilTimer => ref Projectile.ai[2]; // Dual functions for rapid fire shooting cooldown and recoil
+        public bool ChargeLV1 => CurrentChargingFrames >= ArcNovaDiffuser.Charge1Frames;
+        public bool ChargeLV2 => CurrentChargingFrames >= ArcNovaDiffuser.Charge2Frames;
 
         public override void KillHoldoutLogic()
         {
-            if (HeldItem.type != Owner.ActiveItem().type || Owner is null || !Owner.active || Owner.CCed || Owner.dead || Owner.noItems)
-            {
+            if (Owner.CantUseHoldout(false) || HeldItem.type != Owner.ActiveItem().type)
                 Projectile.Kill();
-                Projectile.netUpdate = true;
-            }
         }
 
         public override void HoldoutAI()
@@ -74,8 +71,6 @@ namespace CalamityMod.Projectiles.Ranged
                         ShotsLoaded = 0;
                         ShootRecoilTimer = 24f;
                         OffsetLengthFromArm -= 25f;
-                        Projectile.netSpam = 0;
-                        Projectile.netUpdate = true;
                     }
                     // Retracting recoil
                     else if (ShootRecoilTimer > 0)
@@ -107,8 +102,6 @@ namespace CalamityMod.Projectiles.Ranged
                         ShotsLoaded--;
                         ShootRecoilTimer = 16f;
                         OffsetLengthFromArm -= 5f;
-                        Projectile.netSpam = 0;
-                        Projectile.netUpdate = true;
                     }
                 }
                 // Retracting any remaining recoil

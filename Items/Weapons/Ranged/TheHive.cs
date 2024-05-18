@@ -14,6 +14,7 @@ namespace CalamityMod.Items.Weapons.Ranged
     {
         public new string LocalizationCategory => "Items.Weapons.Ranged";
 
+        public static float MaxCharge = 90f;
         public static int OriginalUseTime = 34;
 
         public override void SetDefaults()

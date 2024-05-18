@@ -60,15 +60,7 @@ namespace CalamityMod.NPCs.Yharon
             {
                 return true;
             }
-            YIndex = -1;
-            for (int i = 0; i < Main.npc.Length; i++)
-            {
-                if (Main.npc[i].active && Main.npc[i].type == YType)
-                {
-                    YIndex = i;
-                    break;
-                }
-            }
+            YIndex = NPC.FindFirstNPC(YType);
             //this.DoGIndex = DoGIndex;
             return YIndex != -1;
         }

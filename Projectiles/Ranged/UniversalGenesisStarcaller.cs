@@ -87,9 +87,8 @@ namespace CalamityMod.Projectiles.Ranged
             bool bossFound = false;
             int life = 0;
             Vector2 targetVec = Projectile.Center;
-            for (int i = 0; i < Main.maxNPCs; i++)
+            foreach (NPC npc in Main.ActiveNPCs)
             {
-                NPC npc = Main.npc[i];
                 if (bossFound && !npc.IsABoss())
                     continue;
                 if (npc.CanBeChasedBy(Projectile, false))

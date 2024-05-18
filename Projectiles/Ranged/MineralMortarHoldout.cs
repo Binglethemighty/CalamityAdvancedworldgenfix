@@ -31,7 +31,7 @@ namespace CalamityMod.Projectiles.Ranged
             {
                 Owner.PickAmmo(Owner.ActiveItem(), out _, out float speed, out int damage, out float knockback, out int usedItemAmmoId);
 
-                Projectile.NewProjectileDirect(Projectile.GetSource_FromThis(), GunTipPosition, Projectile.velocity.SafeNormalize(Vector2.UnitX) * speed, ModContent.ProjectileType<MineralMortarProjectile>(), damage, knockback, Projectile.owner, usedItemAmmoId);
+                Projectile.NewProjectileDirect(Projectile.GetSource_FromThis(), GunTipPosition, Projectile.velocity.SafeNormalize(Vector2.UnitX) * speed * 1.5f, ModContent.ProjectileType<MineralMortarProjectile>(), damage, knockback, Projectile.owner, usedItemAmmoId);
 
                 // Doesn't sync this to the server, it's just effects.
                 if (!Main.dedServ)

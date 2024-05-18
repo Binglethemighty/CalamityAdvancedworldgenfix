@@ -134,9 +134,9 @@ namespace CalamityMod.Projectiles.Magic
         {
             float damageFactor = MathHelper.Lerp(1f, ArtAttack.MaxDamageBoostFactor, Utils.GetLerpValue(0f, ArtAttack.MaxDamageBoostTime, Time, true));
             int damage = (int)(Projectile.damage * damageFactor);
-            for (int i = 0; i < Main.maxNPCs; i++)
+            foreach (var n in Main.ActiveNPCs)
             {
-                if (!Main.npc[i].CanBeChasedBy())
+                if (!n.CanBeChasedBy())
                     continue;
 
                 bool enemyIsInShape = false;
@@ -159,9 +159,9 @@ namespace CalamityMod.Projectiles.Magic
                 Rectangle shapeRectangle = Utils.CenteredRectangle(center, area);
                 for (int j = 0; j < cleanOldPositions.Count; j++)
                 {
-                    Vector2 left = Main.npc[i].Center - Vector2.UnitX * 2000f;
-                    Vector2 right = Main.npc[i].Center + Vector2.UnitX * 2000f;
-                    bool inRangeOfStars = shapeRectangle.Intersects(Main.npc[i].Hitbox);
+                    Vector2 left = n.Center - Vector2.UnitX * 2000f;
+                    Vector2 right = n.Center + Vector2.UnitX * 2000f;
+                    bool inRangeOfStars = shapeRectangle.Intersects(n.Hitbox);
                     bool lineCheck = Collision.CheckLinevLine(left, right, cleanOldPositions[j], cleanOldPositions[(j + 1) % cleanOldPositions.Count]).Length > 0;
                     if (lineCheck && inRangeOfStars)
                     {
@@ -173,12 +173,12 @@ namespace CalamityMod.Projectiles.Magic
                 // Strike an enemy if it's in the shape.
                 if (enemyIsInShape)
                 {
-                    SoundEngine.PlaySound(SoundID.DD2_LightningBugZap, Main.npc[i].Center);
-                    CreateDustExplosionEffect(Main.npc[i].Center);
+                    SoundEngine.PlaySound(SoundID.DD2_LightningBugZap, n.Center);
+                    CreateDustExplosionEffect(n.Center);
 
                     if (Main.myPlayer == Projectile.owner)
                     {
-                        Projectile.NewProjectile(Projectile.GetSource_FromThis(), Main.npc[i].Center, Vector2.Zero, ModContent.ProjectileType<ArtAttackStrike>(), damage, 0f, Projectile.owner, i);
+                        Projectile.NewProjectile(Projectile.GetSource_FromThis(), n.Center, Vector2.Zero, ModContent.ProjectileType<ArtAttackStrike>(), damage, 0f, Projectile.owner, n.whoAmI);
                     }
                 }
             }

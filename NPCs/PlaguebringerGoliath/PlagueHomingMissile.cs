@@ -149,10 +149,9 @@ namespace CalamityMod.NPCs.PlaguebringerGoliath
             }
 
             float distanceBeforeExploding = 42f;
-            for (int i = 0; i < Main.maxPlayers; i++)
+            foreach (Player player in Main.ActivePlayers)
             {
-                Player player = Main.player[i];
-                if (player.active && !player.dead && Vector2.Distance(player.Center, NPC.Center) <= distanceBeforeExploding)
+                if (!player.dead && Vector2.Distance(player.Center, NPC.Center) <= distanceBeforeExploding)
                 {
                     CheckDead();
                     NPC.life = 0;

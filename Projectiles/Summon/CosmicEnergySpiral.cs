@@ -76,9 +76,8 @@ namespace CalamityMod.Projectiles.Summon
             }
             else
             {
-                for (int i = 0; i < Main.maxNPCs; i++)
+                foreach (NPC nPC2 in Main.ActiveNPCs)
                 {
-                    NPC nPC2 = Main.npc[i];
                     if (nPC2.CanBeChasedBy(Projectile, false))
                     {
                         float maxTargetDist = Vector2.Distance(nPC2.Center, Projectile.Center);
@@ -87,7 +86,7 @@ namespace CalamityMod.Projectiles.Summon
                             targetDist = maxTargetDist;
                             projPos = nPC2.Center;
                             canAttack = true;
-                            target = i;
+                            target = nPC2.whoAmI;
                         }
                     }
                 }
@@ -180,12 +179,12 @@ namespace CalamityMod.Projectiles.Summon
                 float projY = Projectile.position.Y;
                 float homeDistance = 1200f;
                 bool isInRange = false;
-                for (int j = 0; j < Main.maxNPCs; j++)
+                foreach (NPC n in Main.ActiveNPCs)
                 {
-                    if (Main.npc[j].CanBeChasedBy(Projectile, false))
+                    if (n.CanBeChasedBy(Projectile, false))
                     {
-                        float npcX = Main.npc[j].position.X + (float)(Main.npc[j].width / 2);
-                        float npcY = Main.npc[j].position.Y + (float)(Main.npc[j].height / 2);
+                        float npcX = n.position.X + (float)(n.width / 2);
+                        float npcY = n.position.Y + (float)(n.height / 2);
                         float npcDistance = Math.Abs(Projectile.position.X + (float)(Projectile.width / 2) - npcX) + Math.Abs(Projectile.position.Y + (float)(Projectile.height / 2) - npcY);
                         if (npcDistance < homeDistance)
                         {

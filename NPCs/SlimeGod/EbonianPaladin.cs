@@ -102,22 +102,25 @@ namespace CalamityMod.NPCs.SlimeGod
 
             Player player = Main.player[NPC.target];
 
-            if (NPC.ai[0] != 4f && (player.dead || !player.active))
+            if (NPC.ai[0] != 4f)
             {
-                NPC.TargetClosest();
-                player = Main.player[NPC.target];
                 if (player.dead || !player.active)
                 {
-                    NPC.ai[0] = 4f;
-                    NPC.ai[1] = 0f;
-                    NPC.ai[2] = 0f;
-                    NPC.ai[3] = 0f;
-                    calamityGlobalNPC.newAI[0] = 0f;
-                    NPC.netUpdate = true;
+                    NPC.TargetClosest();
+                    player = Main.player[NPC.target];
+                    if (player.dead || !player.active)
+                    {
+                        NPC.ai[0] = 4f;
+                        NPC.ai[1] = 0f;
+                        NPC.ai[2] = 0f;
+                        NPC.ai[3] = 0f;
+                        calamityGlobalNPC.newAI[0] = 0f;
+                        NPC.netUpdate = true;
+                    }
                 }
+                else if (NPC.timeLeft < 1800)
+                    NPC.timeLeft = 1800;
             }
-            else if (NPC.timeLeft < 1800)
-                NPC.timeLeft = 1800;
 
             if (lifeRatio <= 0.5f && Main.netMode != NetmodeID.MultiplayerClient && expertMode)
             {
@@ -506,10 +509,10 @@ namespace CalamityMod.NPCs.SlimeGod
                             if (enraged && expertMode)
                             {
                                 List<int> targets = new List<int>();
-                                for (int p = 0; p < Main.maxPlayers; p++)
+                                foreach (Player plr in Main.ActivePlayers)
                                 {
-                                    if (Main.player[p].active && !Main.player[p].dead)
-                                        targets.Add(p);
+                                    if (!plr.dead)
+                                        targets.Add(plr.whoAmI);
 
                                     if (targets.Count > 1)
                                         break;
@@ -606,6 +609,8 @@ namespace CalamityMod.NPCs.SlimeGod
                     NPC.netUpdate = true;
                 }
             }
+
+            // Despawn
             else if (NPC.ai[0] == 4f)
             {
                 // Avoid cheap bullshit
@@ -622,6 +627,7 @@ namespace CalamityMod.NPCs.SlimeGod
 
                 NPC.velocity.X *= 0.98f;
             }
+
             else if (NPC.ai[0] == 5f)
             {
                 // Set damage
@@ -781,7 +787,7 @@ namespace CalamityMod.NPCs.SlimeGod
             return newColor * NPC.Opacity;
         }
 
-        public override bool CheckActive() => false;
+        public override bool CheckActive() => NPC.ai[0] == 4f;
 
         public override void HitEffect(NPC.HitInfo hit)
         {

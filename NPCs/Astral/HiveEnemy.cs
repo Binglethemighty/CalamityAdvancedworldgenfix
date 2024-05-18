@@ -7,6 +7,7 @@ using CalamityMod.Items.Placeables.Banners;
 using CalamityMod.Items.Weapons.Summon;
 using CalamityMod.Sounds;
 using CalamityMod.World;
+using CalamityMod.BiomeManagers.BestiaryCategories;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using ReLogic.Content;
@@ -50,7 +51,7 @@ namespace CalamityMod.NPCs.Astral
             }
             NPC.Calamity().VulnerableToHeat = true;
             NPC.Calamity().VulnerableToSickness = false;
-            SpawnModBiomes = new int[1] { ModContent.GetInstance<UndergroundAstralBiome>().Type };
+            SpawnModBiomes = new int[1] { ModContent.GetInstance<AstralUnderground>().Type };
             if (Main.zenithWorld)
             {
                 NPC.scale = 3f;
@@ -126,6 +127,8 @@ namespace CalamityMod.NPCs.Astral
             if (NPC.life <= 0)
             {
                 int type = ModContent.NPCType<Hiveling>();
+
+                // TODO: Should this use `Main.ActiveNPCs` iterator?
                 for (int i = 0; i < Main.maxNPCs; i++)
                 {
                     if (Main.npc[i].type == type)

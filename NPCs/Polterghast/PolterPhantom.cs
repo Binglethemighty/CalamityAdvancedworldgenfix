@@ -207,12 +207,12 @@ namespace CalamityMod.NPCs.Polterghast
                 float movementLimitX = 0f;
                 float movementLimitY = 0f;
                 int numHooks = 4;
-                for (int i = 0; i < Main.maxNPCs; i++)
+                foreach (var n in Main.ActiveNPCs)
                 {
-                    if (Main.npc[i].active && Main.npc[i].type == ModContent.NPCType<PolterghastHook>())
+                    if (n.type == ModContent.NPCType<PolterghastHook>())
                     {
-                        movementLimitX += Main.npc[i].Center.X;
-                        movementLimitY += Main.npc[i].Center.Y;
+                        movementLimitX += n.Center.X;
+                        movementLimitY += n.Center.Y;
                     }
                 }
                 movementLimitX /= numHooks;

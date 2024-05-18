@@ -37,11 +37,11 @@ namespace CalamityMod.Items.Weapons.Summon
         public override bool Shoot(Player player, EntitySource_ItemUse_WithAmmo source, Vector2 position, Vector2 velocity, int type, int damage, float knockback)
         {
             float totalMinionSlots = 0f;
-            for (int i = 0; i < Main.maxProjectiles; i++)
+            foreach (Projectile pro in Main.ActiveProjectiles)
             {
-                if (Main.projectile[i].active && Main.projectile[i].minion && Main.projectile[i].owner == player.whoAmI)
+                if (pro.minion && pro.owner == player.whoAmI)
                 {
-                    totalMinionSlots += Main.projectile[i].minionSlots;
+                    totalMinionSlots += pro.minionSlots;
                 }
             }
             if (player.altFunctionUse != 2 && totalMinionSlots < player.maxMinions)
@@ -51,16 +51,16 @@ namespace CalamityMod.Items.Weapons.Summon
                 if (Main.projectile.IndexInRange(p))
                     Main.projectile[p].originalDamage = Item.damage;
                 int swordCount = 0;
-                for (int i = 0; i < Main.maxProjectiles; i++)
+                foreach (Projectile pro in Main.ActiveProjectiles)
                 {
-                    if (Main.projectile[i].active && Main.projectile[i].type == type && Main.projectile[i].owner == player.whoAmI)
+                    if (pro.type == type && pro.owner == player.whoAmI)
                     {
-                        if ((Main.projectile[i].ModProjectile as IgneousBlade).Firing)
+                        if ((pro.ModProjectile as IgneousBlade).Firing)
                             continue;
                         swordCount++;
                         for (int j = 0; j < 22; j++)
                         {
-                            Dust dust = Dust.NewDustDirect(Main.projectile[i].position, Main.projectile[i].width, Main.projectile[i].height, DustID.Torch);
+                            Dust dust = Dust.NewDustDirect(pro.position, pro.width, pro.height, DustID.Torch);
                             dust.velocity = Vector2.UnitY * Main.rand.NextFloat(3f, 5.5f) * Main.rand.NextBool().ToDirectionInt();
                             dust.noGravity = true;
                         }
@@ -68,17 +68,17 @@ namespace CalamityMod.Items.Weapons.Summon
                 }
                 float angleVariance = MathHelper.TwoPi / swordCount;
                 float angle = 0f;
-                for (int i = 0; i < Main.maxProjectiles; i++)
+                foreach (Projectile pro in Main.ActiveProjectiles)
                 {
-                    if (Main.projectile[i].active && Main.projectile[i].type == type && Main.projectile[i].owner == player.whoAmI && Main.projectile[i].localAI[1] == 0f)
+                    if (pro.type == type && pro.owner == player.whoAmI && pro.localAI[1] == 0f)
                     {
-                        if ((Main.projectile[i].ModProjectile as IgneousBlade).Firing)
+                        if ((pro.ModProjectile as IgneousBlade).Firing)
                             continue;
-                        Main.projectile[i].ai[0] = angle;
+                        pro.ai[0] = angle;
                         angle += angleVariance;
                         for (int j = 0; j < 22; j++)
                         {
-                            Dust dust = Dust.NewDustDirect(Main.projectile[i].position, Main.projectile[i].width, Main.projectile[i].height, DustID.Torch);
+                            Dust dust = Dust.NewDustDirect(pro.position, pro.width, pro.height, DustID.Torch);
                             dust.velocity = Vector2.UnitY * Main.rand.NextFloat(3f, 5.5f) * Main.rand.NextBool().ToDirectionInt();
                             dust.noGravity = true;
                         }

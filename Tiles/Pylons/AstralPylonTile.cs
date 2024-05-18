@@ -18,8 +18,7 @@ namespace CalamityMod.Tiles.Pylons
 
         public override NPCShop.Entry GetNPCShopEntry()
         {
-            Condition biomeCondition = new Condition(CalamityUtils.GetText("Condition.InAstral"), () => Main.LocalPlayer.Calamity().ZoneAstral);
-            return new NPCShop.Entry(AssociatedItem, Condition.AnotherTownNPCNearby, biomeCondition);
+            return new NPCShop.Entry(AssociatedItem, Condition.AnotherTownNPCNearby, CalamityConditions.InAstral);
         }
 
 

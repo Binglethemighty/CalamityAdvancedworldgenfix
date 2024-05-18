@@ -65,9 +65,8 @@ namespace CalamityMod.Projectiles.Summon
             }
             if (!homeIn)
             {
-                for (int i = 0; i < Main.maxNPCs; i++)
+                foreach (NPC npc in Main.ActiveNPCs)
                 {
-                    NPC npc = Main.npc[i];
                     if ((npc.CanBeChasedBy(Projectile, false) || (npc.type == NPCID.DukeFishron && (!npc.dontTakeDamage || npc.ai[0] > 9f))) && npc.active)
                     {
                         float extraDistance = (npc.width / 2) + (npc.height / 2);

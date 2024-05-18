@@ -1,4 +1,5 @@
-﻿using CalamityMod.Tiles.Ores;
+﻿using System.Collections.Generic;
+using CalamityMod.Tiles.Ores;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Terraria;
@@ -7,11 +8,13 @@ using Terraria.ModLoader;
 
 namespace CalamityMod.Tiles.Crags
 {
-    public class BrimstoneSlag : ModTile
+    public class BrimstoneSlag : ModTile, IMergeableTile
     {
         private const short subsheetWidth = 450;
         private const short subsheetHeight = 198;
-        public byte[,] TileAdjacency;
+        
+        List<TileFraming.MergeFrameData> IMergeableTile.TileAdjacencies { get; } = [];
+        
         public override void SetStaticDefaults()
         {
             Main.tileSolid[Type] = true;
@@ -25,7 +28,7 @@ namespace CalamityMod.Tiles.Crags
             MineResist = 2f;
             MinPick = 100;
             AddMapEntry(new Color(53, 33, 56));
-            TileFraming.SetUpUniversalMerge(Type, TileID.Ash, out TileAdjacency);
+            this.RegisterUniversalMerge(TileID.Ash, "CalamityMod/Tiles/Merges/AshMerge");
         }
 
         public override bool CreateDust(int i, int j, ref int type)
@@ -45,14 +48,8 @@ namespace CalamityMod.Tiles.Crags
             frameXOffset = i % 2 * subsheetWidth;
             frameYOffset = j % 2 * subsheetHeight;
         }
-
-        public override void PostDraw(int i, int j, SpriteBatch spriteBatch)
-        {
-            TileFraming.DrawUniversalMergeFrames(i, j, TileAdjacency, "CalamityMod/Tiles/Merges/AshMerge");
-        }
         public override bool TileFrame(int i, int j, ref bool resetFrame, ref bool noBreak)
         {
-            TileFraming.GetAdjacencyData(i, j, TileID.Ash, out TileAdjacency[i, j]);
             return TileFraming.BrimstoneFraming(i, j, resetFrame);
         }
 

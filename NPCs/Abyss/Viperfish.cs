@@ -3,6 +3,7 @@ using CalamityMod.BiomeManagers;
 using CalamityMod.Buffs.DamageOverTime;
 using CalamityMod.Items.Materials;
 using CalamityMod.Items.Placeables.Banners;
+using CalamityMod.Items.Weapons.Melee;
 using CalamityMod.NPCs.CalamityAIs.CalamityRegularEnemyAIs;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
@@ -10,6 +11,7 @@ using ReLogic.Content;
 using Terraria;
 using Terraria.GameContent;
 using Terraria.GameContent.Bestiary;
+using Terraria.GameContent.ItemDropRules;
 using Terraria.ID;
 using Terraria.ModLoader;
 using Terraria.ModLoader.Utilities;
@@ -158,6 +160,7 @@ namespace CalamityMod.NPCs.Abyss
             var postLevi = npcLoot.DefineConditionalDropSet(DropHelper.PostLevi());
             postLevi.Add(DropHelper.NormalVsExpertQuantity(ModContent.ItemType<DepthCells>(), 2, 1, 2, 2, 3));
             postLevi.Add(ModContent.ItemType<Lumenyl>(), 4);
+            npcLoot.Add(ItemDropRule.NormalvsExpert(ModContent.ItemType<DepthCrusher>(), 10, 6));
         }
 
         public override void HitEffect(NPC.HitInfo hit)

@@ -113,13 +113,13 @@ namespace CalamityMod.Items.Weapons.Summon
             // If the player owns a panel, make it fade away.
             if (player.ownedProjectileCounts[panelID] >= 1)
             {
-                for (int i = 0; i < Main.maxProjectiles; i++)
+                foreach (Projectile p in Main.ActiveProjectiles)
                 {
-                    if (Main.projectile[i].type != panelID || Main.projectile[i].owner != player.whoAmI || !Main.projectile[i].active)
+                    if (p.type != panelID || p.owner != player.whoAmI)
                         continue;
 
-                    Main.projectile[i].ai[0] = 1f;
-                    Main.projectile[i].netUpdate = true;
+                    p.ai[0] = 1f;
+                    p.netUpdate = true;
                 }
             }
 

@@ -160,22 +160,22 @@ namespace CalamityMod.Projectiles.Summon.SmallAresArms
             // Dynamically update panel icons.
             for (int i = 0; i < 4; i++)
                 PanelIcons[i].CurrentState = IconType.Inactive;
-            for (int i = 0; i < Main.maxProjectiles; i++)
+            foreach (Projectile p in Main.ActiveProjectiles)
             {
-                if (!arms.Contains(Main.projectile[i].type) || Main.projectile[i].owner != Projectile.owner || !Main.projectile[i].active)
+                if (!arms.Contains(p.type) || p.owner != Projectile.owner)
                     continue;
 
                 IconType stateFromID = IconType.Inactive;
-                if (Main.projectile[i].type == plasmaCannonID)
+                if (p.type == plasmaCannonID)
                     stateFromID = IconType.Plasma;
-                if (Main.projectile[i].type == teslaCannonID)
+                if (p.type == teslaCannonID)
                     stateFromID = IconType.Tesla;
-                if (Main.projectile[i].type == laserCannonID)
+                if (p.type == laserCannonID)
                     stateFromID = IconType.Laser;
-                if (Main.projectile[i].type == gaussNukeID)
+                if (p.type == gaussNukeID)
                     stateFromID = IconType.Gauss;
 
-                PanelIcons[(int)Main.projectile[i].ai[0]].CurrentState = stateFromID;
+                PanelIcons[(int)p.ai[0]].CurrentState = stateFromID;
             }
 
             // Handle fade effects.
@@ -195,9 +195,9 @@ namespace CalamityMod.Projectiles.Summon.SmallAresArms
             if (ArmIDToSpawn >= 0)
             {
                 bool armAlreadyExists = false;
-                for (int i = 0; i < Main.maxProjectiles; i++)
+                foreach (Projectile p in Main.ActiveProjectiles)
                 {
-                    if (!arms.Contains(Main.projectile[i].type) || Main.projectile[i].owner != Projectile.owner || !Main.projectile[i].active || Main.projectile[i].ai[0] != ArmIndex)
+                    if (!arms.Contains(p.type) || p.owner != Projectile.owner || p.ai[0] != ArmIndex)
                         continue;
 
                     armAlreadyExists = true;
@@ -215,12 +215,12 @@ namespace CalamityMod.Projectiles.Summon.SmallAresArms
             if (ShouldDeleteArmIndex)
             {
                 SoundEngine.PlaySound(SoundID.Item74, Projectile.Center);
-                for (int i = 0; i < Main.maxProjectiles; i++)
+                foreach (Projectile p in Main.ActiveProjectiles)
                 {
-                    if (!arms.Contains(Main.projectile[i].type) || Main.projectile[i].owner != Projectile.owner || !Main.projectile[i].active || Main.projectile[i].ai[0] != ArmIndex)
+                    if (!arms.Contains(p.type) || p.owner != Projectile.owner || p.ai[0] != ArmIndex)
                         continue;
-
-                    Main.projectile[i].Kill();
+                    
+                    p.Kill();
                 }
             }
 

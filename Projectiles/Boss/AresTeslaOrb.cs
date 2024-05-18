@@ -155,15 +155,15 @@ namespace CalamityMod.Projectiles.Boss
             bool expertMode = Main.expertMode || bossRush;
 
             float detachDistance = bossRush ? 1600f : death ? 1360f : revenge ? 1280f : expertMode ? 1200f : 960f;
-            for (int i = 0; i < Main.maxProjectiles; i++)
+            foreach (Projectile p in Main.ActiveProjectiles)
             {
-                if (Main.projectile[i].type != Projectile.type || Main.projectile[i].ai[0] != Identity + 1f || !Main.projectile[i].active || Main.npc[CalamityGlobalNPC.draedonExoMechPrime].Calamity().newAI[0] == (float)AresBody.Phase.Deathrays)
+                if (p.type != Projectile.type || p.ai[0] != Identity + 1f || Main.npc[CalamityGlobalNPC.draedonExoMechPrime].Calamity().newAI[0] == (float)AresBody.Phase.Deathrays)
                     continue;
 
-                if (Vector2.Distance(Projectile.Center, Main.projectile[i].Center) > detachDistance)
+                if (Vector2.Distance(Projectile.Center, p.Center) > detachDistance)
                     continue;
 
-                return Main.projectile[i];
+                return p;
             }
 
             return null;

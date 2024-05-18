@@ -87,10 +87,9 @@ namespace CalamityMod.Projectiles.Rogue
                 Vector2 homingTarget = Projectile.Center;
                 bool foundTarget = false;
                 Vector2 targetVelocity = new Vector2(0f);
-                for (int i = 0; i < Main.maxNPCs; i++)
+                foreach (NPC potentialTarget in Main.ActiveNPCs)
                 {
-                    NPC potentialTarget = Main.npc[i];
-                    if (potentialTarget.CanBeChasedBy(Projectile, false) && Projectile.WithinRange(Main.npc[i].Center, homingRange))
+                    if (potentialTarget.CanBeChasedBy(Projectile, false) && Projectile.WithinRange(potentialTarget.Center, homingRange))
                     {
                         if (!foundTarget)
                         {

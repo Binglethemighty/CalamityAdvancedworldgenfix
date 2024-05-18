@@ -236,10 +236,9 @@ namespace CalamityMod.Projectiles.Melee.Yoyos
                 return;
             Player owner = Main.player[Projectile.owner];
 
-            for (int i = 0; i < Main.maxNPCs; ++i)
+            foreach (NPC target in Main.ActiveNPCs)
             {
-                NPC target = Main.npc[i];
-                if (!target.active || target.dontTakeDamage || target.friendly)
+                if (target.dontTakeDamage || target.friendly)
                     continue;
 
                 // Shock any valid target within range. Check all four corners of their hitbox.
@@ -256,7 +255,7 @@ namespace CalamityMod.Projectiles.Melee.Yoyos
                     int finalDamage = (int)owner.GetTotalDamage<MeleeDamageClass>().ApplyTo(baseDamage);
                     if (Projectile.owner == Main.myPlayer)
                     {
-                        Projectile p = Projectile.NewProjectileDirect(Projectile.GetSource_FromThis(), target.Center, Vector2.Zero, ModContent.ProjectileType<DirectStrike>(), finalDamage, 0f, Projectile.owner, i);
+                        Projectile p = Projectile.NewProjectileDirect(Projectile.GetSource_FromThis(), target.Center, Vector2.Zero, ModContent.ProjectileType<DirectStrike>(), finalDamage, 0f, Projectile.owner, target.whoAmI);
                         if (p.whoAmI.WithinBounds(Main.maxProjectiles))
                             p.DamageType = DamageClass.MeleeNoSpeed;
                     }

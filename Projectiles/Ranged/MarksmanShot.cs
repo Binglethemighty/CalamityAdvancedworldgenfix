@@ -45,6 +45,8 @@ namespace CalamityMod.Projectiles.Ranged
             Projectile.DamageType = DamageClass.Ranged;
             Projectile.friendly = true;
             Projectile.penetrate = -1;
+            Projectile.usesLocalNPCImmunity = true;
+            Projectile.localNPCHitCooldown = -1;
             Projectile.timeLeft = Lifetime;
             Projectile.MaxUpdates = UpdateCount;
             Projectile.alpha = 255;

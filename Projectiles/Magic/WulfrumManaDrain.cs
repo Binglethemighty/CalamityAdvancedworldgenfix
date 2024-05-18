@@ -94,11 +94,9 @@ namespace CalamityMod.Projectiles.Magic
         {
             float collisionPoint = 0f;
 
-            for (int i = 0; i < Main.maxNPCs; i++)
+            foreach (NPC struckNPC in Main.ActiveNPCs)
             {
-                NPC struckNPC = Main.npc[i];
-
-                if (!struckNPC.active || struckNPC.townNPC || struckNPC.friendly)
+                if (struckNPC.townNPC || struckNPC.friendly)
                     continue;
 
                 float distance = struckNPC.Distance(Projectile.Center);

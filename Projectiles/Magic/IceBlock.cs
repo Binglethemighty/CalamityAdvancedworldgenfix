@@ -35,9 +35,8 @@ namespace CalamityMod.Projectiles.Magic
             {
                 Projectile.alpha = 20;
             }
-            for (int i = 0; i < Main.maxProjectiles; i++)
+            foreach (Projectile proj in Main.ActiveProjectiles)
             {
-                Projectile proj = Main.projectile[i];
                 if (proj.type == ModContent.ProjectileType<IceBarrageMain>() && proj.owner == Main.myPlayer)
                 {
                     Vector2 pos1 = new Vector2(proj.Center.X, proj.Center.Y - (proj.height * 0.5f) - 44f);

@@ -17,7 +17,7 @@ namespace CalamityMod.Projectiles.Melee
 
         private const int TimeToFall = TimeLeft / 2;
 
-        private const int TotalSplits = 4;
+        private const int TotalSplits = 3;
 
         private const int SplitTime = TimeLeft / TotalSplits;
 

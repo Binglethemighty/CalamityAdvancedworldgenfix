@@ -212,16 +212,15 @@ namespace CalamityMod
 
             int r = wormHead.whoAmI;
             float minDist = 1E+06f;
-            for (int i = 0; i < Main.npc.Length; ++i)
+            foreach (NPC n in Main.ActiveNPCs)
             {
-                NPC n = Main.npc[i];
-                if (n != null && n.active && idsToCheck.Contains(n.type))
+                if (idsToCheck.Contains(n.type))
                 {
                     float dist = (n.Center - playerPos).Length();
                     if (dist < minDist)
                     {
                         minDist = dist;
-                        r = i;
+                        r = n.whoAmI;
                     }
                 }
             }
@@ -545,10 +544,9 @@ namespace CalamityMod
         public static IItemDropRuleCondition AnglerFedToTrasherCondition = If((info) =>
         {
             bool trasherNearby = false;
-            for (int i = 0; i < Main.maxNPCs; ++i)
+            foreach (NPC nearby in Main.ActiveNPCs)
             {
-                NPC nearby = Main.npc[i];
-                if (nearby is null || !nearby.active || nearby.type != ModContent.NPCType<Trasher>())
+                if (nearby.type != ModContent.NPCType<Trasher>())
                     continue;
                 if (info.npc.Distance(nearby.Center) < TrasherEatDistance)
                 {
@@ -559,71 +557,69 @@ namespace CalamityMod
             return trasherNearby;
         });
         // The text is a separate rule so it doesn't show up on the non-Trasher Fishing Rod drop which only occurs if the Angler is not fed to a Trasher
-        public static IItemDropRuleCondition TrasherText = If((info) => true, true, CalamityUtils.GetTextValue("Condition.Drops.TrasherKill"));
+        public static IItemDropRuleCondition TrasherText => CalamityConditions.TrasherTextCondition.ToDropCondition(ShowItemDropInUI.Always);
 
         // Get Fixed Boi seed drop rule
-        public static IItemDropRuleCondition GFB = If((info) => Main.zenithWorld, () => Main.zenithWorld, CalamityUtils.GetTextValue("Condition.Drops.IsGFB"));
+        public static IItemDropRuleCondition GFB => Condition.ZenithWorld.ToDropCondition(ShowItemDropInUI.WhenConditionSatisfied);
 
-        public static IItemDropRuleCondition RevNoMaster = If((info) => !Main.masterMode && CalamityWorld.revenge, () => !Main.masterMode && CalamityWorld.revenge, CalamityUtils.GetTextValue("Condition.Drops.IsRev"));
-        public static IItemDropRuleCondition RevAndMaster = If((info) => Main.masterMode || CalamityWorld.revenge, () => Main.masterMode || CalamityWorld.revenge, () =>
-        {
-            return Main.masterMode ? Language.GetTextValue("Bestiary_ItemDropConditions.IsMasterMode") : CalamityUtils.GetTextValue("Condition.Drops.IsRev");
-        });
+        public static IItemDropRuleCondition RevNoMaster => CalamityConditions.InRevengeanceModeNotMasterMode.ToDropCondition(ShowItemDropInUI.WhenConditionSatisfied);
+        public static IItemDropRuleCondition RevAndMaster => CalamityConditions.InRevengeanceModeOrMasterMode.ToDropCondition(ShowItemDropInUI.WhenConditionSatisfied);
 
         #region Boss Defeat Conditionals
-        public static IItemDropRuleCondition PostKS(bool ui = true) => If(() => NPC.downedSlimeKing, ui, CalamityUtils.GetTextValue("Condition.Drops.DownedKS"));
-        public static IItemDropRuleCondition PostDS(bool ui = true) => If(() => DownedBossSystem.downedDesertScourge, ui, CalamityUtils.GetTextValue("Condition.Drops.DownedDS"));
-        public static IItemDropRuleCondition PostEoC(bool ui = true) => If(() => NPC.downedBoss1, ui, CalamityUtils.GetTextValue("Condition.Drops.DownedEoC"));
-        public static IItemDropRuleCondition PostCrab(bool ui = true) => If(() => DownedBossSystem.downedCrabulon, ui, CalamityUtils.GetTextValue("Condition.Drops.DownedCrab"));
-        public static IItemDropRuleCondition PostEvil1(bool ui = true) => If(() => NPC.downedBoss2, ui, CalamityUtils.GetTextValue("Condition.Drops.Downed" + (WorldGen.crimson ? "BoC" : "EoW")));
-        public static IItemDropRuleCondition PostHM(bool ui = true) => If(() => DownedBossSystem.downedHiveMind, ui, CalamityUtils.GetTextValue("Condition.Drops.DownedHM"));
-        public static IItemDropRuleCondition PostPerfs(bool ui = true) => If(() => DownedBossSystem.downedPerforator, ui, CalamityUtils.GetTextValue("Condition.Drops.DownedPerfs"));
-        public static IItemDropRuleCondition PostEvil2(bool ui = true) => If(() => DownedBossSystem.downedHiveMind || DownedBossSystem.downedPerforator, ui, CalamityUtils.GetTextValue("Condition.Drops.Downed" + (WorldGen.crimson ? "Perfs" : "HM")));
-        public static IItemDropRuleCondition PostQB(bool ui = true) => If(() => NPC.downedQueenBee, ui, CalamityUtils.GetTextValue("Condition.Drops.DownedQB"));
-        public static IItemDropRuleCondition PostDeer(bool ui = true) => If(() => NPC.downedDeerclops, ui, CalamityUtils.GetTextValue("Condition.Drops.DownedDeer"));
-        public static IItemDropRuleCondition PostSkele(bool ui = true) => If(() => NPC.downedBoss3, ui, CalamityUtils.GetTextValue("Condition.Drops.DownedSkele"));
-        public static IItemDropRuleCondition PostSG(bool ui = true) => If(() => DownedBossSystem.downedSlimeGod, ui, CalamityUtils.GetTextValue("Condition.Drops.DownedSG"));
-        public static IItemDropRuleCondition Hardmode(bool ui = true) => If(() => Main.hardMode, ui, CalamityUtils.GetTextValue("Condition.Drops.Hardmode"));
-        public static IItemDropRuleCondition PostQS(bool ui = true) => If(() => NPC.downedQueenSlime, ui, CalamityUtils.GetTextValue("Condition.Drops.DownedQS"));
-        public static IItemDropRuleCondition PostCryo(bool ui = true) => If(() => DownedBossSystem.downedCryogen, ui, CalamityUtils.GetTextValue("Condition.Drops.DownedCryo"));
-        public static IItemDropRuleCondition PostAS(bool ui = true) => If(() => DownedBossSystem.downedAquaticScourge, ui, CalamityUtils.GetTextValue("Condition.Drops.DownedAS"));
-        public static IItemDropRuleCondition PostBrim(bool ui = true) => If(() => DownedBossSystem.downedBrimstoneElemental, ui, CalamityUtils.GetTextValue("Condition.Drops.DownedBrim"));
-        public static IItemDropRuleCondition PostDest(bool ui = true) => If(() => NPC.downedMechBoss1, ui, CalamityUtils.GetTextValue("Condition.Drops.DownedDest"));
-        public static IItemDropRuleCondition PostTwins(bool ui = true) => If(() => NPC.downedMechBoss2, ui, CalamityUtils.GetTextValue("Condition.Drops.DownedTwins"));
-        public static IItemDropRuleCondition PostSP(bool ui = true) => If(() => NPC.downedMechBoss3, ui, CalamityUtils.GetTextValue("Condition.Drops.DownedSP"));
-        public static IItemDropRuleCondition Post1Mech(bool ui = true) => If(() => NPC.downedMechBossAny, ui, CalamityUtils.GetTextValue("Condition.Drops.Downed1Mech"));
-        public static IItemDropRuleCondition Post3Mechs(bool ui = true) => If(() => NPC.downedMechBoss1 && NPC.downedMechBoss2 && NPC.downedMechBoss3, ui, CalamityUtils.GetTextValue("Condition.Drops.Downed3Mechs"));
-        public static IItemDropRuleCondition PostCal(bool ui = true) => If(() => DownedBossSystem.downedCalamitasClone, ui, CalamityUtils.GetTextValue("Condition.Drops.DownedCal"));
-        public static IItemDropRuleCondition PostPlant(bool ui = true) => If(() => NPC.downedPlantBoss, ui, CalamityUtils.GetTextValue("Condition.Drops.DownedPlant"));
-        public static IItemDropRuleCondition PostLevi(bool ui = true) => If(() => DownedBossSystem.downedLeviathan, ui, CalamityUtils.GetTextValue("Condition.Drops.DownedLebi"));
-        public static IItemDropRuleCondition PostAureus(bool ui = true) => If(() => DownedBossSystem.downedAstrumAureus, ui, CalamityUtils.GetTextValue("Condition.Drops.DownedAureus"));
-        public static IItemDropRuleCondition PostGolem(bool ui = true) => If(() => NPC.downedGolemBoss, ui, CalamityUtils.GetTextValue("Condition.Drops.DownedGolem"));
-        public static IItemDropRuleCondition PostPBG(bool ui = true) => If(() => DownedBossSystem.downedPlaguebringer, ui, CalamityUtils.GetTextValue("Condition.Drops.DownedPBG"));
-        public static IItemDropRuleCondition PostEoL(bool ui = true) => If(() => NPC.downedEmpressOfLight, ui, CalamityUtils.GetTextValue("Condition.Drops.DownedEoL"));
-        public static IItemDropRuleCondition PostFish(bool ui = true) => If(() => NPC.downedFishron, ui, CalamityUtils.GetTextValue("Condition.Drops.DownedFish"));
-        public static IItemDropRuleCondition PostRav(bool ui = true) => If(() => DownedBossSystem.downedRavager, ui, CalamityUtils.GetTextValue("Condition.Drops.DownedRav"));
-        public static IItemDropRuleCondition PostLC(bool ui = true) => If(() => NPC.downedAncientCultist, ui, CalamityUtils.GetTextValue("Condition.Drops.DownedLC"));
-        public static IItemDropRuleCondition PostAD(bool ui = true) => If(() => DownedBossSystem.downedAstrumDeus, ui, CalamityUtils.GetTextValue("Condition.Drops.DownedAD"));
-        public static IItemDropRuleCondition PostML(bool ui = true) => If(() => NPC.downedMoonlord, ui, CalamityUtils.GetTextValue("Condition.Drops.DownedML"));
-        public static IItemDropRuleCondition PostGuard(bool ui = true) => If(() => DownedBossSystem.downedGuardians, ui, CalamityUtils.GetTextValue("Condition.Drops.DownedGuard"));
-        public static IItemDropRuleCondition PostBirb(bool ui = true) => If(() => DownedBossSystem.downedDragonfolly, ui, CalamityUtils.GetTextValue("Condition.Drops.DownedBirb"));
-        public static IItemDropRuleCondition PostProv(bool ui = true) => If(() => DownedBossSystem.downedProvidence, ui, CalamityUtils.GetTextValue("Condition.Drops.DownedProv"));
-        public static IItemDropRuleCondition PostSig(bool ui = true) => If(() => DownedBossSystem.downedSignus, ui, CalamityUtils.GetTextValue("Condition.Drops.DownedSig"));
-        public static IItemDropRuleCondition PostSW(bool ui = true) => If(() => DownedBossSystem.downedStormWeaver, ui, CalamityUtils.GetTextValue("Condition.Drops.DownedSW"));
-        public static IItemDropRuleCondition PostCV(bool ui = true) => If(() => DownedBossSystem.downedCeaselessVoid, ui, CalamityUtils.GetTextValue("Condition.Drops.DownedCV"));
-        public static IItemDropRuleCondition PostPolter(bool ui = true) => If(() => DownedBossSystem.downedPolterghast, ui, CalamityUtils.GetTextValue("Condition.Drops.DownedPolter"));
-        public static IItemDropRuleCondition PostOD(bool ui = true) => If(() => DownedBossSystem.downedBoomerDuke, ui, CalamityUtils.GetTextValue("Condition.Drops.DownedOD"));
-        public static IItemDropRuleCondition PostDoG(bool ui = true) => If(() => DownedBossSystem.downedDoG, ui, CalamityUtils.GetTextValue("Condition.Drops.DownedDoG"));
-        public static IItemDropRuleCondition PostYharon(bool ui = true) => If(() => DownedBossSystem.downedYharon, ui, CalamityUtils.GetTextValue("Condition.Drops.DownedYharon"));
-        public static IItemDropRuleCondition PostExos(bool ui = true) => If(() => DownedBossSystem.downedExoMechs, ui, CalamityUtils.GetTextValue("Condition.Drops.DownedExos"));
-        public static IItemDropRuleCondition PostSCal(bool ui = true) => If(() => DownedBossSystem.downedCalamitas, ui, CalamityUtils.GetTextValue("Condition.Drops.DownedSCal"));
-        public static IItemDropRuleCondition PostAEW(bool ui = true) => If(() => DownedBossSystem.downedPrimordialWyrm, ui, CalamityUtils.GetTextValue("Condition.Drops.DownedAEW"));
-        public static IItemDropRuleCondition PostClam(bool ui = true) => If(() => DownedBossSystem.downedCLAM, ui, CalamityUtils.GetTextValue("Condition.Drops.DownedClam"));
-        public static IItemDropRuleCondition PostClamHM(bool ui = true) => If(() => DownedBossSystem.downedCLAMHardMode, ui, CalamityUtils.GetTextValue("Condition.Drops.DownedClamHM"));
-        public static IItemDropRuleCondition PostGSS(bool ui = true) => If(() => DownedBossSystem.downedGSS, ui, CalamityUtils.GetTextValue("Condition.Drops.DownedGSS"));
-        public static IItemDropRuleCondition PostBetsy(bool ui = true) => If(() => DownedBossSystem.downedBetsy, ui, CalamityUtils.GetTextValue("Condition.Drops.DownedBetsy"));
-        public static IItemDropRuleCondition PostT1AR(bool ui = true) => If(() => DownedBossSystem.downedEoCAcidRain, ui, CalamityUtils.GetTextValue("Condition.Drops.DownedT1AR"));
-        public static IItemDropRuleCondition PostT2AR(bool ui = true) => If(() => DownedBossSystem.downedAquaticScourgeAcidRain, ui, CalamityUtils.GetTextValue("Condition.Drops.DownedT2AR"));
+        public static IItemDropRuleCondition PostKS(bool ui = true) => Condition.DownedKingSlime.ToDropCondition(ui ? ShowItemDropInUI.Always : ShowItemDropInUI.Never);
+        public static IItemDropRuleCondition PostDS(bool ui = true) => CalamityConditions.DownedDesertScourge.ToDropCondition(ui ? ShowItemDropInUI.Always : ShowItemDropInUI.Never);
+        public static IItemDropRuleCondition PostEoC(bool ui = true) => Condition.DownedEyeOfCthulhu.ToDropCondition(ui ? ShowItemDropInUI.Always : ShowItemDropInUI.Never);
+        public static IItemDropRuleCondition PostCrab(bool ui = true) => CalamityConditions.DownedCrabulon.ToDropCondition(ui ? ShowItemDropInUI.Always : ShowItemDropInUI.Never);
+        public static IItemDropRuleCondition PostEvil1(bool ui = true) => Condition.DownedEowOrBoc.ToDropCondition(ui ? ShowItemDropInUI.Always : ShowItemDropInUI.Never);
+        public static IItemDropRuleCondition PostHM(bool ui = true) => CalamityConditions.DownedHiveMind.ToDropCondition(ui ? ShowItemDropInUI.Always : ShowItemDropInUI.Never);
+        public static IItemDropRuleCondition PostPerfs(bool ui = true) => CalamityConditions.DownedPerforator.ToDropCondition(ui ? ShowItemDropInUI.Always : ShowItemDropInUI.Never);
+        public static IItemDropRuleCondition PostEvil2(bool ui = true) => CalamityConditions.DownedHiveMindOrPerforator.ToDropCondition(ui ? ShowItemDropInUI.Always : ShowItemDropInUI.Never);
+        public static IItemDropRuleCondition PostQB(bool ui = true) => Condition.DownedQueenBee.ToDropCondition(ui ? ShowItemDropInUI.Always : ShowItemDropInUI.Never);
+        public static IItemDropRuleCondition PostDeer(bool ui = true) => Condition.DownedDeerclops.ToDropCondition(ui ? ShowItemDropInUI.Always : ShowItemDropInUI.Never);
+        public static IItemDropRuleCondition PostSkele(bool ui = true) => Condition.DownedSkeletron.ToDropCondition(ui ? ShowItemDropInUI.Always : ShowItemDropInUI.Never);
+        public static IItemDropRuleCondition PostSG(bool ui = true) => CalamityConditions.DownedSlimeGod.ToDropCondition(ui ? ShowItemDropInUI.Always : ShowItemDropInUI.Never);
+        public static IItemDropRuleCondition Hardmode(bool ui = true) => Condition.Hardmode.ToDropCondition(ui ? ShowItemDropInUI.Always : ShowItemDropInUI.Never);
+        public static IItemDropRuleCondition PostQS(bool ui = true) => Condition.DownedQueenSlime.ToDropCondition(ui ? ShowItemDropInUI.Always : ShowItemDropInUI.Never);
+        public static IItemDropRuleCondition PostCryo(bool ui = true) => CalamityConditions.DownedCryogen.ToDropCondition(ui ? ShowItemDropInUI.Always : ShowItemDropInUI.Never);
+        public static IItemDropRuleCondition PostAS(bool ui = true) => CalamityConditions.DownedAquaticScourge.ToDropCondition(ui ? ShowItemDropInUI.Always : ShowItemDropInUI.Never);
+        public static IItemDropRuleCondition PostBrim(bool ui = true) => CalamityConditions.DownedBrimstoneElemental.ToDropCondition(ui ? ShowItemDropInUI.Always : ShowItemDropInUI.Never);
+        public static IItemDropRuleCondition PostDest(bool ui = true) => Condition.DownedDestroyer.ToDropCondition(ui ? ShowItemDropInUI.Always : ShowItemDropInUI.Never);
+        public static IItemDropRuleCondition PostTwins(bool ui = true) => Condition.DownedTwins.ToDropCondition(ui ? ShowItemDropInUI.Always : ShowItemDropInUI.Never);
+        public static IItemDropRuleCondition PostSP(bool ui = true) => Condition.DownedSkeletronPrime.ToDropCondition(ui ? ShowItemDropInUI.Always : ShowItemDropInUI.Never);
+        public static IItemDropRuleCondition Post1Mech(bool ui = true) => Condition.DownedMechBossAny.ToDropCondition(ui ? ShowItemDropInUI.Always : ShowItemDropInUI.Never);
+        public static IItemDropRuleCondition Post3Mechs(bool ui = true) => Condition.DownedMechBossAll.ToDropCondition(ui ? ShowItemDropInUI.Always : ShowItemDropInUI.Never);
+        public static IItemDropRuleCondition PostCal(bool ui = true) => CalamityConditions.DownedCalamitasClone.ToDropCondition(ui ? ShowItemDropInUI.Always : ShowItemDropInUI.Never);
+        public static IItemDropRuleCondition PostPlant(bool ui = true) => Condition.DownedPlantera.ToDropCondition(ui ? ShowItemDropInUI.Always : ShowItemDropInUI.Never);
+        public static IItemDropRuleCondition PostCalPlant(bool ui = true) => CalamityConditions.DownedCalamitasCloneOrPlantera.ToDropCondition(ui ? ShowItemDropInUI.Always : ShowItemDropInUI.Never);
+        public static IItemDropRuleCondition PostLevi(bool ui = true) => CalamityConditions.DownedLeviathan.ToDropCondition(ui ? ShowItemDropInUI.Always : ShowItemDropInUI.Never);
+        public static IItemDropRuleCondition PostAureus(bool ui = true) => CalamityConditions.DownedAstrumAureus.ToDropCondition(ui ? ShowItemDropInUI.Always : ShowItemDropInUI.Never);
+        public static IItemDropRuleCondition PostGolem(bool ui = true) => Condition.DownedGolem.ToDropCondition(ui ? ShowItemDropInUI.Always : ShowItemDropInUI.Never);
+        public static IItemDropRuleCondition PostPBG(bool ui = true) => CalamityConditions.DownedPlaguebringer.ToDropCondition(ui ? ShowItemDropInUI.Always : ShowItemDropInUI.Never);
+        public static IItemDropRuleCondition PostEoL(bool ui = true) => Condition.DownedEmpressOfLight.ToDropCondition(ui ? ShowItemDropInUI.Always : ShowItemDropInUI.Never);
+        public static IItemDropRuleCondition PostFish(bool ui = true) => Condition.DownedDukeFishron.ToDropCondition(ui ? ShowItemDropInUI.Always : ShowItemDropInUI.Never);
+        public static IItemDropRuleCondition PostRav(bool ui = true) => CalamityConditions.DownedRavager.ToDropCondition(ui ? ShowItemDropInUI.Always : ShowItemDropInUI.Never);
+        public static IItemDropRuleCondition PostLC(bool ui = true) => Condition.DownedCultist.ToDropCondition(ui ? ShowItemDropInUI.Always : ShowItemDropInUI.Never);
+        public static IItemDropRuleCondition PostAD(bool ui = true) => CalamityConditions.DownedAstrumDeus.ToDropCondition(ui ? ShowItemDropInUI.Always : ShowItemDropInUI.Never);
+        public static IItemDropRuleCondition PostML(bool ui = true) => Condition.DownedMoonLord.ToDropCondition(ui ? ShowItemDropInUI.Always : ShowItemDropInUI.Never);
+        public static IItemDropRuleCondition PostGuard(bool ui = true) => CalamityConditions.DownedGuardians.ToDropCondition(ui ? ShowItemDropInUI.Always : ShowItemDropInUI.Never);
+        public static IItemDropRuleCondition PostBirb(bool ui = true) => CalamityConditions.DownedBumblebird.ToDropCondition(ui ? ShowItemDropInUI.Always : ShowItemDropInUI.Never);
+        public static IItemDropRuleCondition PostProv(bool ui = true) => CalamityConditions.DownedProvidence.ToDropCondition(ui ? ShowItemDropInUI.Always : ShowItemDropInUI.Never);
+        public static IItemDropRuleCondition PostSig(bool ui = true) => CalamityConditions.DownedSignus.ToDropCondition(ui ? ShowItemDropInUI.Always : ShowItemDropInUI.Never);
+        public static IItemDropRuleCondition PostSW(bool ui = true) => CalamityConditions.DownedStormWeaver.ToDropCondition(ui ? ShowItemDropInUI.Always : ShowItemDropInUI.Never);
+        public static IItemDropRuleCondition PostCV(bool ui = true) => CalamityConditions.DownedCeaselessVoid.ToDropCondition(ui ? ShowItemDropInUI.Always : ShowItemDropInUI.Never);
+        public static IItemDropRuleCondition PostPolter(bool ui = true) => CalamityConditions.DownedPolterghast.ToDropCondition(ui ? ShowItemDropInUI.Always : ShowItemDropInUI.Never);
+        public static IItemDropRuleCondition PostOD(bool ui = true) => CalamityConditions.DownedOldDuke.ToDropCondition(ui ? ShowItemDropInUI.Always : ShowItemDropInUI.Never);
+        public static IItemDropRuleCondition PostDoG(bool ui = true) => CalamityConditions.DownedDevourerOfGods.ToDropCondition(ui ? ShowItemDropInUI.Always : ShowItemDropInUI.Never);
+        public static IItemDropRuleCondition PostYharon(bool ui = true) => CalamityConditions.DownedYharon.ToDropCondition(ui ? ShowItemDropInUI.Always : ShowItemDropInUI.Never);
+        public static IItemDropRuleCondition PostExos(bool ui = true) => CalamityConditions.DownedExoMechs.ToDropCondition(ui ? ShowItemDropInUI.Always : ShowItemDropInUI.Never);
+        public static IItemDropRuleCondition PostSCal(bool ui = true) => CalamityConditions.DownedSupremeCalamitas.ToDropCondition(ui ? ShowItemDropInUI.Always : ShowItemDropInUI.Never);
+        public static IItemDropRuleCondition PostAEW(bool ui = true) => CalamityConditions.DownedPrimordialWyrm.ToDropCondition(ui ? ShowItemDropInUI.Always : ShowItemDropInUI.Never);
+        public static IItemDropRuleCondition PostClam(bool ui = true) => CalamityConditions.DownedClam.ToDropCondition(ui ? ShowItemDropInUI.Always : ShowItemDropInUI.Never);
+        public static IItemDropRuleCondition PostClamHM(bool ui = true) => CalamityConditions.DownedBuffedClam.ToDropCondition(ui ? ShowItemDropInUI.Always : ShowItemDropInUI.Never);
+        public static IItemDropRuleCondition PostGSS(bool ui = true) => CalamityConditions.DownedGreatSandShark.ToDropCondition(ui ? ShowItemDropInUI.Always : ShowItemDropInUI.Never);
+        public static IItemDropRuleCondition PostBetsy(bool ui = true) => CalamityConditions.DownedBetsy.ToDropCondition(ui ? ShowItemDropInUI.Always : ShowItemDropInUI.Never);
+        public static IItemDropRuleCondition PostT1AR(bool ui = true) => CalamityConditions.DownedAcidRainT1.ToDropCondition(ui ? ShowItemDropInUI.Always : ShowItemDropInUI.Never);
+        public static IItemDropRuleCondition PostT2AR(bool ui = true) => CalamityConditions.DownedAcidRainT2.ToDropCondition(ui ? ShowItemDropInUI.Always : ShowItemDropInUI.Never);
         #endregion
         #endregion
 
@@ -1163,9 +1159,8 @@ namespace CalamityMod
                     NPC npc = info.npc;
                     int idx = Item.NewItem(npc.GetSource_Loot(), npc.Center, itemId, stack, true, -1);
                     Main.timeItemSlotCannotBeReusedFor[idx] = protectionTime;
-                    for (int i = 0; i < Main.maxPlayers; ++i)
-                        if (Main.player[i].active)
-                            NetMessage.SendData(MessageID.InstancedItem, i, -1, null, idx);
+                    foreach (Player player in Main.ActivePlayers)
+                        NetMessage.SendData(MessageID.InstancedItem, player.whoAmI, -1, null, idx);
                     Main.item[idx].active = false;
                 }
 

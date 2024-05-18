@@ -887,7 +887,7 @@ namespace CalamityMod
         /// </summary>
         /// <param name="player">The player using the holdout.</param>
         /// <returns>Returns <see langword="true"/> if the player CAN'T use the item.</returns>
-        public static bool CantUseHoldout(this Player player) => player == null || !player.active || player.dead || !player.channel || player.CCed || player.noItems;
+        public static bool CantUseHoldout(this Player player, bool needsToHold = true) => player == null || !player.active || player.dead || (!player.channel && needsToHold) || player.CCed || player.noItems;
 
         /// <summary>
         /// Makes the given player send the given packet to all appropriate receivers.<br />

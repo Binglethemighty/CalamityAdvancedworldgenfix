@@ -4,6 +4,7 @@ using CalamityMod.Dusts;
 using CalamityMod.Events;
 using CalamityMod.Items.Placeables.Furniture.Trophies;
 using CalamityMod.Items.Weapons.Summon;
+using CalamityMod.NPCs.DevourerofGods;
 using CalamityMod.Particles;
 using CalamityMod.Projectiles.Boss;
 using CalamityMod.World;
@@ -173,6 +174,13 @@ namespace CalamityMod.NPCs.SupremeCalamitas
                 return;
             }
 
+            NPC scal = Main.npc[CalamityGlobalNPC.SCal];
+            if (scal.ModNPC<SupremeCalamitas>().respawnBro == false && Main.masterMode && !broIsAlive)
+            {
+                if (NPC.life > (NPC.lifeMax * 0.65f))
+                    NPC.life = (int)(NPC.lifeMax * 0.65f);
+            }
+
             // Difficulty modes
             bool bossRush = BossRushEvent.BossRushActive;
             bool death = CalamityWorld.death || bossRush;
@@ -326,7 +334,12 @@ namespace CalamityMod.NPCs.SupremeCalamitas
                 {
                     PunchCounter = 0f;
                     SoundEngine.PlaySound(SupremeCalamitas.HellblastSound, NPC.Center);
+
                     int type = ModContent.ProjectileType<SupremeCataclysmFist>();
+
+                    if (Main.zenithWorld)
+                        type = ModContent.ProjectileType<SupremeCatastropheSlash>();
+
                     int damage = NPC.GetProjectileDamage(type);
                     if (bossRush)
                         damage /= 2;
@@ -391,6 +404,10 @@ namespace CalamityMod.NPCs.SupremeCalamitas
                     PunchCounter = 0f;
 
                     int type = ModContent.ProjectileType<SupremeCataclysmFist>();
+
+                    if (Main.zenithWorld)
+                        type = ModContent.ProjectileType<SupremeCatastropheSlash>();
+
                     int damage = NPC.GetProjectileDamage(type);
                     if (bossRush)
                         damage /= 2;
@@ -398,8 +415,8 @@ namespace CalamityMod.NPCs.SupremeCalamitas
 
                     if ((broIsAlive == false ? BigAttackLimit <= 3 && BigAttackLimit > 0 : BigAttackLimit == 1) && death)
                     {
-                        Projectile.NewProjectile(NPC.GetSource_FromAI(), fistSpawnPosition, (NPC.DirectionTo(Target.Center) * 11f).RotatedBy(0.6f - BigAttackLimit * 0.16f), type, damage, 0f, Main.myPlayer, 0f, 0, 2);
-                        Projectile.NewProjectile(NPC.GetSource_FromAI(), fistSpawnPosition, (NPC.DirectionTo(Target.Center) * 11f).RotatedBy(-0.6f + BigAttackLimit * 0.16f), type, damage, 0f, Main.myPlayer, 0f, 0, 2);
+                        Projectile.NewProjectile(NPC.GetSource_FromAI(), fistSpawnPosition, (NPC.DirectionTo(Target.Center) * (Main.zenithWorld ? 1 : 11f)).RotatedBy(0.6f - BigAttackLimit * 0.16f), type, damage, 0f, Main.myPlayer, 0f, 0, Main.zenithWorld ? 3 : 2);
+                        Projectile.NewProjectile(NPC.GetSource_FromAI(), fistSpawnPosition, (NPC.DirectionTo(Target.Center) * (Main.zenithWorld ? 1 : 11f)).RotatedBy(-0.6f + BigAttackLimit * 0.16f), type, damage, 0f, Main.myPlayer, 0f, 0, Main.zenithWorld ? 3 : 2);
                         SoundStyle fire = new("CalamityMod/Sounds/NPCHit/ThanatosHitOpen1");
                         SoundEngine.PlaySound(fire with { Volume = 0.4f, Pitch = -0.8f - BigAttackLimit * 0.1f }, NPC.Center);
                     }
@@ -407,7 +424,7 @@ namespace CalamityMod.NPCs.SupremeCalamitas
                     {
                         if (Main.netMode != NetmodeID.MultiplayerClient)
                         {
-                            Projectile.NewProjectile(NPC.GetSource_FromAI(), fistSpawnPosition, NPC.DirectionTo(Target.Center) * 9.5f, type, damage, 0f, Main.myPlayer, 0f, PunchingFromRight.ToInt(), 3);
+                            Projectile.NewProjectile(NPC.GetSource_FromAI(), fistSpawnPosition, NPC.DirectionTo(Target.Center) * 9.5f, ModContent.ProjectileType<SupremeCataclysmFist>(), damage, 0f, Main.myPlayer, 0f, PunchingFromRight.ToInt(), 3);
                         }
                         SoundEngine.PlaySound(SupremeCalamitas.BrimstoneShotSound with { Volume = 1.8f, Pitch = 0.5f }, NPC.Center);
                         SoundStyle charge = new("CalamityMod/Sounds/Item/ScorchedEarthShot", 3);
@@ -533,7 +550,35 @@ namespace CalamityMod.NPCs.SupremeCalamitas
 
                 // Turn into dust on death.
                 if (NPC.life <= 0)
+                {
+                    if (NPC.AnyNPCs(ModContent.NPCType<SupremeCalamitas>()))
+                    {
+                        NPC scal = Main.npc[CalamityGlobalNPC.SCal];
+                        if (scal.ModNPC<SupremeCalamitas>().respawnBro == true && Main.masterMode && !broIsAlive)
+                        {
+                            for (int i = 0; i < 45; i++)
+                            {
+                                Vector2 vel = new Vector2(14, 14).RotatedByRandom(100) * Main.rand.NextFloat(0.1f, 2.5f);
+                                Dust catastrophedust = Dust.NewDustPerfect(NPC.Center + vel * 2, 279, vel);
+                                catastrophedust.noGravity = true;
+                                catastrophedust.scale = Main.rand.NextFloat(1.2f, 1.8f);
+                                catastrophedust.color = Color.DeepSkyBlue;
+                            }
+                            Particle pulse = new DirectionalPulseRing(NPC.Center, Vector2.Zero, Color.Cyan, new Vector2(1f, 1f), 0, 0.1f, 5f, 25);
+                            GeneralParticleHandler.SpawnParticle(pulse);
+                            Particle pulse2 = new DirectionalPulseRing(NPC.Center, Vector2.Zero, Color.Lerp(Color.Cyan, Color.DodgerBlue, 0.3f), new Vector2(1f, 1f), 0, 0.05f, 4f, 28);
+                            GeneralParticleHandler.SpawnParticle(pulse2);
+
+                            SoundStyle respawn = new("CalamityMod/Sounds/NPCKilled/RavagerLimbLoss3");
+                            SoundEngine.PlaySound(respawn with { Volume = 0.9f, Pitch = 0.3f }, NPC.Center);
+
+                            CalamityUtils.SpawnBossBetter(NPC.Center, ModContent.NPCType<SupremeCatastrophe>(), null, MovingUp ? -1 : 1);
+                            scal.ModNPC<SupremeCalamitas>().respawnBro = false;
+                        }
+
+                    }
                     DeathAshParticle.CreateAshesFromNPC(NPC);
+                }
             }
         }
     }

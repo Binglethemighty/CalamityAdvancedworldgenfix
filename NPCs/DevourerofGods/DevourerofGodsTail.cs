@@ -217,15 +217,7 @@ namespace CalamityMod.NPCs.DevourerofGods
                 NPC.takenDamageMultiplier = 1.25f;
 
             // Check if other segments are still alive, if not, die
-            bool shouldDespawn = true;
-            for (int i = 0; i < Main.maxNPCs; i++)
-            {
-                if (Main.npc[i].active && Main.npc[i].type == ModContent.NPCType<DevourerofGodsHead>())
-                {
-                    shouldDespawn = false;
-                    break;
-                }
-            }
+            bool shouldDespawn = !NPC.AnyNPCs(ModContent.NPCType<DevourerofGodsHead>());
             if (!shouldDespawn)
             {
                 if (NPC.ai[1] <= 0f)

@@ -1,4 +1,5 @@
-﻿using CalamityMod.Tiles.Crags;
+﻿using System.Collections.Generic;
+using CalamityMod.Tiles.Crags;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Terraria;
@@ -8,13 +9,12 @@ using Terraria.ModLoader;
 
 namespace CalamityMod.Tiles.Crags
 {
-    public class BrimstoneSlab : ModTile
+    public class BrimstoneSlab : ModTile, IMergeableTile
     {
         private int subsheetWidth = 450;
         private int subsheetHeight = 198;
 
-        public byte[,] tileAdjacency;
-        public byte[,] secondTileAdjacency;
+        List<TileFraming.MergeFrameData> IMergeableTile.TileAdjacencies { get; } = [];
 
         public override void SetStaticDefaults()
         {
@@ -30,8 +30,8 @@ namespace CalamityMod.Tiles.Crags
             HitSound = SoundID.Tink;
             DustType = 235;
 
-            TileFraming.SetUpUniversalMerge(Type, ModContent.TileType<BrimstoneSlag>(), out tileAdjacency);
-            TileFraming.SetUpUniversalMerge(Type, TileID.Ash, out secondTileAdjacency);
+            this.RegisterUniversalMerge(ModContent.TileType<BrimstoneSlag>(), "CalamityMod/Tiles/Merges/BrimstoneSlagMerge");
+            this.RegisterUniversalMerge(TileID.Ash, "CalamityMod/Tiles/Merges/AshMerge");
         }
 
         public override bool CanExplode(int i, int j)
@@ -49,15 +49,9 @@ namespace CalamityMod.Tiles.Crags
             frameXOffset = i % 2 * subsheetWidth;
             frameYOffset = j % 2 * subsheetHeight;
         }
-        public override void PostDraw(int i, int j, SpriteBatch spriteBatch)
-        {
-            TileFraming.DrawUniversalMergeFrames(i, j, secondTileAdjacency, "CalamityMod/Tiles/Merges/AshMerge");
-            TileFraming.DrawUniversalMergeFrames(i, j, tileAdjacency, "CalamityMod/Tiles/Merges/BrimstoneSlagMerge");
-        }
+
         public override bool TileFrame(int i, int j, ref bool resetFrame, ref bool noBreak)
         {
-            TileFraming.GetAdjacencyData(i, j, ModContent.TileType<BrimstoneSlag>(), out tileAdjacency[i, j]);
-            TileFraming.GetAdjacencyData(i, j, TileID.Ash, out secondTileAdjacency[i, j]);
             return TileFraming.BrimstoneFraming(i, j, resetFrame);
         }
     }

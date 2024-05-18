@@ -127,15 +127,15 @@ namespace CalamityMod.Projectiles.Rogue
             int kunaiFound = 0;
             int oldestKunai = -1;
             int oldestKunaiTimeLeft = lifeSpan;
-            for (int i = 0; i < Main.maxProjectiles; i++)
+            foreach (Projectile p in Main.ActiveProjectiles)
             {
-                if (Main.projectile[i].active && Main.projectile[i].owner == Main.myPlayer && Main.projectile[i].type == Projectile.type && i != Projectile.whoAmI && Main.projectile[i].ai[1] == target.whoAmI)
+                if (p.owner == Main.myPlayer && p.type == Projectile.type && p.whoAmI != Projectile.whoAmI && p.ai[1] == target.whoAmI)
                 {
                     kunaiFound++;
-                    if (Main.projectile[i].timeLeft < oldestKunaiTimeLeft)
+                    if (p.timeLeft < oldestKunaiTimeLeft)
                     {
-                        oldestKunaiTimeLeft = Main.projectile[i].timeLeft;
-                        oldestKunai = Main.projectile[i].whoAmI;
+                        oldestKunaiTimeLeft = p.timeLeft;
+                        oldestKunai = p.whoAmI;
                     }
                     if (kunaiFound >= maxKunai)
                         break;

@@ -8,7 +8,7 @@ using Terraria.ModLoader;
 
 namespace CalamityMod.Projectiles.Melee
 {
-    public class TerratomereBeam : ModProjectile, ILocalizedModType
+    public class TerratomereMeleeSlash : ModProjectile, ILocalizedModType
     {
         public new string LocalizationCategory => "Projectiles.Melee";
         public Vector2[] ControlPoints;
@@ -54,8 +54,8 @@ namespace CalamityMod.Projectiles.Melee
             for (int i = 0; i < ControlPoints.Length; i++)
                 points.Add(ControlPoints[i] + ControlPoints[i].SafeNormalize(Vector2.Zero) * (Projectile.scale - 1f) * 40f);
 
-            for (int i = 0; i < 3; i++)
-                PrimitiveRenderer.RenderTrail(points, new(SlashWidthFunction, SlashColorFunction, (_) => Projectile.Center, shader: GameShaders.Misc["CalamityMod:ExobladeSlash"]), 65);
+            // 17MAY2024: Ozzatron: remove Terratomere rendering its trails multiple times
+            PrimitiveRenderer.RenderTrail(points, new(SlashWidthFunction, SlashColorFunction, (_) => Projectile.Center, shader: GameShaders.Misc["CalamityMod:ExobladeSlash"]), 65);
 
             Main.spriteBatch.ExitShaderRegion();
             return false;

@@ -2031,11 +2031,11 @@ DukeEditFailed:
 
         internal static void SplittingWormBroadcastInteraction(NPC npc, int player, int head, int body, int tail)
         {
-            for (int i = 0; i < Main.maxNPCs; i++)
+            foreach (NPC n in Main.ActiveNPCs)
             {
-                if (i != npc.whoAmI && Main.npc[i].active && (Main.npc[i].type == head || Main.npc[i].type == body || Main.npc[i].type == tail))
+                if (n.whoAmI != npc.whoAmI && (n.type == head || n.type == body || n.type == tail))
                 {
-                    Main.npc[i].ApplyInteraction(player);
+                    n.ApplyInteraction(player);
                 }
             }
         }
@@ -2105,9 +2105,9 @@ DukeEditFailed:
 
             bool CheckSegments(int head, int body, int tail)
             {
-                for (int i = 0; i < Main.maxNPCs; i++)
+                foreach (NPC n in Main.ActiveNPCs)
                 {
-                    if (i != npc.whoAmI && Main.npc[i].active && (Main.npc[i].type == head || Main.npc[i].type == body || Main.npc[i].type == tail))
+                    if (n.whoAmI != npc.whoAmI && (n.type == head || n.type == body || n.type == tail))
                     {
                         return false;
                     }

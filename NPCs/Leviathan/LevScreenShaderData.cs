@@ -24,11 +24,11 @@ namespace CalamityMod.NPCs.Leviathan
                 return;
             }
             LevIndex = -1;
-            for (int i = 0; i < Main.npc.Length; i++)
+            foreach (NPC n in Main.ActiveNPCs)
             {
-                if (Main.npc[i].active && Main.npc[i].type == LevType)
+                if (n.type == LevType)
                 {
-                    LevIndex = i;
+                    LevIndex = n.whoAmI;
                     break;
                 }
             }

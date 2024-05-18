@@ -62,11 +62,11 @@ namespace CalamityMod.NPCs.DevourerofGods
                 return true;
             }
             DoGIndex = -1;
-            for (int i = 0; i < Main.npc.Length; i++)
+            foreach (NPC n in Main.ActiveNPCs)
             {
-                if (Main.npc[i].active && Main.npc[i].type == DoGType)
+                if (n.type == DoGType)
                 {
-                    DoGIndex = i;
+                    DoGIndex = n.whoAmI;
                     break;
                 }
             }

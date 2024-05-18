@@ -169,14 +169,14 @@ namespace CalamityMod.Projectiles.Damageable
         public virtual bool NPCCollisionCheck()
         {
             Player player = Main.player[Projectile.owner];
-            for (int i = 0; i < Main.npc.Length; i++)
+            foreach (NPC n in Main.ActiveNPCs)
             {
-                if (Main.npc[i].IsAnEnemy() && DamageSources.HasFlag(DamageSourceType.HostileNPCs))
+                if (n.IsAnEnemy() && DamageSources.HasFlag(DamageSourceType.HostileNPCs))
                 {
-                    if (Main.npc[i].Hitbox.Intersects(Projectile.Hitbox) && !NPCsToIgnore.Contains(Main.npc[i].type))
+                    if (n.Hitbox.Intersects(Projectile.Hitbox) && !NPCsToIgnore.Contains(n.type))
                     {
-                        int damage = Main.DamageVar(Main.npc[i].damage);
-                        int bannerBuffId = Item.NPCtoBanner(Main.npc[i].BannerID());
+                        int damage = Main.DamageVar(n.damage);
+                        int bannerBuffId = Item.NPCtoBanner(n.BannerID());
                         if (bannerBuffId > 0 && player.HasNPCBannerBuff(bannerBuffId))
                         {
                             if (Main.expertMode)
@@ -190,7 +190,7 @@ namespace CalamityMod.Projectiles.Damageable
                         }
                         CombatText.NewText(new Rectangle((int)Projectile.position.X, (int)Projectile.position.Y, Projectile.width, Projectile.height), CombatText.DamagedFriendly, damage);
                         Life -= damage;
-                        HitEffectNPC(damage, Main.npc[i]);
+                        HitEffectNPC(damage, n);
                         DamageImmunityFrames = MaxDamageImmunityFrames;
                         NetUpdate(true);
                         return true;
@@ -201,20 +201,20 @@ namespace CalamityMod.Projectiles.Damageable
         }
         public virtual bool ProjectileCollisionCheck()
         {
-            for (int i = 0; i < Main.projectile.Length; i++)
+            foreach (Projectile p in Main.ActiveProjectiles)
             {
-                bool canBeHit = (Main.projectile[i].friendly && DamageSources.HasFlag(DamageSourceType.FriendlyProjectiles) ||
-                                 Main.projectile[i].hostile && DamageSources.HasFlag(DamageSourceType.HostileProjectiles)) &&
-                                 i != Projectile.whoAmI;
-                if (Main.projectile[i].active && canBeHit && Main.projectile[i].damage > 0)
+                bool canBeHit = (p.friendly && DamageSources.HasFlag(DamageSourceType.FriendlyProjectiles) ||
+                                 p.hostile && DamageSources.HasFlag(DamageSourceType.HostileProjectiles)) &&
+                                 p.whoAmI != Projectile.whoAmI;
+                if (canBeHit && p.damage > 0)
                 {
-                    if (Main.projectile[i].Colliding(Main.projectile[i].Hitbox, Projectile.Hitbox))
+                    if (p.Colliding(p.Hitbox, Projectile.Hitbox))
                     {
-                        int damage = Main.DamageVar(Main.projectile[i].damage) * 2;
+                        int damage = Main.DamageVar(p.damage) * 2;
                         damage = Main.expertMode ? (int)(damage * Main.RegisteredGameModes[GameModeID.Expert].EnemyDamageMultiplier) : damage;
                         CombatText.NewText(new Rectangle((int)Projectile.position.X, (int)Projectile.position.Y, Projectile.width, Projectile.height), CombatText.DamagedFriendly, damage);
                         Life -= damage;
-                        HitEffectProjectile(damage, Main.projectile[i]);
+                        HitEffectProjectile(damage, p);
                         DamageImmunityFrames = MaxDamageImmunityFrames;
                         if (Projectile.usesIDStaticNPCImmunity)
                             DamageImmunityFrames = Projectile.idStaticNPCHitCooldown;

@@ -194,10 +194,9 @@ namespace CalamityMod.Projectiles.Summon
             if (Target is not null)
             {
                 // Find the vortex that it shot.
-                for (int i = 0; i < Main.maxProjectiles; i++)
+                foreach (Projectile proj in Main.ActiveProjectiles)
                 {
-                    Projectile proj = Main.projectile[i];
-                    if (proj is null || !proj.active || proj.type != ModContent.ProjectileType<MutatedTruffleVortex>() || proj.owner != Owner.whoAmI || proj.timeLeft < MutatedTruffle.VortexTimeUntilNextState)
+                    if (proj.type != ModContent.ProjectileType<MutatedTruffleVortex>() || proj.owner != Owner.whoAmI || proj.timeLeft < MutatedTruffle.VortexTimeUntilNextState)
                         continue;
 
                     // Spin around the vortex.

@@ -200,20 +200,20 @@ namespace CalamityMod.Projectiles.Summon
             if (!CannonIsMounted)
             {
                 int detachedCannonID = ModContent.ProjectileType<AtlasMunitionsAutocannonHeld>();
-                for (int i = 0; i < Main.maxProjectiles; i++)
+                foreach (Projectile p in Main.ActiveProjectiles)
                 {
-                    if (Main.projectile[i].type != detachedCannonID || !Main.projectile[i].active || Main.projectile[i].owner != Projectile.owner)
+                    if (p.type != detachedCannonID || p.owner != Projectile.owner)
                         continue;
 
-                    if (!Main.projectile[i].Hitbox.Intersects(Projectile.Hitbox))
+                    if (!p.Hitbox.Intersects(Projectile.Hitbox))
                         continue;
 
-                    if (Main.projectile[i].ModProjectile<AtlasMunitionsAutocannonHeld>().BeingHeld)
+                    if (p.ModProjectile<AtlasMunitionsAutocannonHeld>().BeingHeld)
                         continue;
 
-                    Main.projectile[i].Kill();
+                    p.Kill();
                     CannonIsMounted = true;
-                    HeatInterpolant = Main.projectile[i].ModProjectile<AtlasMunitionsAutocannonHeld>().HeatInterpolant;
+                    HeatInterpolant = p.ModProjectile<AtlasMunitionsAutocannonHeld>().HeatInterpolant;
                     Projectile.netUpdate = true;
                     break;
                 }
@@ -222,11 +222,13 @@ namespace CalamityMod.Projectiles.Summon
             // If a cannon is not mounted, die if the owner goes very, very far away.
             else if (!Projectile.WithinRange(Owner.Center, 7200f))
             {
-                for (int i = 0; i < Main.maxProjectiles; i++)
+                int podID = ModContent.ProjectileType<AtlasMunitionsDropPod>();
+                int podUpperID = ModContent.ProjectileType<AtlasMunitionsDropPodUpper>();
+                foreach (Projectile p in Main.ActiveProjectiles)
                 {
-                    bool validID = Main.projectile[i].type == ModContent.ProjectileType<AtlasMunitionsDropPod>();
-                    if (Main.projectile[i].active && validID && Main.projectile[i].owner == Projectile.owner)
-                        Main.projectile[i].Kill();
+                    bool validID = p.type == podID || p.type == podUpperID;
+                    if (validID && p.owner == Projectile.owner)
+                        p.Kill();
                 }
 
                 Projectile.Kill();

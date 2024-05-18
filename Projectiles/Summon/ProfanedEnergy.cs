@@ -102,20 +102,20 @@ namespace CalamityMod.Projectiles.Summon
                 }
                 if (!canAttack)
                 {
-                    for (int j = 0; j < Main.maxNPCs; j++)
+                    foreach (NPC n in Main.ActiveNPCs)
                     {
-                        if (Main.npc[j].CanBeChasedBy(Projectile, false))
+                        if (n.CanBeChasedBy(Projectile, false))
                         {
-                            float npcX = Main.npc[j].position.X + (float)(Main.npc[j].width / 2);
-                            float npcY = Main.npc[j].position.Y + (float)(Main.npc[j].height / 2);
+                            float npcX = n.position.X + (float)(n.width / 2);
+                            float npcY = n.position.Y + (float)(n.height / 2);
                             float npcDist = Math.Abs(Projectile.position.X + (float)(Projectile.width / 2) - npcX) + Math.Abs(Projectile.position.Y + (float)(Projectile.height / 2) - npcY);
-                            if (npcDist < attackDistance && Collision.CanHit(Projectile.position, Projectile.width, Projectile.height, Main.npc[j].position, Main.npc[j].width, Main.npc[j].height))
+                            if (npcDist < attackDistance && Collision.CanHit(Projectile.position, Projectile.width, Projectile.height, n.position, n.width, n.height))
                             {
                                 attackDistance = npcDist;
                                 projX = npcX;
                                 projY = npcY;
                                 canAttack = true;
-                                target = j;
+                                target = n.whoAmI;
                             }
                         }
                     }

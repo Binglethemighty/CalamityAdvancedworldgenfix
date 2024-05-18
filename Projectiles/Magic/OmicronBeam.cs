@@ -1,8 +1,8 @@
-﻿using CalamityMod.Particles;
+﻿using System.IO;
+using CalamityMod.Particles;
 using Microsoft.Xna.Framework;
 using Terraria;
 using Terraria.Audio;
-using Terraria.ID;
 using Terraria.ModLoader;
 
 namespace CalamityMod.Projectiles.Magic
@@ -11,10 +11,17 @@ namespace CalamityMod.Projectiles.Magic
     {
         public new string LocalizationCategory => "Projectiles.Magic";
         public override string Texture => "CalamityMod/Projectiles/InvisibleProj";
-        public ref float time => ref Projectile.ai[0];
 
-        public Color mainColor = Color.MediumVioletRed;
-        public bool HitDirect = false;
+        public ref float time => ref Projectile.ai[0];
+        public ref float isSplit => ref Projectile.ai[1];
+        public bool splitShot
+        {
+            get => Projectile.ai[2] == 1f;
+            set => Projectile.ai[2] = value == true ? 1f : 0f;
+        }
+        public bool HitDirect { get; set; }
+        public Color mainColor { get; set; } = Color.MediumVioletRed;
+
         public override void SetDefaults()
         {
             Projectile.width = 50;
@@ -28,15 +35,25 @@ namespace CalamityMod.Projectiles.Magic
             Projectile.usesIDStaticNPCImmunity = true;
             Projectile.idStaticNPCHitCooldown = 91;
         }
+
         public override void AI()
         {
+            if (isSplit == 0)
+            {
+                Projectile.netSpam = 0;
+                Projectile.netUpdate = true;
+                splitShot = true;
+            }
+
             Player Owner = Main.player[Projectile.owner];
             float targetDist = Vector2.Distance(Owner.Center, Projectile.Center);
+
             if (Projectile.timeLeft % 2 == 0 && time > 2 && targetDist < 1400f)
             {
                 Particle spark = new GlowSparkParticle(Projectile.Center, -Projectile.velocity * 0.05f, false, 25, MathHelper.Clamp(0.34f - time * 0.07f, 0.085f, 0.34f), mainColor, new Vector2(0.5f, 1.3f));
                 GeneralParticleHandler.SpawnParticle(spark);
             }
+
             if (Main.rand.NextBool())
             {
                 Vector2 trailPos = Projectile.Center;
@@ -44,18 +61,26 @@ namespace CalamityMod.Projectiles.Magic
                 Particle Trail = new SparkParticle(trailPos, Projectile.velocity * Main.rand.NextFloat(0.2f, 0.9f), false, Main.rand.Next(40, 50 + 1), trailScale, mainColor);
                 GeneralParticleHandler.SpawnParticle(Trail);
             }
+
             Vector2 dustVel = new Vector2(2, 2).RotatedByRandom(100) * Main.rand.NextFloat(0.1f, 0.8f);
             Dust dust = Dust.NewDustPerfect(Projectile.Center + dustVel, Main.rand.NextBool(4) ? 264 : 66, dustVel, 0, default, Main.rand.NextFloat(0.9f, 1.2f));
             dust.noGravity = true;
             dust.color = Main.rand.NextBool() ? Color.Lerp(mainColor, Color.White, 0.5f) : mainColor;
 
             time++;
+
+            if (Projectile.numUpdates == 1)
+            {
+                Projectile.netSpam = 0;
+                Projectile.netUpdate = true;
+            }
         }
+
         public override void OnKill(int timeLeft)
         {
             int numProj = 2;
             float rotation = MathHelper.ToRadians(10);
-            if (Projectile.ai[1] == 0 && time < 250 && !HitDirect)
+            if (splitShot && time < 250 && !HitDirect)
             {
                 for (int i = 0; i < numProj; i++)
                 {
@@ -89,19 +114,22 @@ namespace CalamityMod.Projectiles.Magic
                 dust.color = Main.rand.NextBool() ? Color.Lerp(mainColor, Color.White, 0.5f) : mainColor;
             }
         }
+
         public override void ModifyHitNPC(NPC target, ref NPC.HitModifiers modifiers)
         {
-            if (Projectile.ai[1] == 0 && time > 7 && !HitDirect)
+            if (splitShot && time > 7 && !HitDirect)
                 Projectile.Kill();
 
             Player Owner = Main.player[Projectile.owner];
+
             for (int i = 0; i <= 8; i++)
             {
                 Dust dust = Dust.NewDustPerfect(Projectile.Center, Main.rand.NextBool(4) ? 264 : 66, (Projectile.velocity.SafeNormalize(Vector2.UnitY) * 15f).RotatedByRandom(MathHelper.ToRadians(15f)) * Main.rand.NextFloat(0.1f, 0.8f), 0, default, Main.rand.NextFloat(1.2f, 1.6f));
                 dust.noGravity = true;
                 dust.color = Main.rand.NextBool() ? Color.Lerp(mainColor, Color.White, 0.5f) : mainColor;
             }
-            if (time <= 7 && Projectile.ai[1] == 0) // This is the sweet spot
+
+            if (time <= 7 && splitShot) // This is the sweet spot
             {
                 modifiers.SourceDamage *= 5;
 
@@ -135,6 +163,11 @@ namespace CalamityMod.Projectiles.Magic
                 HitDirect = true;
             }
         }
+
         public override bool? Colliding(Rectangle projHitbox, Rectangle targetHitbox) => CalamityUtils.CircularHitboxCollision(Projectile.Center, time <= 7 ? 90 : 20, targetHitbox);
+
+        public override void SendExtraAI(BinaryWriter writer) => writer.Write(HitDirect);
+
+        public override void ReceiveExtraAI(BinaryReader reader) => HitDirect = reader.ReadBoolean();
     }
 }

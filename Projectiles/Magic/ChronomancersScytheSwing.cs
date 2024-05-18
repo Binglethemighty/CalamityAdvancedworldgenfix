@@ -1,7 +1,7 @@
 ﻿using System;
 using CalamityMod.Buffs.DamageOverTime;
 using CalamityMod.Buffs.StatDebuffs;
-using CalamityMod.Items.Weapons.Melee;
+using CalamityMod.Items.Weapons.Magic;
 using CalamityMod.Projectiles.Typeless;
 using Microsoft.Xna.Framework;
 using Terraria;
@@ -10,7 +10,7 @@ using Terraria.ID;
 using Terraria.Localization;
 using Terraria.ModLoader;
 
-namespace CalamityMod.Projectiles.Melee
+namespace CalamityMod.Projectiles.Magic
 {
     public class ChronomancersScytheSwing : ModProjectile
     {
@@ -32,7 +32,7 @@ namespace CalamityMod.Projectiles.Melee
             Projectile.friendly = true;
             Projectile.penetrate = -1;
             Projectile.tileCollide = false;
-            Projectile.DamageType = DamageClass.MeleeNoSpeed;
+            Projectile.DamageType = DamageClass.Magic;
             Projectile.ownerHitCheck = true;
             Projectile.usesLocalNPCImmunity = true;
             Projectile.localNPCHitCooldown = 5;
@@ -59,6 +59,18 @@ namespace CalamityMod.Projectiles.Melee
                 SoundEngine.PlaySound(SoundID.Item71, Projectile.Center);
                 Projectile.soundDelay = 24;
             }
+
+            if (Projectile.ai[2] >= 32)
+            {
+                bool manaCostPaid = Owner.CheckMana(Owner.ActiveItem(), -1, true, false);
+                if (!manaCostPaid)
+                {
+                    Projectile.Kill();
+                    return;
+                }
+                Projectile.ai[2] = 0;
+            }
+            Projectile.ai[2]++;
 
             if (Main.myPlayer == Projectile.owner)
             {

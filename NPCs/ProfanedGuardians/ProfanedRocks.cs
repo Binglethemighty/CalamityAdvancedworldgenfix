@@ -231,29 +231,25 @@ namespace CalamityMod.NPCs.ProfanedGuardians
                     if (death)
                     {
                         float pushVelocity = bossRush ? 0.2f : 0.15f;
-                        for (int i = 0; i < Main.maxNPCs; i++)
+                        foreach (NPC n in Main.ActiveNPCs)
                         {
-                            if (Main.npc[i].active)
+                            if (n.whoAmI != NPC.whoAmI && n.type == NPC.type)
                             {
-                                if (i != NPC.whoAmI && Main.npc[i].type == NPC.type)
+                                if (Vector2.Distance(NPC.Center, n.Center) < 160f)
                                 {
-                                    if (Vector2.Distance(NPC.Center, Main.npc[i].Center) < 160f)
-                                    {
-                                        if (NPC.position.X < Main.npc[i].position.X)
-                                            NPC.velocity.X -= pushVelocity;
-                                        else
-                                            NPC.velocity.X += pushVelocity;
-
-                                        if (NPC.position.Y < Main.npc[i].position.Y)
-                                            NPC.velocity.Y -= pushVelocity;
-                                        else
-                                            NPC.velocity.Y += pushVelocity;
-                                    }
-
-                                    // Slow down so they don't push away from each other too far
+                                    if (NPC.position.X < n.position.X)
+                                        NPC.velocity.X -= pushVelocity;
                                     else
-                                        NPC.velocity *= 0.95f;
+                                        NPC.velocity.X += pushVelocity;
+
+                                    if (NPC.position.Y < n.position.Y)
+                                        NPC.velocity.Y -= pushVelocity;
+                                    else
+                                        NPC.velocity.Y += pushVelocity;
                                 }
+                                // Slow down so they don't push away from each other too far
+                                else
+                                    NPC.velocity *= 0.95f;
                             }
                         }
                     }

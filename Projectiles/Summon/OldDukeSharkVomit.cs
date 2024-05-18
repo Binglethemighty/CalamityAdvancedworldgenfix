@@ -73,18 +73,14 @@ namespace CalamityMod.Projectiles.Summon
             }
             if (!hasHomingTarget)
             {
-                for (int i = 0; i < Main.npc.Length; ++i)
+                foreach (NPC npc in Main.ActiveNPCs)
                 {
-                    NPC npc = Main.npc[i];
-                    if (npc is null || !npc.active)
-                        continue;
-
                     if (npc.CanBeChasedBy(Projectile, false))
                     {
                         float dist = (Projectile.Center - npc.Center).Length();
                         if (dist < maxHomingRange && Collision.CanHit(Projectile.Center, Projectile.width, Projectile.height, npc.Center, npc.width, npc.height))
                         {
-                            targetIdx = i;
+                            targetIdx = npc.whoAmI;
                             maxHomingRange = dist;
                             hasHomingTarget = true;
                         }

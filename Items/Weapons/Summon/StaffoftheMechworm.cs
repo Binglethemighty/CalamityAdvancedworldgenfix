@@ -35,10 +35,9 @@ namespace CalamityMod.Items.Weapons.Summon
         {
             float neededSlots = 1;
             float foundSlotsCount = 0;
-            for (int i = 0; i < Main.maxProjectiles; i++)
+            foreach (Projectile p in Main.ActiveProjectiles)
             {
-                Projectile p = Main.projectile[i];
-                if (p.active && p.minion && p.owner == player.whoAmI)
+                if (p.minion && p.owner == player.whoAmI)
                 {
                     foundSlotsCount += p.minionSlots;
                     if (foundSlotsCount + neededSlots > player.maxMinions)
@@ -100,17 +99,17 @@ namespace CalamityMod.Items.Weapons.Summon
         {
             int head = -1;
             int tail = -1;
-            for (int i = 0; i < Main.maxProjectiles; i++)
+            foreach (Projectile p in Main.ActiveProjectiles)
             {
-                if (Main.projectile[i].active && Main.projectile[i].owner == Main.myPlayer)
+                if (p.owner == Main.myPlayer)
                 {
-                    if (head == -1 && Main.projectile[i].type == ModContent.ProjectileType<MechwormHead>())
+                    if (head == -1 && p.type == ModContent.ProjectileType<MechwormHead>())
                     {
-                        head = i;
+                        head = p.whoAmI;
                     }
-                    if (tail == -1 && Main.projectile[i].type == ModContent.ProjectileType<MechwormTail>())
+                    if (tail == -1 && p.type == ModContent.ProjectileType<MechwormTail>())
                     {
-                        tail = i;
+                        tail = p.whoAmI;
                     }
                     if (head != -1 && tail != -1)
                     {

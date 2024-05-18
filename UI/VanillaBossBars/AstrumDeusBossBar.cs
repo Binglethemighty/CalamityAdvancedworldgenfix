@@ -29,10 +29,9 @@ namespace CalamityMod.UI.VanillaBossBars
             lifeMax = 0f;
 
             // Determine the real health by finding more of itself
-            for (int i = 0; i < Main.maxNPCs; i++)
+            foreach (NPC worm in Main.ActiveNPCs)
             {
-                NPC worm = Main.npc[i];
-                if (worm.active && worm.type == target.type)
+                if (worm.type == target.type)
                 {
                     // In Death Mode, every worm must be killed
                     if (CalamityWorld.death)
@@ -57,16 +56,8 @@ namespace CalamityMod.UI.VanillaBossBars
 
         public bool FindMoreWorms(ref BigProgressBarInfo info)
         {
-            for (int i = 0; i < Main.maxNPCs; i++)
-            {
-                NPC target = Main.npc[i];
-                if (target.active && target.type == NPCType<AstrumDeusHead>())
-                {
-                    info.npcIndexToAimAt = i;
-                    return true;
-                }
-            }
-            return false;
+            info.npcIndexToAimAt = NPC.FindFirstNPC(ModContent.NPCType<AstrumDeusHead>());
+            return info.npcIndexToAimAt != -1;
         }
     }
 }

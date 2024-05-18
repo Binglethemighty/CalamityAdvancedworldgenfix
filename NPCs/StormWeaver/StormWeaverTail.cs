@@ -159,15 +159,7 @@ namespace CalamityMod.NPCs.StormWeaver
             }
 
             // Check if other segments are still alive, if not, die
-            bool shouldDespawn = true;
-            for (int i = 0; i < Main.maxNPCs; i++)
-            {
-                if (Main.npc[i].active && Main.npc[i].type == ModContent.NPCType<StormWeaverHead>())
-                {
-                    shouldDespawn = false;
-                    break;
-                }
-            }
+            bool shouldDespawn = !NPC.AnyNPCs(ModContent.NPCType<StormWeaverHead>());
             if (!shouldDespawn)
             {
                 if (NPC.ai[1] <= 0f)

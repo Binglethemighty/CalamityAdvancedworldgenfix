@@ -156,13 +156,12 @@ namespace CalamityMod.Projectiles.Summon
                 // If the player has any existing UIs, kill them all.
                 if (player.ownedProjectileCounts[ModContent.ProjectileType<AndromedaUI_Background>()] > 0)
                 {
-                    for (int i = 0; i < Main.projectile.Length; i++)
+                    foreach (Projectile p in Main.ActiveProjectiles)
                     {
-                        if (Main.projectile[i].active &&
-                            Main.projectile[i].type == ModContent.ProjectileType<AndromedaUI_Background>() &&
-                            Main.projectile[i].owner == player.whoAmI)
+                        if (p.type == ModContent.ProjectileType<AndromedaUI_Background>() &&
+                            p.owner == player.whoAmI)
                         {
-                            Main.projectile[i].Kill();
+                            p.Kill();
                         }
                     }
                 }
@@ -289,13 +288,12 @@ namespace CalamityMod.Projectiles.Summon
             }
             int slashIndex = -1;
 
-            for (int i = 0; i < Main.projectile.Length; i++)
+            foreach (Projectile p in Main.ActiveProjectiles)
             {
-                if (Main.projectile[i].active &&
-                    Main.projectile[i].type == ModContent.ProjectileType<AndromedaRegislash>() &&
-                    Main.projectile[i].owner == Projectile.owner)
+                if (p.type == ModContent.ProjectileType<AndromedaRegislash>() &&
+                    p.owner == Projectile.owner)
                 {
-                    slashIndex = i;
+                    slashIndex = p.whoAmI;
                     break;
                 }
             }
@@ -310,13 +308,12 @@ namespace CalamityMod.Projectiles.Summon
 
             int laserBeamIndex = -1;
 
-            for (int i = 0; i < Main.projectile.Length; i++)
+            foreach (Projectile p in Main.ActiveProjectiles)
             {
-                if (Main.projectile[i].active &&
-                    Main.projectile[i].type == ModContent.ProjectileType<AndromedaDeathRay>() &&
-                    Main.projectile[i].owner == Projectile.owner)
+                if (p.type == ModContent.ProjectileType<AndromedaDeathRay>() &&
+                    p.owner == Projectile.owner)
                 {
-                    laserBeamIndex = i;
+                    laserBeamIndex = p.whoAmI;
                     break;
                 }
             }

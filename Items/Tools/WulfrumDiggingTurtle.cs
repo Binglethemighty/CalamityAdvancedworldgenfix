@@ -53,10 +53,9 @@ namespace CalamityMod.Items.Tools
             {
                 bool explodedAny = false;
 
-                for (int i = 0; i < Main.maxProjectiles; ++i)
+                foreach (Projectile p in Main.ActiveProjectiles)
                 {
-                    Projectile p = Main.projectile[i];
-                    if (!p.active || p.owner != player.whoAmI || p.type != Item.shoot)
+                    if (p.owner != player.whoAmI || p.type != Item.shoot)
                         continue;
 
                     p.ai[1] = 1f;

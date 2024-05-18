@@ -18,8 +18,7 @@ namespace CalamityMod.Tiles.Pylons
 
         public override NPCShop.Entry GetNPCShopEntry()
         {
-            Condition biomeCondition = new Condition(CalamityUtils.GetText("Condition.InSunken"), () => Main.LocalPlayer.Calamity().ZoneSunkenSea);
-            return new NPCShop.Entry(AssociatedItem, Condition.AnotherTownNPCNearby, biomeCondition);
+            return new NPCShop.Entry(AssociatedItem, Condition.AnotherTownNPCNearby, CalamityConditions.InSunken);
         }
 
         public override bool ValidTeleportCheck_BiomeRequirements(TeleportPylonInfo pylonInfo, SceneMetrics sceneData) => BiomeTileCounterSystem.SunkenSeaTiles >= 100;

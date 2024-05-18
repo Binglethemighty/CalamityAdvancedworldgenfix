@@ -100,10 +100,9 @@ namespace CalamityMod.Projectiles.Summon
         {
             // Make an imp laugh sound every so often if you're the first seeker in the projectile array.
             if (Main.rand.NextBool(1600))
-            {
-                for (int i = 0; i < Main.maxProjectiles; i++)
+			{
+                foreach (Projectile seeker in Main.ActiveProjectiles)
                 {
-                    Projectile seeker = Main.projectile[i];
                     if (seeker.type == Projectile.type)
                     {
                         if (seeker == Projectile)

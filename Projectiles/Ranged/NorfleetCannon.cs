@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Runtime.Intrinsics.X86;
+using CalamityMod.Buffs.DamageOverTime;
 using CalamityMod.Items.Weapons.Ranged;
 using CalamityMod.Particles;
 using Humanizer;
@@ -37,6 +39,8 @@ namespace CalamityMod.Projectiles.Ranged
         public Color mainColor = Color.White;
         public Color randomColor = Color.White;
         public int colorTimer = 0;
+        public bool hasFired = false;
+        public bool PUNISHMENTMODE = false;
 
         public override void SetDefaults()
         {
@@ -50,7 +54,10 @@ namespace CalamityMod.Projectiles.Ranged
         {
             Item heldItem = Owner.ActiveItem();
 
-            randomColor = Main.rand.Next(3) switch
+            if (Owner.dead || Owner is null)
+                Projectile.Kill();
+
+                randomColor = Main.rand.Next(3) switch
             {
                 0 => Color.OrangeRed,
                 1 => Color.Aqua,
@@ -59,6 +66,8 @@ namespace CalamityMod.Projectiles.Ranged
             if (mainColor == Color.White)
             {
                 mainColor = randomColor;
+                if (Projectile.ai[1] == 1000)
+                    PUNISHMENTMODE = true;
             }
 
             if (ShootingTimer % 15 == 0)
@@ -77,7 +86,7 @@ namespace CalamityMod.Projectiles.Ranged
             mainColor = Color.Lerp(mainColor, variedColor, (PostFireCooldown <= 20 || recharging) ? 0.07f : 0);
 
             // If there's no player, or the player is the server, or the owner's stunned, there'll be no holdout.
-            if (Owner.CantUseHoldout() && !HasLetGo || heldItem.type != ModContent.ItemType<Norfleet>())
+            if (Owner.CantUseHoldout() && !HasLetGo)
             {
                 if (SoundEngine.TryGetActiveSound(NorfleetRecharge, out var hum) && hum.IsPlaying)
                 {
@@ -86,16 +95,16 @@ namespace CalamityMod.Projectiles.Ranged
                 if (loadedShots > 1)
                 {
                     ShootRocket(heldItem);
-                    PostFireCooldown = 55;
+                    PostFireCooldown = PUNISHMENTMODE ? 1000 : 55;
                     ShootingTimer = 1;
-                    mainColor = Color.MediumOrchid;
+                    mainColor = PUNISHMENTMODE ? Color.Red : Color.MediumOrchid;
                 }
                 else
                 {
                     ShootRocket(heldItem);
-                    PostFireCooldown = 262;
+                    PostFireCooldown = PUNISHMENTMODE ? 1000 : 262;
                     ShootingTimer = 1;
-                    mainColor = Color.MediumOrchid;
+                    mainColor = PUNISHMENTMODE ? Color.Red : Color.MediumOrchid;
                 }
                     
 
@@ -159,7 +168,7 @@ namespace CalamityMod.Projectiles.Ranged
 
             // Rumble (only while channeling)
             float rumble = 1f;
-            if (!Owner.CantUseHoldout())
+            if (!Owner.CantUseHoldout() && PostFireCooldown <= 0)
                 Projectile.Center += Main.rand.NextVector2Circular(rumble, rumble);
             if (PostFireCooldown < 297 && PostFireCooldown > 15 && recharging)
             {
@@ -170,53 +179,76 @@ namespace CalamityMod.Projectiles.Ranged
 
         private void ShootRocket(Item item)
         {
-            // We use the velocity of this projectile as its direction vector.
-            Vector2 shootDirection = Projectile.velocity.SafeNormalize(Vector2.Zero);
-
-            // The position of the tip of the gun.
-            Vector2 tipPosition = Projectile.Center + Projectile.velocity.SafeNormalize(Vector2.Zero).RotatedBy(-0.05f * Projectile.direction) * 73f;
-
-            // Spawns the projectile.
-            SoundStyle fire = new("CalamityMod/Sounds/Item/NorfleetFire");
-            SoundEngine.PlaySound(fire with { Volume = 0.9f, PitchVariance = 0.25f }, Projectile.Center);
-
-            for (int i = 0; i < 3; i++)
+            if (hasFired == false)
             {
-                Vector2 firingVelocity = shootDirection.RotatedByRandom((0.2f * i) + 0.02f) * 5f * Main.rand.NextFloat(0.7f, 1.3f);
-                Projectile.NewProjectileDirect(Projectile.GetSource_FromThis(), tipPosition, firingVelocity, ModContent.ProjectileType<NorfleetComet>(), Projectile.damage / 3, Projectile.knockBack, Projectile.owner, 0, i);
+                // We use the velocity of this projectile as its direction vector.
+                Vector2 shootDirection = Projectile.velocity.SafeNormalize(Vector2.Zero);
+
+                // The position of the tip of the gun.
+                Vector2 tipPosition = Projectile.Center + Projectile.velocity.SafeNormalize(Vector2.Zero).RotatedBy(-0.05f * Projectile.direction) * 73f;
+
+                // Spawns the projectile.
+                SoundStyle fire = new("CalamityMod/Sounds/Item/NorfleetFire");
+                SoundEngine.PlaySound(fire with { Volume = 0.9f, PitchVariance = 0.25f }, Projectile.Center);
+
+                for (int i = 0; i < 3; i++)
+                {
+                    Vector2 firingVelocity = shootDirection.RotatedByRandom((0.2f * i) + 0.02f) * 5f * Main.rand.NextFloat(0.7f, 1.3f);
+                    Projectile.NewProjectileDirect(Projectile.GetSource_FromThis(), tipPosition, firingVelocity, ModContent.ProjectileType<NorfleetComet>(), Projectile.damage / 3, Projectile.knockBack, Projectile.owner, 0, i, PUNISHMENTMODE ? 1 : 0);
+                }
+
+                NetUpdate();
+
+                // Inside here go all the things that dedicated servers shouldn't spend resources on.
+                // Like visuals and sounds.
+                if (Main.dedServ)
+                    return;
+
+                for (int k = 0; k < 30; k++)
+                {
+                    Vector2 shootVel = (shootDirection * 10).RotatedByRandom(0.5f) * Main.rand.NextFloat(0.1f, 1.8f);
+
+                    Dust dust2 = Dust.NewDustPerfect(tipPosition, Main.rand.NextBool(4) ? 264 : 66, shootVel);
+                    dust2.scale = Main.rand.NextFloat(1.15f, 1.45f);
+                    dust2.noGravity = true;
+                    if (dust2.type == 66)
+                        dust2.color = Main.rand.NextBool() ? Color.DarkViolet : Color.MediumOrchid;
+                    else
+                        dust2.color = Color.White;
+                }
+                for (int k = 0; k < 15; k++)
+                {
+                    Particle pulse = new GlowSparkParticle((tipPosition - shootDirection * 14) + Main.rand.NextVector2Circular(12, 12), shootDirection * 17 * Main.rand.NextFloat(0.35f, 1.35f), false, Main.rand.Next(7, 11 + 1), 0.025f * Main.rand.NextFloat(0.45f, 1.25f), Color.MediumOrchid, new Vector2(1.5f, 0.9f), true);
+                    GeneralParticleHandler.SpawnParticle(pulse);
+                }
+
+                // By decreasing the offset length of the gun from the arms, we give an effect of recoil.
+                OffsetLength -= 34f;
+                hasFired = true;
             }
-
-            NetUpdate();
-
-            // Inside here go all the things that dedicated servers shouldn't spend resources on.
-            // Like visuals and sounds.
-            if (Main.dedServ)
-                return;
-
-            for (int k = 0; k < 30; k++)
+            else
             {
-                Vector2 shootVel = (shootDirection * 10).RotatedByRandom(0.5f) * Main.rand.NextFloat(0.1f, 1.8f);
-
-                Dust dust2 = Dust.NewDustPerfect(tipPosition, Main.rand.NextBool(4) ? 264 : 66, shootVel);
-                dust2.scale = Main.rand.NextFloat(1.15f, 1.45f);
-                dust2.noGravity = true;
-                if (dust2.type == 66)
-                    dust2.color = Main.rand.NextBool() ? Color.DarkViolet : Color.MediumOrchid;
+                if (Owner.Calamity().NorfleetCounter >= 1000)
+                    Owner.Calamity().NorfleetCounter = 3;
                 else
-                    dust2.color = Color.White;
-            }
-            for (int k = 0; k < 15; k++)
-            {
-                Particle pulse = new GlowSparkParticle((tipPosition - shootDirection * 14) + Main.rand.NextVector2Circular(12, 12), shootDirection * 17 * Main.rand.NextFloat(0.35f, 1.35f), false, Main.rand.Next(7, 11 + 1), 0.025f * Main.rand.NextFloat(0.45f, 1.25f), Color.MediumOrchid, new Vector2(1.5f, 0.9f), true);
-                GeneralParticleHandler.SpawnParticle(pulse);
-            }
+                    Owner.Calamity().NorfleetCounter = 1000;
 
-            // By decreasing the offset length of the gun from the arms, we give an effect of recoil.
-            OffsetLength -= 34f;
+                Projectile.Kill();
+            }
         }
         private void PostFiringCooldown()
         {
+            Owner.channel = true;
             Vector2 tipPosition = Projectile.Center + Projectile.velocity.SafeNormalize(Vector2.Zero).RotatedBy(-0.05f * Projectile.direction) * 73f;
+
+            if (PUNISHMENTMODE)
+            {
+                PostFireCooldown = 1000; 
+                Owner.AddBuff(ModContent.BuffType<MiracleBlight>(), 900);
+                Owner.AddBuff(ModContent.BuffType<VulnerabilityHex>(), 900);
+                if (Owner.statLife > 1)
+                    Owner.statLife = (int)(Owner.statLife * 0.99f);
+            }
 
             if (PostFireCooldown == 207)
             {
@@ -228,12 +260,12 @@ namespace CalamityMod.Projectiles.Ranged
             if (PostFireCooldown > 0 && !recharging)
             {
                 Vector2 smokeVel = new Vector2(0, -8) * Main.rand.NextFloat(0.1f, 1.1f);
-                Particle smoke = new HeavySmokeParticle(tipPosition, smokeVel, StaticEffectsColor, Main.rand.Next(40, 60 + 1), Main.rand.NextFloat(0.3f, 0.6f), 0.5f, Main.rand.NextFloat(-0.2f, 0.2f), Main.rand.NextBool(), required: true);
+                Particle smoke = new HeavySmokeParticle(tipPosition, smokeVel, PUNISHMENTMODE ? Color.Red : StaticEffectsColor, Main.rand.Next(40, 60 + 1), Main.rand.NextFloat(0.3f, 0.6f), 0.5f, Main.rand.NextFloat(-0.2f, 0.2f), Main.rand.NextBool(), required: true);
                 GeneralParticleHandler.SpawnParticle(smoke);
 
                 Dust dust = Dust.NewDustPerfect(tipPosition, 303, smokeVel.RotatedByRandom(0.1f), 80, default, Main.rand.NextFloat(0.4f, 1.3f));
                 dust.noGravity = false;
-                dust.color = Color.White;
+                dust.color = PUNISHMENTMODE ? Color.Red : Color.White;
             }
             else if (!recharging)
             {
@@ -268,6 +300,7 @@ namespace CalamityMod.Projectiles.Ranged
 
                     SoundStyle click = new("CalamityMod/Sounds/Item/DudFire");
                     SoundEngine.PlaySound(click with { Volume = 1f, Pitch = 0.7f }, Projectile.Center);
+                    Owner.Calamity().NorfleetCounter = 0;
                 }
                 if (PostFireCooldown > 15)
                 {
@@ -336,7 +369,7 @@ namespace CalamityMod.Projectiles.Ranged
             Texture2D rechargeTexture = ModContent.Request<Texture2D>("CalamityMod/Particles/BloomCircle").Value;
 
             Main.EntitySpriteDraw(texture, drawPosition, null, drawColor, drawRotation, rotationPoint, Projectile.scale, flipSprite);
-            Main.EntitySpriteDraw(glowTexture, drawPosition, null, mainColor, drawRotation, rotationPoint, Projectile.scale, flipSprite);
+            Main.EntitySpriteDraw(glowTexture, drawPosition, null, PUNISHMENTMODE ? Color.Red : mainColor, drawRotation, rotationPoint, Projectile.scale, flipSprite);
             if (PostFireCooldown > 15 && recharging)
             {
                 float randSize = Main.rand.NextFloat(0.8f, 1.2f);

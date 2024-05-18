@@ -779,6 +779,10 @@ namespace CalamityMod.NPCs.VanillaNPCAIOverrides.Bosses
                 }
             }
 
+            // 10 seconds of resistance to prevent spawn killing
+            if (npc.Calamity().newAI[1] < DRIncreaseTime)
+                npc.Calamity().newAI[1] += 1f;
+
             npc.realLife = -1;
 
             if (npc.target < 0 || npc.target == Main.maxPlayers || Main.player[npc.target].dead)

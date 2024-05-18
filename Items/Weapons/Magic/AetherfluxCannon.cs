@@ -39,11 +39,12 @@ namespace CalamityMod.Items.Weapons.Magic
 
         public override bool CanUseItem(Player player) => player.ownedProjectileCounts[Item.shoot] <= 0;
 
+        public override void HoldItem(Player player) => player.Calamity().mouseRotationListener = true;
+
         public override bool Shoot(Player player, EntitySource_ItemUse_WithAmmo source, Vector2 position, Vector2 velocity, int type, int damage, float knockback)
         {
-            Vector2 shootVelocity = velocity;
-            Vector2 shootDirection = shootVelocity.SafeNormalize(Vector2.UnitX * player.direction);
-            Projectile.NewProjectile(source, position, shootDirection, type, damage, knockback, player.whoAmI);
+            Vector2 spawnPosition = player.RotatedRelativePoint(player.MountedCenter, true);
+            Projectile.NewProjectileDirect(source, spawnPosition, player.Calamity().mouseWorld - spawnPosition, ModContent.ProjectileType<AetherfluxCannonHoldout>(), damage, knockback, player.whoAmI);
             return false;
         }
 

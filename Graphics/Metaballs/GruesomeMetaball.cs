@@ -136,8 +136,12 @@ namespace CalamityMod.Graphics.Metaballs
             }
 
             // Draw gruesome eminence ghost heads.
-            foreach (Projectile eminence in CalamityUtils.AllProjectilesByID(ModContent.ProjectileType<SpiritCongregation>()))
-                eminence.ModProjectile<SpiritCongregation>().DrawHeadForMetaball();
+            int eminenceType = ModContent.ProjectileType<SpiritCongregation>();
+            foreach (Projectile p in Main.ActiveProjectiles)
+            {
+                if (p.type == eminenceType)
+                    p.ModProjectile<SpiritCongregation>().DrawHeadForMetaball();
+            }
         }
     }
 }

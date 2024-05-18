@@ -38,9 +38,9 @@ namespace CalamityMod
                 return 0;
 
             int count = 0;
-            for (int i = 0; i < Main.maxNPCs; i++)
+            foreach (NPC n in Main.ActiveNPCs)
             {
-                if (!typesToCheck.Contains(Main.npc[i].type) || !Main.npc[i].active)
+                if (!typesToCheck.Contains(n.type))
                     continue;
 
                 count++;
@@ -147,7 +147,7 @@ namespace CalamityMod
             // "Non-enemies" (e.g. butterflies or projectile enemies) with near zero max health,
             // or anything but the strongest enemies with no contact damage (e.g. Celestial Pillars, Providence)
             // do not generate rage.
-            if (npc.lifeMax <= BalancingConstants.TinyHealthThreshold || (npc.damage <= BalancingConstants.TinyDamageThreshold && npc.lifeMax <= BalancingConstants.NoContactDamageHealthThreshold))
+            if (npc.lifeMax <= BalancingConstants.TinyHealthThreshold || (npc.defDamage <= BalancingConstants.TinyDamageThreshold && npc.lifeMax <= BalancingConstants.NoContactDamageHealthThreshold))
                 return false;
             // Also explicitly exclude dummies and anything with a ridiculous health pool (dummies from Fargo's for example).
             if (npc.type == NPCID.TargetDummy || npc.type == NPCType<SuperDummyNPC>() || npc.lifeMax > BalancingConstants.UnreasonableHealthThreshold)
@@ -174,18 +174,14 @@ namespace CalamityMod
 
         public static bool AnyBossNPCS(bool checkForMechs = false)
         {
-            for (int i = 0; i < Main.maxNPCs; i++)
+            foreach (NPC npc in Main.ActiveNPCs)
             {
-                if (Main.npc[i] != null)
+                if (npc.IsABoss())
                 {
-                    NPC npc = Main.npc[i];
-                    if (npc.IsABoss())
-                    {
-                        // Added due to the new mech boss ore progression, return true if any mech is alive and checkForMechs is true, reduces mech boss projectile damage if true.
-                        if (checkForMechs)
-                            return npc.type == NPCID.TheDestroyer || npc.type == NPCID.SkeletronPrime || npc.type == NPCID.Spazmatism || npc.type == NPCID.Retinazer;
-                        return true;
-                    }
+                    // Added due to the new mech boss ore progression, return true if any mech is alive and checkForMechs is true, reduces mech boss projectile damage if true.
+                    if (checkForMechs)
+                        return npc.type == NPCID.TheDestroyer || npc.type == NPCID.SkeletronPrime || npc.type == NPCID.Spazmatism || npc.type == NPCID.Retinazer;
+                    return true;
                 }
             }
             return FindFirstProjectile(ProjectileType<DeusRitualDrama>()) != -1;
@@ -267,6 +263,7 @@ namespace CalamityMod
                     // If we've found a valid boss target, ignore ALL targets which aren't bosses.
                     if (bossFound && !(Main.npc[index].boss || Main.npc[index].type == NPCID.WallofFleshEye))
                         continue;
+
                     if (Main.npc[index].CanBeChasedBy(null, false))
                     {
                         float extraDistance = (Main.npc[index].width / 2) + (Main.npc[index].height / 2);
@@ -275,10 +272,11 @@ namespace CalamityMod
                         if (extraDistance < distance && !ignoreTiles)
                             canHit = Collision.CanHit(origin, 1, 1, Main.npc[index].Center, 1, 1);
 
-                        if (Vector2.Distance(origin, Main.npc[index].Center) < (distance + extraDistance) && canHit)
+                        if (Vector2.Distance(origin, Main.npc[index].Center) < distance && canHit)
                         {
                             if (Main.npc[index].boss || Main.npc[index].type == NPCID.WallofFleshEye)
                                 bossFound = true;
+
                             distance = Vector2.Distance(origin, Main.npc[index].Center);
                             closestTarget = Main.npc[index];
                         }
@@ -297,7 +295,7 @@ namespace CalamityMod
                         if (extraDistance < distance && !ignoreTiles)
                             canHit = Collision.CanHit(origin, 1, 1, Main.npc[index].Center, 1, 1);
 
-                        if (Vector2.Distance(origin, Main.npc[index].Center) < (distance + extraDistance) && canHit)
+                        if (Vector2.Distance(origin, Main.npc[index].Center) < distance && canHit)
                         {
                             distance = Vector2.Distance(origin, Main.npc[index].Center);
                             closestTarget = Main.npc[index];
@@ -495,12 +493,11 @@ namespace CalamityMod
                 return;
 
             Projectile projectile = null;
-            for (int i = 0; i < Main.maxProjectiles; i++)
+            foreach (Projectile p in Main.ActiveProjectiles)
             {
-                projectile = Main.projectile[i];
-                if (Main.projectile[i].active && Main.projectile[i].bobber && Main.projectile[i].owner == playerIndex)
+                if (p.bobber && p.owner == playerIndex)
                 {
-                    projectile = Main.projectile[i];
+                    projectile = p;
                     break;
                 }
             }

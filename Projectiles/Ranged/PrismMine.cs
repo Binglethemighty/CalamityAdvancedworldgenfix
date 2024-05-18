@@ -68,10 +68,9 @@ namespace CalamityMod.Projectiles.Ranged
         public List<Projectile> LocateOtherMines()
         {
             List<Projectile> mines = new List<Projectile>();
-            for (int i = 0; i < Main.maxProjectiles; i++)
+            foreach (Projectile proj in Main.ActiveProjectiles)
             {
-                Projectile proj = Main.projectile[i];
-                if (proj.type != Projectile.type || !proj.active || proj.timeLeft <= 12 || i == Projectile.whoAmI)
+                if (proj.type != Projectile.type || proj.timeLeft <= 12 || proj.whoAmI == Projectile.whoAmI)
                     continue;
                 if (!Projectile.WithinRange(proj.Center, MineConnectDistanceMax))
                     continue;

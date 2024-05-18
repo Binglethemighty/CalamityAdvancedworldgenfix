@@ -7,9 +7,6 @@ using Microsoft.Xna.Framework.Graphics;
 using ReLogic.Content;
 using Terraria;
 using Terraria.Audio;
-using Terraria.DataStructures;
-using Terraria.GameContent;
-using Terraria.ID;
 using Terraria.ModLoader;
 using static System.MathF;
 using static CalamityMod.Items.Weapons.Summon.LiliesOfFinality;
@@ -58,8 +55,6 @@ namespace CalamityMod.Projectiles.Summon
                     Projectile.NewProjectileDirect(Projectile.GetSource_FromThis(), Projectile.Center, Vector2.Zero, ProjectileType<LiliesOfFinalityAoE>(), Projectile.damage, 0f, Projectile.owner, Projectile.whoAmI);
 
                 Timer = 0f;
-
-                NetUpdate();
             }
         }
 
@@ -128,21 +123,21 @@ namespace CalamityMod.Projectiles.Summon
 
         public override void CheckMinionExistence()
         {
+            if (Elster is null)
+            {
+                for (int i = 0; i < Main.maxProjectiles; i++)
+                {
+                    Projectile p = Main.projectile[i];
+                    if (p == null || !p.active || p.owner != Projectile.owner || p.type != ProjectileType<LiliesOfFinalityElster>())
+                        continue;
+                    Elster = p;
+                    break;
+                }
+            }
+
             Projectile.timeLeft = 2;
             if (Elster is null || !Elster.active || Elster.owner != Projectile.owner || Elster.type != ProjectileType<LiliesOfFinalityElster>())
                 Projectile.Kill();
-        }
-
-        public override void OnSpawn(IEntitySource source)
-        {
-            for (int i = 0; i < Main.maxProjectiles; i++)
-            {
-                Projectile p = Main.projectile[i];
-                if (p == null || !p.active || p.owner != Projectile.owner || p.type != ProjectileType<LiliesOfFinalityElster>())
-                    continue;
-                Elster = p;
-                break;
-            }
         }
 
         public override bool OnTileCollide(Vector2 oldVelocity) => false;
@@ -181,6 +176,9 @@ namespace CalamityMod.Projectiles.Summon
             }
 
             Timer++;
+
+            Projectile.netSpam = 0;
+            Projectile.netUpdate = true;
 
             // If on a dedicated server, don't bother running the visuals and sounds to save resources.
             if (Main.dedServ)
@@ -297,7 +295,6 @@ namespace CalamityMod.Projectiles.Summon
                 Projectile.owner);
 
             Timer = 0f;
-            NetUpdate();
 
             // If on a dedicated server, don't bother running the visuals and sounds to save resources.
             if (Main.dedServ)
@@ -345,13 +342,6 @@ namespace CalamityMod.Projectiles.Summon
         {
             Projectile.velocity = (Projectile.velocity * 20f + Projectile.SafeDirectionTo(place) * speed) / 21f;
             Projectile.spriteDirection = spriteDirection;
-        }
-
-        private void NetUpdate()
-        {
-            Projectile.netUpdate = true;
-            if (Projectile.netSpam >= 10)
-                Projectile.netSpam = 9;
         }
 
         #endregion

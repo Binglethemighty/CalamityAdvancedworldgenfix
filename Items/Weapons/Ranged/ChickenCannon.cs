@@ -66,10 +66,9 @@ namespace CalamityMod.Items.Weapons.Ranged
 
         private void DetonateRockets(Player player)
         {
-            for (int i = 0; i < Main.maxProjectiles; ++i)
+            foreach (Projectile p in Main.ActiveProjectiles)
             {
-                Projectile p = Main.projectile[i];
-                if (!p.active || p.owner != player.whoAmI || p.type != Item.shoot)
+                if (p.owner != player.whoAmI || p.type != Item.shoot)
                     continue;
 
                 // All rockets will instantly explode on the next frame and send packets to indicate as such.

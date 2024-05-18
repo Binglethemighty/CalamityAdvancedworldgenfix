@@ -51,15 +51,7 @@ namespace CalamityMod.NPCs.PlaguebringerGoliath
             {
                 return true;
             }
-            PbGIndex = -1;
-            for (int i = 0; i < Main.npc.Length; i++)
-            {
-                if (Main.npc[i].active && Main.npc[i].type == PbGType)
-                {
-                    PbGIndex = i;
-                    break;
-                }
-            }
+            PbGIndex = NPC.FindFirstNPC(PbGType);
             //this.DoGIndex = DoGIndex;
             return PbGIndex != -1;
         }

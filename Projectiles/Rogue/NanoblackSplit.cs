@@ -128,10 +128,9 @@ namespace CalamityMod.Projectiles.Rogue
             bool bossFound = false;
             int target = -1;
             float minDist = HomingStartRange;
-            for (int i = 0; i < Main.maxNPCs; ++i)
+            foreach (NPC npc in Main.ActiveNPCs)
             {
-                NPC npc = Main.npc[i];
-                if (!npc.active || npc.type == NPCID.TargetDummy)
+                if (npc.type == NPCID.TargetDummy)
                     continue;
 
                 // If we've found a valid boss target, ignore ALL targets which aren't bosses.
@@ -149,7 +148,7 @@ namespace CalamityMod.Projectiles.Rogue
                         if (npc.boss)
                             bossFound = true;
                         minDist = distToNPC;
-                        target = i;
+                        target = npc.whoAmI;
                     }
                 }
             }

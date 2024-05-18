@@ -35,11 +35,11 @@ namespace CalamityMod.Items.Weapons.Summon
         public override bool Shoot(Player player, EntitySource_ItemUse_WithAmmo source, Vector2 position, Vector2 velocity, int type, int damage, float knockback)
         {
             float totalMinionSlots = 0f;
-            for (int i = 0; i < Main.projectile.Length; i++)
+            foreach (Projectile pro in Main.ActiveProjectiles)
             {
-                if (Main.projectile[i].active && Main.projectile[i].minion && Main.projectile[i].owner == player.whoAmI)
+                if (pro.minion && pro.owner == player.whoAmI)
                 {
-                    totalMinionSlots += Main.projectile[i].minionSlots;
+                    totalMinionSlots += pro.minionSlots;
                 }
             }
             if (player.altFunctionUse != 2 && totalMinionSlots < player.maxMinions)
@@ -50,29 +50,29 @@ namespace CalamityMod.Items.Weapons.Summon
                 if (Main.projectile.IndexInRange(p))
                     Main.projectile[p].originalDamage = Item.damage;
                 int pointyThingCount = 0;
-                for (int i = 0; i < Main.projectile.Length; i++)
+                foreach (Projectile pro in Main.ActiveProjectiles)
                 {
-                    if (Main.projectile[i].active && Main.projectile[i].type == type && Main.projectile[i].owner == player.whoAmI)
+                    if (pro.type == type && pro.owner == player.whoAmI)
                     {
-                        if (!(Main.projectile[i].ModProjectile as GlacialEmbracePointyThing).circlingPlayer)
+                        if (!(pro.ModProjectile as GlacialEmbracePointyThing).circlingPlayer)
                             continue;
                         pointyThingCount++;
                     }
                 }
                 float angleVariance = MathHelper.TwoPi / pointyThingCount;
                 float angle = 0f;
-                for (int i = 0; i < Main.projectile.Length; i++)
+                foreach (Projectile pro in Main.ActiveProjectiles)
                 {
-                    if (Main.projectile[i].active && Main.projectile[i].type == type && Main.projectile[i].owner == player.whoAmI && Main.projectile[i].ai[1] == 0f)
+                    if (pro.type == type && pro.owner == player.whoAmI && pro.ai[1] == 0f)
                     {
-                        if (!(Main.projectile[i].ModProjectile as GlacialEmbracePointyThing).circlingPlayer)
+                        if (!(pro.ModProjectile as GlacialEmbracePointyThing).circlingPlayer)
                             continue;
-                        Main.projectile[i].ai[0] = angle;
-                        Main.projectile[i].netUpdate = true;
+                        pro.ai[0] = angle;
+                        pro.netUpdate = true;
                         angle += angleVariance;
                         for (int j = 0; j < 22; j++)
                         {
-                            Dust dust = Dust.NewDustDirect(Main.projectile[i].position, Main.projectile[i].width, Main.projectile[i].height, DustID.Ice);
+                            Dust dust = Dust.NewDustDirect(pro.position, pro.width, pro.height, DustID.Ice);
                             dust.velocity = Vector2.UnitY * Main.rand.NextFloat(3f, 5.5f) * Main.rand.NextBool().ToDirectionInt();
                             dust.noGravity = true;
                         }

@@ -1,5 +1,6 @@
 ﻿using CalamityMod.Events;
 using CalamityMod.Items;
+using CalamityMod.Systems;
 using Microsoft.Xna.Framework;
 using Terraria;
 using Terraria.Audio;
@@ -35,9 +36,15 @@ namespace CalamityMod.Projectiles.Typeless
             BossRushEvent.SyncEndTimer((int)Time);
 
             float currentShakePower = MathHelper.Lerp(1f, 20f, Utils.GetLerpValue(140f, 180f, Time, true) * Utils.GetLerpValue(10f, 40f, Projectile.timeLeft, true));
-            Main.LocalPlayer.Calamity().GeneralScreenShakePower = currentShakePower;
+            if (Projectile.timeLeft > 5)
+                Main.LocalPlayer.Calamity().GeneralScreenShakePower = currentShakePower;
 
             MoonlordDeathDrama.RequestLight(Utils.GetLerpValue(220f, 265f, Time, true) * Utils.GetLerpValue(10f, 30f, Projectile.timeLeft, true), Main.LocalPlayer.Center);
+
+            // Bit of an ugly solution, but this code prevents the end effect projectile from despawning while the end dialogue is playing.
+            // This fixes a bug where the first-time end dialogue did not play as intended.
+            if (Projectile.timeLeft < 5 && BossRushDialogueSystem.CurrentDialogueDelay != 0)
+                Projectile.timeLeft = 5;
 
             Time++;
         }
@@ -45,16 +52,13 @@ namespace CalamityMod.Projectiles.Typeless
         public override void OnKill(int timeLeft)
         {
             BossRushEvent.End();
-            for (int i = Main.maxPlayers - 1; i >= 0; i--)
+            foreach (Player p in Main.ActivePlayers)
             {
-                Player p = Main.player[i];
-                if (p is null || !p.active)
-                    continue;
                 int rock = Item.NewItem(p.GetSource_Misc("CalamityMod_BossRushRock"), (int)p.position.X, (int)p.position.Y, p.width, p.height, ModContent.ItemType<Rock>());
                 if (Main.netMode == NetmodeID.Server)
                 {
                     Main.timeItemSlotCannotBeReusedFor[rock] = 54000;
-                    NetMessage.SendData(MessageID.InstancedItem, i, -1, null, rock);
+                    NetMessage.SendData(MessageID.InstancedItem, p.whoAmI, -1, null, rock);
                 }
             }
         }

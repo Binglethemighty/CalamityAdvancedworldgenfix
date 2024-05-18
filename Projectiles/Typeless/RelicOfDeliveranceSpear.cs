@@ -176,11 +176,8 @@ namespace CalamityMod.Projectiles.Typeless
                 // Adjust the player's held projectile type.
                 if (player.heldProj == -1)
                     player.heldProj = Projectile.whoAmI;
-                if (player.mount != null)
-                {
-                    player.mount.Dismount(player);
-                }
-                player.ChangeDir((int)Projectile.velocity.X);
+                player.mount?.Dismount(player);
+                player.ChangeDir(Math.Sign(Projectile.velocity.X) <= 0 ? -1 : 1);
                 // Generate dust
                 if (Projectile.ai[0] % DustSpawnInterval == DustSpawnInterval - 1f)
                 {

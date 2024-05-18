@@ -146,15 +146,7 @@ namespace CalamityMod.NPCs.ExoMechs.Thanatos
             bool expertMode = Main.expertMode || bossRush;
 
             // Check if other segments are still alive, if not, die
-            bool shouldDespawn = true;
-            for (int i = 0; i < Main.maxNPCs; i++)
-            {
-                if (Main.npc[i].active && Main.npc[i].type == ModContent.NPCType<ThanatosHead>())
-                {
-                    shouldDespawn = false;
-                    break;
-                }
-            }
+            bool shouldDespawn = !NPC.AnyNPCs(ModContent.NPCType<ThanatosHead>());
             if (!shouldDespawn)
             {
                 if (NPC.ai[1] <= 0f)
@@ -289,16 +281,16 @@ namespace CalamityMod.NPCs.ExoMechs.Thanatos
                                 int numProjectiles = 0;
                                 float maxDistance = 2400f;
 
-                                for (int i = 0; i < Main.maxPlayers; i++)
+                                foreach (Player plr in Main.ActivePlayers)
                                 {
-                                    if (!Main.player[i].active || Main.player[i].dead)
+                                    if (plr.dead)
                                         continue;
 
-                                    Vector2 playerCenter = Main.player[i].Center;
+                                    Vector2 playerCenter = plr.Center;
                                     float distance = Vector2.Distance(playerCenter, NPC.Center);
                                     if (distance < maxDistance)
                                     {
-                                        whoAmIArray[numProjectiles] = i;
+                                        whoAmIArray[numProjectiles] = plr.whoAmI;
                                         targetCenterArray[numProjectiles] = playerCenter;
                                         int projectileLimit = numProjectiles + 1;
                                         numProjectiles = projectileLimit;
@@ -353,16 +345,16 @@ namespace CalamityMod.NPCs.ExoMechs.Thanatos
                                 int numProjectiles = 0;
                                 float maxDistance = 2400f;
 
-                                for (int i = 0; i < Main.maxPlayers; i++)
+                                foreach (Player plr in Main.ActivePlayers)
                                 {
-                                    if (!Main.player[i].active || Main.player[i].dead)
+                                    if (plr.dead)
                                         continue;
 
-                                    Vector2 playerCenter = Main.player[i].Center;
+                                    Vector2 playerCenter = plr.Center;
                                     float distance = Vector2.Distance(playerCenter, NPC.Center);
                                     if (distance < maxDistance)
                                     {
-                                        whoAmIArray[numProjectiles] = i;
+                                        whoAmIArray[numProjectiles] = plr.whoAmI;
                                         targetCenterArray[numProjectiles] = playerCenter;
                                         int projectileLimit = numProjectiles + 1;
                                         numProjectiles = projectileLimit;

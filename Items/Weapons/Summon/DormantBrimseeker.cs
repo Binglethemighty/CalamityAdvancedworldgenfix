@@ -32,11 +32,11 @@ namespace CalamityMod.Items.Weapons.Summon
         public override bool Shoot(Player player, EntitySource_ItemUse_WithAmmo source, Vector2 position, Vector2 velocity, int type, int damage, float knockback)
         {
             float totalSlots = 0f;
-            for (int i = 0; i < Main.projectile.Length; i++)
+            foreach (Projectile p in Main.ActiveProjectiles)
             {
-                if (Main.projectile[i].minion && Main.projectile[i].active && Main.projectile[i].owner == player.whoAmI)
+                if (p.minion && p.owner == player.whoAmI)
                 {
-                    totalSlots += Main.projectile[i].minionSlots;
+                    totalSlots += p.minionSlots;
                 }
             }
             if (totalSlots < player.maxMinions)

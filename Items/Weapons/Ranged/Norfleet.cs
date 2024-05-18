@@ -1,7 +1,9 @@
-﻿using CalamityMod.Projectiles.Ranged;
+﻿using CalamityMod.Buffs.StatDebuffs;
+using CalamityMod.Projectiles.Ranged;
 using CalamityMod.Rarities;
 using Microsoft.Xna.Framework;
 using Terraria;
+using Terraria.Audio;
 using Terraria.DataStructures;
 using Terraria.ID;
 using Terraria.ModLoader;
@@ -45,14 +47,29 @@ namespace CalamityMod.Items.Weapons.Ranged
 
         public override bool Shoot(Player player, EntitySource_ItemUse_WithAmmo source, Vector2 position, Vector2 velocity, int type, int damage, float knockback)
         {
-            Projectile holdout = Projectile.NewProjectileDirect(source, player.MountedCenter, Vector2.Zero, ModContent.ProjectileType<NorfleetCannon>(), damage, knockback, player.whoAmI, 0, 0, loadedShots);
+            // Funny punishment for trying to cheeese with Norfleet
+            bool cheater = (player.Calamity().NorfleetCounter >= 3 && player.Calamity().NorfleetCounter < 1000);
+            if (player.Calamity().NorfleetCounter >= 1000)
+                loadedShots = 1;
+
+            if (cheater)
+            {
+                SoundStyle fire = new("CalamityMod/Sounds/Item/NuhUhUh");
+                SoundEngine.PlaySound(fire, player.Center);
+            }
+
+            Projectile holdout = Projectile.NewProjectileDirect(source, player.MountedCenter, Vector2.Zero, ModContent.ProjectileType<NorfleetCannon>(), damage, knockback, player.whoAmI, 0, (cheater ? 1000 : 0), loadedShots);
             
             // We set the rotation to the direction to the mouse so the first frame doesn't appear bugged out.
             holdout.velocity = (player.Calamity().mouseWorld - player.MountedCenter).SafeNormalize(Vector2.Zero);
 
+            player.Calamity().NorfleetCounter++;
             loadedShots--;
+
             if (loadedShots <= 0)
+            {
                 loadedShots = 3;
+            }
             return false;
         }
     }

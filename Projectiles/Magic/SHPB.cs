@@ -68,12 +68,12 @@ namespace CalamityMod.Projectiles.Magic
             float projY = Projectile.Center.Y;
             float explodeRange = 250f;
             bool canExplode = false;
-            for (int i = 0; i < Main.maxNPCs; i++)
+            foreach (NPC n in Main.ActiveNPCs)
             {
-                if (Main.npc[i].CanBeChasedBy(Projectile, false) && Collision.CanHit(Projectile.Center, 1, 1, Main.npc[i].Center, 1, 1))
+                if (n.CanBeChasedBy(Projectile, false) && Collision.CanHit(Projectile.Center, 1, 1, n.Center, 1, 1))
                 {
-                    float npcX = Main.npc[i].position.X + (float)(Main.npc[i].width / 2);
-                    float npcY = Main.npc[i].position.Y + (float)(Main.npc[i].height / 2);
+                    float npcX = n.position.X + (float)(n.width / 2);
+                    float npcY = n.position.Y + (float)(n.height / 2);
                     float npcDist = Math.Abs(Projectile.position.X + (float)(Projectile.width / 2) - npcX) + Math.Abs(Projectile.position.Y + (float)(Projectile.height / 2) - npcY);
                     if (npcDist < explodeRange)
                     {

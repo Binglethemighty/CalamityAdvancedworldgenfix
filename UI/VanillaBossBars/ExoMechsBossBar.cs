@@ -79,16 +79,15 @@ namespace CalamityMod.UI.VanillaBossBars
                 lifeMax += FalseNPCSegment.lifeMax;
 
                 // Find the others
-                for (int i = 0; i < Main.maxNPCs; i++)
+                foreach (NPC ecco in Main.ActiveNPCs)
                 {
-                    NPC ecco = Main.npc[i];
-                    if (ecco.active && ecco.type == NPCType<AresBody>() && target.type != NPCType<AresBody>())
+                    if (ecco.type == NPCType<AresBody>() && target.type != NPCType<AresBody>())
                         life += ecco.life;
 
-                    if (ecco.active && ecco.type == NPCType<Artemis>() && target.type != NPCType<Artemis>())
+                    if (ecco.type == NPCType<Artemis>() && target.type != NPCType<Artemis>())
                         life += ecco.life;
 
-                    if (ecco.active && ecco.type == NPCType<ThanatosHead>() && target.type != NPCType<ThanatosHead>())
+                    if (ecco.type == NPCType<ThanatosHead>() && target.type != NPCType<ThanatosHead>())
                         life += ecco.life;
                 }
             }
@@ -97,9 +96,8 @@ namespace CalamityMod.UI.VanillaBossBars
 
         public void ValidateAllMechs(ref BigProgressBarInfo info)
         {
-            for (int i = 0; i < Main.maxNPCs; i++)
+            foreach (NPC target in Main.ActiveNPCs)
             {
-                NPC target = Main.npc[i];
                 // Find out first whether or not each of the mechs are in hiding
                 if (target.type == NPCType<AresBody>())
                     HideAres = target.Opacity < 0.5f;

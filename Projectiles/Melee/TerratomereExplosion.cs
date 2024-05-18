@@ -33,7 +33,7 @@ namespace CalamityMod.Projectiles.Melee
             // Play an explosion sound on the first frame of this projectile's existence.
             if (Projectile.localAI[0] == 0f)
             {
-                SoundEngine.PlaySound(SubsumingVortex.ExplosionSound, Projectile.Center);
+                SoundEngine.PlaySound(SubsumingVortex.ExplosionSound with { Volume = 0.6f }, Projectile.Center);
                 Projectile.localAI[0] = 1f;
             }
 
@@ -44,7 +44,7 @@ namespace CalamityMod.Projectiles.Melee
             Projectile.frameCounter++;
             if (Projectile.frameCounter % 5 == 4)
                 Projectile.frame++;
-            if (Projectile.frame >= 18)
+            if (Projectile.frame >= 17)
                 Projectile.Kill();
 
             // Exponentially accelerate.
@@ -60,14 +60,15 @@ namespace CalamityMod.Projectiles.Melee
             Vector2 drawPosition = Projectile.Center - Main.screenPosition;
             Vector2 origin = frame.Size() * 0.5f;
 
-            for (int i = 0; i < 36; i++)
+            for (int i = 0; i < 2; i++)
             {
                 Vector2 lightDrawPosition = drawPosition + (MathHelper.TwoPi * i / 36f + Main.GlobalTimeWrappedHourly * 5f).ToRotationVector2() * Projectile.scale * 12f;
                 Color lightBurstColor = CalamityUtils.MulticolorLerp(Projectile.timeLeft / 144f, Terratomere.TerraColor1, Terratomere.TerraColor2);
-                lightBurstColor = Color.Lerp(lightBurstColor, Color.White, 0.4f) * Projectile.Opacity * 0.184f;
+                lightBurstColor = Color.Lerp(lightBurstColor, Color.White, 0.4f) * Projectile.Opacity * 0.24f;
                 Main.spriteBatch.Draw(lightTexture, lightDrawPosition, null, lightBurstColor, 0f, lightTexture.Size() * 0.5f, Projectile.scale * 1.32f, SpriteEffects.None, 0);
             }
-            Main.spriteBatch.Draw(texture, drawPosition, frame, Color.White, 0f, origin, 1.6f, SpriteEffects.None, 0);
+            if (Projectile.timeLeft < 149)
+                Main.spriteBatch.Draw(texture, drawPosition, frame, Color.White, 0f, origin, 1.6f, SpriteEffects.None, 0);
         }
     }
 }

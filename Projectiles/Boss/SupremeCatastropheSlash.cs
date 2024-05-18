@@ -175,7 +175,7 @@ namespace CalamityMod.Projectiles.Boss
                 }
             }
 
-            if (NPC.AnyNPCs(ModContent.NPCType<SupremeCatastrophe>()) == false)
+            if (NPC.AnyNPCs(ModContent.NPCType<SupremeCatastrophe>()) == false && !Main.zenithWorld)
             {
                 Projectile.timeLeft = 1;
                 for (int k = 0; k < 10; k++)

@@ -88,17 +88,16 @@ namespace CalamityMod.Projectiles.Typeless
                 }
                 if (projectile.ModProjectile is ArtifactOfResilienceShard1)
                 {
-                    for (int i = 0; i < Main.npc.Length; i++)
+                    foreach (var n in Main.ActiveNPCs)
                     {
-                        if (Main.npc[i].active &&
-                            Main.npc[i].Distance(StartingPosition) < projectile.ai[1] &&
-                            Main.npc[i].damage > 0)
+                        if (n.Distance(StartingPosition) < projectile.ai[1] &&
+                            n.damage > 0)
                         {
-                            if (Main.npc[i].Calamity().relicOfResilienceCooldown <= 0)
+                            if (n.Calamity().relicOfResilienceCooldown <= 0)
                             {
-                                Main.npc[i].Calamity().relicOfResilienceCooldown = 600;
-                                Main.npc[i].Calamity().relicOfResilienceWeakness = 180;
-                                Main.npc[i].AddBuff(ModContent.BuffType<ProfanedWeakness>(), Main.npc[i].Calamity().relicOfResilienceWeakness);
+                                n.Calamity().relicOfResilienceCooldown = 600;
+                                n.Calamity().relicOfResilienceWeakness = 180;
+                                n.AddBuff(ModContent.BuffType<ProfanedWeakness>(), n.Calamity().relicOfResilienceWeakness);
                             }
                         }
                     }

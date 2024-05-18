@@ -5,11 +5,11 @@ using Terraria.Audio;
 using Terraria.ID;
 using Terraria.ModLoader;
 
-namespace CalamityMod.Projectiles.Melee
+namespace CalamityMod.Projectiles.Magic
 {
     public class ChronoIcicleSmall : ModProjectile, ILocalizedModType
     {
-        public new string LocalizationCategory => "Projectiles.Melee";
+        public new string LocalizationCategory => "Projectiles.Magic";
         public override void SetDefaults()
         {
             Projectile.width = 12;
@@ -18,7 +18,7 @@ namespace CalamityMod.Projectiles.Melee
             Projectile.coldDamage = true;
             Projectile.friendly = true;
             Projectile.penetrate = 1;
-            Projectile.DamageType = DamageClass.Melee;
+            Projectile.DamageType = DamageClass.Magic;
             Projectile.coldDamage = true;
         }
 

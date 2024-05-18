@@ -120,17 +120,16 @@ namespace CalamityMod.Projectiles.Melee
             // Find the closest NPC targetable
             float range = MaxHomingRange;
             int targetNPC = -1;
-            for (int i = 0; i < Main.npc.Length; i++)
+            foreach (NPC target in Main.ActiveNPCs)
             {
-                NPC target = Main.npc[i];
-                if (!target.CanBeChasedBy(Projectile) || PreviousNPCs.Contains(i))
+                if (!target.CanBeChasedBy(Projectile) || PreviousNPCs.Contains(target.whoAmI))
                     continue;
 
                 float distance = Vector2.Distance(target.Center, Projectile.Center);
                 if (distance < range && Collision.CanHit(Projectile, target))
                 {
                     range = distance;
-                    targetNPC = i;
+                    targetNPC = target.whoAmI;
                 }
             }
 

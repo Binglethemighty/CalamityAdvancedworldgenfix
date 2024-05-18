@@ -93,15 +93,15 @@ namespace CalamityMod.Projectiles.Magic
                 float inertia = 25f;
                 float homingSpeed = 23f;
 
-                for (int i = 0; i < Main.maxNPCs; i++)
+                foreach (NPC n in Main.ActiveNPCs)
                 {
-                    if (Main.npc[i].CanBeChasedBy(Projectile, false))
+                    if (n.CanBeChasedBy(Projectile, false))
                     {
-                        float extraDistance = (float)(Main.npc[i].width / 2) + (float)(Main.npc[i].height / 2);
+                        float extraDistance = (float)(n.width / 2) + (float)(n.height / 2);
 
-                        if (Vector2.Distance(Main.npc[i].Center, Projectile.Center) < (homingRange + extraDistance))
+                        if (Vector2.Distance(n.Center, Projectile.Center) < (homingRange + extraDistance))
                         {
-                            center = Main.npc[i].Center;
+                            center = n.Center;
                             homeIn = true;
                             break;
                         }

@@ -194,8 +194,8 @@ namespace CalamityMod.NPCs.ExoMechs.Ares
             // Whether Ares should be buffed while in berserk phase
             bool shouldGetBuffedByBerserkPhase = berserk && !otherMechIsBerserk;
 
-            // Target variable
-            Player player = Main.player[Main.npc[CalamityGlobalNPC.draedonExoMechPrime].target];
+            // Target variables
+            int targetIndex = Main.npc[CalamityGlobalNPC.draedonExoMechPrime].target;
 
             if (NPC.ai[2] > 0f)
                 NPC.realLife = (int)NPC.ai[2];
@@ -237,8 +237,8 @@ namespace CalamityMod.NPCs.ExoMechs.Ares
             if (lastMechAlive)
                 predictionAmt *= 1.5f;
 
-            Vector2 predictionVector = player.velocity * predictionAmt;
-            Vector2 rotationVector = player.Center + predictionVector - NPC.Center;
+            Vector2 predictionVector = Main.player[targetIndex].velocity * predictionAmt;
+            Vector2 rotationVector = Main.player[targetIndex].Center + predictionVector - NPC.Center;
 
             bool fireMoreOrbs = calamityGlobalNPC_Body.newAI[0] == (float)AresBody.Phase.Deathrays;
             float projectileVelocity = (passivePhase || fireMoreOrbs) ? 5.2f : 7.8f;
@@ -261,7 +261,7 @@ namespace CalamityMod.NPCs.ExoMechs.Ares
             NPC.rotation = NPC.rotation.AngleTowards(rotation, rateOfRotation);
 
             // Direction
-            int direction = Math.Sign(player.Center.X - NPC.Center.X);
+            int direction = Math.Sign(Main.player[targetIndex].Center.X - NPC.Center.X);
             if (direction != 0)
             {
                 NPC.direction = direction;
@@ -285,35 +285,31 @@ namespace CalamityMod.NPCs.ExoMechs.Ares
             float setTimerTo = (int)(teslaOrbPhaseGateValue * 0.3f) - 1;
 
             // Despawn if target is dead
-            if (player.dead)
+            if (Main.player[targetIndex].dead)
             {
-                player = Main.player[Main.npc[CalamityGlobalNPC.draedonExoMechPrime].target];
-                if (player.dead)
-                {
-                    AIState = (float)Phase.Nothing;
-                    calamityGlobalNPC.newAI[1] = setTimerTo;
-                    calamityGlobalNPC.newAI[2] = 0f;
-                    NPC.dontTakeDamage = true;
+                AIState = (float)Phase.Nothing;
+                calamityGlobalNPC.newAI[1] = setTimerTo;
+                calamityGlobalNPC.newAI[2] = 0f;
+                NPC.dontTakeDamage = true;
 
+                NPC.velocity.Y -= 1f;
+                if ((double)NPC.position.Y < Main.topWorld + 16f)
                     NPC.velocity.Y -= 1f;
-                    if ((double)NPC.position.Y < Main.topWorld + 16f)
-                        NPC.velocity.Y -= 1f;
 
-                    if ((double)NPC.position.Y < Main.topWorld + 16f)
+                if ((double)NPC.position.Y < Main.topWorld + 16f)
+                {
+                    for (int a = 0; a < Main.maxNPCs; a++)
                     {
-                        for (int a = 0; a < Main.maxNPCs; a++)
-                        {
-                            if (Main.npc[a].type == NPC.type || Main.npc[a].type == ModContent.NPCType<Artemis.Artemis>() || Main.npc[a].type == ModContent.NPCType<AresBody>() ||
-                                Main.npc[a].type == ModContent.NPCType<AresLaserCannon>() || Main.npc[a].type == ModContent.NPCType<AresPlasmaFlamethrower>() ||
-                                Main.npc[a].type == ModContent.NPCType<Apollo.Apollo>() || Main.npc[a].type == ModContent.NPCType<AresGaussNuke>() ||
-                                Main.npc[a].type == ModContent.NPCType<ThanatosHead>() || Main.npc[a].type == ModContent.NPCType<ThanatosBody1>() ||
-                                Main.npc[a].type == ModContent.NPCType<ThanatosBody2>() || Main.npc[a].type == ModContent.NPCType<ThanatosTail>())
-                                Main.npc[a].active = false;
-                        }
+                        if (Main.npc[a].type == NPC.type || Main.npc[a].type == ModContent.NPCType<Artemis.Artemis>() || Main.npc[a].type == ModContent.NPCType<AresBody>() ||
+                            Main.npc[a].type == ModContent.NPCType<AresLaserCannon>() || Main.npc[a].type == ModContent.NPCType<AresPlasmaFlamethrower>() ||
+                            Main.npc[a].type == ModContent.NPCType<Apollo.Apollo>() || Main.npc[a].type == ModContent.NPCType<AresGaussNuke>() ||
+                            Main.npc[a].type == ModContent.NPCType<ThanatosHead>() || Main.npc[a].type == ModContent.NPCType<ThanatosBody1>() ||
+                            Main.npc[a].type == ModContent.NPCType<ThanatosBody2>() || Main.npc[a].type == ModContent.NPCType<ThanatosTail>())
+                            Main.npc[a].active = false;
                     }
-
-                    return;
                 }
+
+                return;
             }
 
             // Default vector to fly to
@@ -349,7 +345,7 @@ namespace CalamityMod.NPCs.ExoMechs.Ares
             float movementDistanceGateValue = 50f;
 
             // If Tesla Cannon can fire projectiles, cannot fire if too close to the target and in deathray spiral phase
-            bool canFire = Vector2.Distance(NPC.Center, player.Center) > 320f || calamityGlobalNPC_Body.newAI[0] != (float)AresBody.Phase.Deathrays;
+            bool canFire = Vector2.Distance(NPC.Center, Main.player[targetIndex].Center) > 320f || calamityGlobalNPC_Body.newAI[0] != (float)AresBody.Phase.Deathrays;
 
             // Telegraph duration for deathray spiral
             float deathrayTelegraphDuration = bossRush ? AresBody.deathrayTelegraphDuration_BossRush : death ? AresBody.deathrayTelegraphDuration_Death :

@@ -80,16 +80,15 @@ namespace CalamityMod.Projectiles.Melee
             {
                 int npcTracker = -1;
                 float homingRange = 60f;
-                for (int i = 0; i < Main.maxNPCs; i++)
+                foreach (NPC nPC in Main.ActiveNPCs)
                 {
-                    NPC nPC = Main.npc[i];
                     if (nPC.CanBeChasedBy(Projectile, false))
                     {
                         float npcDistance = Projectile.Distance(nPC.Center);
                         if (npcDistance < homingRange && Collision.CanHitLine(Projectile.Center, 0, 0, nPC.Center, 0, 0))
                         {
                             homingRange = npcDistance;
-                            npcTracker = i;
+                            npcTracker = nPC.whoAmI;
                         }
                     }
                 }

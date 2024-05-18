@@ -153,7 +153,7 @@ namespace CalamityMod.NPCs.Astral
             }
             NPC.Calamity().VulnerableToHeat = true;
             NPC.Calamity().VulnerableToSickness = false;
-            SpawnModBiomes = new int[1] { ModContent.GetInstance<AbovegroundAstralBiome>().Type };
+            SpawnModBiomes = new int[1] { ModContent.GetInstance<BiomeManagers.AstralInfectionBiome>().Type };
 
             // Scale stats in Expert and Master
             CalamityGlobalNPC.AdjustExpertModeStatScaling(NPC);
@@ -270,13 +270,13 @@ namespace CalamityMod.NPCs.Astral
                     centerY - height / 2,
                     width, height);
 
-                for (int i = 0; i < Main.player.Length; i++)
+                foreach (Player player in Main.ActivePlayers)
                 {
-                    if (Main.player[i].active && !Main.player[i].dead && Main.player[i].getRect().Intersects(hitbox))
+                    if (!player.dead && player.getRect().Intersects(hitbox))
                     {
-                        Vector2 before = Main.player[i].velocity;
-                        Main.player[i].Hurt(PlayerDeathReason.ByNPC(NPC.whoAmI), NPC.defDamage, NPC.direction);
-                        Vector2 after = Main.player[i].velocity;
+                        Vector2 before = player.velocity;
+                        player.Hurt(PlayerDeathReason.ByNPC(NPC.whoAmI), NPC.defDamage, NPC.direction);
+                        Vector2 after = player.velocity;
                         Vector2 difference = after - before;
 
                         float horMult = 3.5f;
@@ -291,7 +291,7 @@ namespace CalamityMod.NPCs.Astral
                             swingYeet = true;
                         }
 
-                        if (Main.player[i].noKnockback)
+                        if (player.noKnockback)
                         {
                             horMult *= 0.5f;
                             verMult *= 0.5f;
@@ -299,7 +299,7 @@ namespace CalamityMod.NPCs.Astral
 
                         difference *= new Vector2(horMult, verMult);
 
-                        Main.player[i].velocity = before + difference;
+                        player.velocity = before + difference;
                     }
                 }
             }

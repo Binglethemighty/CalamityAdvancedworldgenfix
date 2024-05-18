@@ -503,16 +503,16 @@ namespace CalamityMod.Projectiles.Summon
             }
 
             float distance = searchDistance * searchDistance;
-            for (int i = 0; i < Main.maxNPCs; i++)
+            foreach (NPC n in Main.ActiveNPCs)
             {
-                if (Main.npc[i].CanBeChasedBy() && Main.npc[i].type != heartType)
+                if (n.CanBeChasedBy() && n.type != heartType)
                 {
-                    float extraDistance = (Main.npc[i].width / 2) + (Main.npc[i].height / 2);
+                    float extraDistance = (n.width / 2) + (n.height / 2);
 
-                    if (Main.npc[i].WithinRange(Projectile.Center, distance + extraDistance))
+                    if (n.WithinRange(Projectile.Center, distance + extraDistance))
                     {
-                        distance = Main.npc[i].DistanceSQ(Projectile.Center);
-                        closestTarget = Main.npc[i];
+                        distance = n.DistanceSQ(Projectile.Center);
+                        closestTarget = n;
                     }
                 }
             }

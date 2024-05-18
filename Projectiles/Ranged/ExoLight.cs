@@ -71,10 +71,10 @@ namespace CalamityMod.Projectiles.Ranged
             Projectile.scale = MathHelper.Lerp(0.001f, 1f, Utils.GetLerpValue(0f, 25f, Time, true));
             if (Projectile.localAI[0] == 0f)
             {
-                for (int i = 0; i < Main.maxNPCs; i++)
+                foreach (NPC n in Main.ActiveNPCs)
                 {
-                    if (Main.npc[i].CanBeChasedBy(Projectile.GetSource_FromThis(), false))
-                        NPCDestination = Main.npc[i].Center + Main.npc[i].velocity * 5f;
+                    if (n.CanBeChasedBy(Projectile.GetSource_FromThis(), false))
+                        NPCDestination = n.Center + n.velocity * 5f;
                 }
                 InitialCenter = Projectile.Center;
                 Projectile.localAI[0] = 1f;

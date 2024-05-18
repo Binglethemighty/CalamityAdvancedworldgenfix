@@ -1,19 +1,16 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.IO;
 using CalamityMod.Items.Weapons.Magic;
 using CalamityMod.Particles;
-using Humanizer;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
-using ReLogic.Utilities;
 using Terraria;
 using Terraria.Audio;
 using Terraria.DataStructures;
 using Terraria.ID;
 using Terraria.Localization;
 using Terraria.ModLoader;
-using System.Collections.Generic;
-using System.IO;
-using CalamityMod.Graphics.Renderers;
 
 namespace CalamityMod.Projectiles.Magic
 {
@@ -26,7 +23,6 @@ namespace CalamityMod.Projectiles.Magic
         private ref float ShootingTimer => ref Projectile.ai[0];
         private float FiringTime = 10;
         private float PostFireCooldown = 0;
-        private Vector2 MovementOffset;
         public bool MovingUp = true;
         public float xOffset = 1;
         public float yOffset = 0;
@@ -42,45 +38,48 @@ namespace CalamityMod.Projectiles.Magic
 
         public bool recharging = false;
 
+        public override void SetStaticDefaults()
+        {
+            ProjectileID.Sets.TrailCacheLength[Type] = 9;
+            ProjectileID.Sets.TrailingMode[Type] = 2;
+        }
+
         public override void SetDefaults()
         {
             Projectile.width = Projectile.height = 142;
             Projectile.tileCollide = false;
             Projectile.ignoreWater = true;
             Projectile.netImportant = true;
-            ProjectileID.Sets.TrailCacheLength[Projectile.type] = 9;
-            ProjectileID.Sets.TrailingMode[Projectile.type] = 2;
             Projectile.hide = true;
         }
 
         public override void AI()
         {
+            Owner ??= Main.player[Projectile.owner];
+
             if (time > 1 && Owner.ownedProjectileCounts[ModContent.ProjectileType<OmicronHoldout>()] < 1 && PostFireCooldown <= 0)
                 Projectile.Kill();
+
             Lighting.AddLight(Projectile.Center, StaticEffectsColor.ToVector3() * 0.2f);
+
             if (time == 0)
-            {
-                MovingUp = Projectile.ai[2] == 1 ? true : false;
-            }
+                MovingUp = Projectile.ai[2] == 1;
+
             firingDelay--;
             Item heldItem = Owner.ActiveItem();
 
             // Update damage based on curent magic damage stat (so Mana Sickness affects it)
             Projectile.damage = heldItem is null ? 0 : Owner.GetWeaponDamage(heldItem);
 
-            Vector2 tipPosition = Projectile.Center + Projectile.velocity.SafeNormalize(Vector2.Zero).RotatedBy(-0.05f * Projectile.direction) * 12f;
             // If there's no player, or the player is the server, or the owner's stunned, there'll be no holdout.
             if (PostFireCooldown == 0 && launchDelay == 0 && Owner.CantUseHoldout() || heldItem.type != ModContent.ItemType<Omicron>())
             {
-                NetUpdate();
                 if (PostFireCooldown <= 0)
                     Projectile.Kill();
             }
 
             if (PostFireCooldown > 0)
-            {
                 PostFiringCooldown();
-            }
 
             if (launchDelay > 0 || (PostFireCooldown <= 0 && (Owner.Calamity().mouseRight || (firingDelay <= 0 && Projectile.ai[2] == 1 || Projectile.ai[2] == -1))))
             {
@@ -89,10 +88,10 @@ namespace CalamityMod.Projectiles.Magic
                 {
                     if (launchDelay < 50)
                         launchDelay++;
-                    
+
                     if (launchDelay >= 50 && (Owner.CheckMana(Owner.ActiveItem(), (int)(heldItem.mana * Owner.manaCost) * 2, true, false)))
                     {
-                        Shoot(heldItem, true);
+                        Shoot(true);
                         PostFireCooldown = 50;
                         ShootingTimer = 0;
                         launchDelay = 0;
@@ -102,13 +101,11 @@ namespace CalamityMod.Projectiles.Magic
                 {
                     if (Owner.CheckMana(Owner.ActiveItem(), -1, false, false))
                     {
-                        Shoot(heldItem, false);
+                        Shoot(false);
                         ShootingTimer = 0;
                     }
                     else if (PostFireCooldown <= 0)
-                    {
                         Projectile.Kill();
-                    }
                 }
             }
 
@@ -119,7 +116,7 @@ namespace CalamityMod.Projectiles.Magic
             Vector2 ownerToMouse = Owner.Calamity().mouseWorld - ownerPosition;
 
             // Deals with the holdout's rotation and direction, the owner's arms, etc.
-            ManageHoldout(ownerPosition, ownerToMouse);
+            ManagePlayerProjectileMembers(ownerToMouse);
 
             // When we change the distance of the gun from the arms for the recoil,
             // recover to the original position smoothly.
@@ -127,82 +124,66 @@ namespace CalamityMod.Projectiles.Magic
                 OffsetLength = MathHelper.Lerp(OffsetLength, MaxOffsetLength, 0.1f);
 
             ShootingTimer++;
-
-            // Inside here go all the things that dedicated servers shouldn't spend resources on.
-            // Like visuals and sounds.
-            if (Main.dedServ)
-                return;
-
-            Vector2 shootDirection = Projectile.velocity.SafeNormalize(Vector2.Zero) * 20;
             time++;
             Projectile.soundDelay--;
+
+            Projectile.netSpam = 0;
+            Projectile.netUpdate = true;
         }
 
-        private void ManageHoldout(Vector2 mountedCenter, Vector2 ownerToMouse)
+        private void ManagePlayerProjectileMembers(Vector2 ownerToMouse)
         {
             Vector2 rotationVector = Projectile.rotation.ToRotationVector2();
             float velocityRotation = Projectile.velocity.ToRotation();
-            float proximityLookingUpwards = Vector2.Dot(ownerToMouse.SafeNormalize(Vector2.Zero), -Vector2.UnitY);
             int direction = MathF.Sign(ownerToMouse.X);
-
-            Vector2 armPosition = Owner.RotatedRelativePoint(mountedCenter, true);
             Vector2 lengthOffset = rotationVector * OffsetLength;
-            Vector2 armOffset = new Vector2(Utils.Remap(proximityLookingUpwards, -1f, 1f, 0f, -12f) * direction, -10f + Utils.Remap(MathF.Abs(proximityLookingUpwards), 0f, 1f, 0f, proximityLookingUpwards > 0f ? 15f : 0f));
 
             if (time % 30 == 0)
-            {
                 MovingUp = !MovingUp;
-            }
 
             //xOffset = MathHelper.Lerp(xOffset, placementOffset.X, 0.01f);
             yOffset = MathHelper.Lerp(yOffset, 150 * (MovingUp ? -1 : 1), (0.085f - (FiringTime * 0.0012f)));
 
             Vector2 placementOffset = Projectile.velocity.SafeNormalize(Vector2.UnitX).RotatedBy(MathHelper.PiOver2) * (yOffset);
-
             Vector2 location = Owner.MountedCenter + placementOffset;
             Projectile.Center = lengthOffset + location;
-
-
             Projectile.velocity = velocityRotation.AngleTowards(ownerToMouse.ToRotation(), 0.2f).ToRotationVector2();
-            Projectile.rotation = (Main.MouseWorld - Projectile.Center).SafeNormalize(Vector2.UnitX).ToRotation();
+            Projectile.rotation = (Owner.Calamity().mouseWorld - Projectile.Center).SafeNormalize(Vector2.UnitX).ToRotation();
             Projectile.timeLeft = 2;
-
-            Owner.heldProj = Projectile.whoAmI;
-            Owner.itemTime = Owner.itemAnimation = 2;
-            Owner.itemRotation = (Projectile.velocity * Projectile.direction).ToRotation();
-
             Projectile.spriteDirection = Projectile.direction = direction;
         }
 
-        private void Shoot(Item item, bool isGrenade)
+        private void Shoot(bool isGrenade)
         {
-            Vector2 shootDirection = (Main.MouseWorld - Projectile.Center).SafeNormalize(Vector2.UnitX);
+            Vector2 shootDirection = (Owner.Calamity().mouseWorld - Projectile.Center).SafeNormalize(Vector2.UnitX);
 
             // The position of the tip of the gun.
             Vector2 tipPosition = Projectile.Center + Projectile.velocity.SafeNormalize(Vector2.Zero).RotatedBy(-0.05f * Projectile.direction) * 12f;
-
-            // Spawns the projectile.
 
             Vector2 firingVelocity = shootDirection * 10;
             if (isGrenade)
             {
                 SoundStyle fire = new("CalamityMod/Sounds/Item/DeadSunExplosion");
                 SoundEngine.PlaySound(fire with { Volume = 0.2f, Pitch = -0.4f, PitchVariance = 0.2f }, Projectile.Center);
-                Projectile bomb = Projectile.NewProjectileDirect(Projectile.GetSource_FromThis(), tipPosition, firingVelocity, ModContent.ProjectileType<WingmanGrenade>(), Projectile.damage * 20, Projectile.knockBack * 5, Projectile.owner, 0, 2);
-                bomb.timeLeft = 530;
-                Projectile.NewProjectileDirect(Projectile.GetSource_FromThis(), tipPosition, firingVelocity * 1.2f, ModContent.ProjectileType<WingmanGrenade>(), Projectile.damage * 20, Projectile.knockBack * 5, Projectile.owner, 0, 2);
+                if (Main.myPlayer == Projectile.owner)
+                {
+                    Projectile bomb = Projectile.NewProjectileDirect(Projectile.GetSource_FromThis(), tipPosition, firingVelocity, ModContent.ProjectileType<WingmanGrenade>(), Projectile.damage * 14, Projectile.knockBack * 5, Projectile.owner, 0, 2);
+                    bomb.timeLeft = 530;
+                    Projectile.NewProjectileDirect(Projectile.GetSource_FromThis(), tipPosition, firingVelocity * 1.2f, ModContent.ProjectileType<WingmanGrenade>(), Projectile.damage * 14, Projectile.knockBack * 5, Projectile.owner, 0, 2);
+                }
             }
             else
             {
                 SoundStyle fire = new("CalamityMod/Sounds/Item/MagnaCannonShot");
                 SoundEngine.PlaySound(fire with { Volume = 0.25f, Pitch = 1f, PitchVariance = 0.35f }, Projectile.Center);
-                
-                Projectile.NewProjectileDirect(Projectile.GetSource_FromThis(), tipPosition, firingVelocity, ModContent.ProjectileType<WingmanShot>(), Projectile.damage, Projectile.knockBack, Projectile.owner, 0, 2);
-                Projectile.NewProjectileDirect(Projectile.GetSource_FromThis(), tipPosition, firingVelocity.RotatedBy(-0.05) * 0.85f, ModContent.ProjectileType<WingmanShot>(), Projectile.damage, Projectile.knockBack, Projectile.owner, 0, 2);
-                Projectile.NewProjectileDirect(Projectile.GetSource_FromThis(), tipPosition, firingVelocity.RotatedBy(0.05) * 0.85f, ModContent.ProjectileType<WingmanShot>(), Projectile.damage, Projectile.knockBack, Projectile.owner, 0, 2);
-            }
 
-            NetUpdate();
+                if (Main.myPlayer == Projectile.owner)
+                {
+                    Projectile.NewProjectileDirect(Projectile.GetSource_FromThis(), tipPosition, firingVelocity, ModContent.ProjectileType<WingmanShot>(), Projectile.damage, Projectile.knockBack, Projectile.owner, 0, 2);
+                    Projectile.NewProjectileDirect(Projectile.GetSource_FromThis(), tipPosition, firingVelocity.RotatedBy(-0.05) * 0.85f, ModContent.ProjectileType<WingmanShot>(), Projectile.damage, Projectile.knockBack, Projectile.owner, 0, 2);
+                    Projectile.NewProjectileDirect(Projectile.GetSource_FromThis(), tipPosition, firingVelocity.RotatedBy(0.05) * 0.85f, ModContent.ProjectileType<WingmanShot>(), Projectile.damage, Projectile.knockBack, Projectile.owner, 0, 2);
+                }
+            }
 
             // Inside here go all the things that dedicated servers shouldn't spend resources on.
             // Like visuals and sounds.
@@ -218,6 +199,7 @@ namespace CalamityMod.Projectiles.Magic
                 dust2.noGravity = true;
                 dust2.color = Main.rand.NextBool() ? Color.Lerp(StaticEffectsColor, Color.White, 0.5f) : StaticEffectsColor;
             }
+
             Particle pulse = new GlowSparkParticle((tipPosition - shootDirection * 14), shootDirection * 20, false, Main.rand.Next(7, 11 + 1), 0.035f, StaticEffectsColor, new Vector2(1.5f, 0.9f), true);
             GeneralParticleHandler.SpawnParticle(pulse);
 
@@ -227,8 +209,10 @@ namespace CalamityMod.Projectiles.Magic
             else
                 OffsetLength -= 5f;
         }
+
         private void PostFiringCooldown()
         {
+            Owner.channel = true;
             Vector2 tipPosition = Projectile.Center + Projectile.velocity.SafeNormalize(Vector2.Zero).RotatedBy(-0.05f * Projectile.direction) * 12f;
 
             if (PostFireCooldown > 0 && Main.rand.NextBool())
@@ -241,23 +225,13 @@ namespace CalamityMod.Projectiles.Magic
                 dust.noGravity = false;
                 dust.color = StaticEffectsColor;
             }
+
             ShootingTimer = 0;
             firingDelay = 15;
             PostFireCooldown--;
         }
 
-        private void NetUpdate()
-        {
-            Projectile.netUpdate = true;
-            if (Projectile.netSpam >= 10)
-                Projectile.netSpam = 9;
-        }
-
-        public override void OnSpawn(IEntitySource source)
-        {
-            Owner = Main.player[Projectile.owner];
-            OffsetLength = MaxOffsetLength;
-        }
+        public override void OnSpawn(IEntitySource source) => OffsetLength = MaxOffsetLength;
 
         // Because we use the velocity as a direction, we don't need it to change its position.
         public override bool ShouldUpdatePosition() => false;
@@ -269,8 +243,7 @@ namespace CalamityMod.Projectiles.Magic
             if (time <= 0)
                 return false;
 
-            Texture2D texture = ModContent.Request<Texture2D>("CalamityMod/Items/Weapons/Magic/Wingman").Value;
-
+            Texture2D texture;
             if (Projectile.ai[2] == 1)
                 texture = ModContent.Request<Texture2D>("CalamityMod/Projectiles/Magic/OmicronWingman").Value;
             else
@@ -290,9 +263,29 @@ namespace CalamityMod.Projectiles.Magic
 
             return false;
         }
-        public override void DrawBehind(int index, List<int> behindNPCsAndTiles, List<int> behindNPCs, List<int> behindProjectiles, List<int> overPlayers, List<int> overWiresUI)
+
+        public override void DrawBehind(int index, List<int> behindNPCsAndTiles, List<int> behindNPCs, List<int> behindProjectiles, List<int> overPlayers, List<int> overWiresUI) => behindNPCs.Add(index);
+
+        public override void SendExtraAI(BinaryWriter writer)
         {
-            behindNPCs.Add(index);
+            writer.Write(Projectile.rotation);
+            writer.Write(Projectile.spriteDirection);
+            writer.Write(OffsetLength);
+            writer.Write(time);
+            writer.Write(firingDelay);
+            writer.Write(launchDelay);
+            writer.Write(MovingUp);
+        }
+
+        public override void ReceiveExtraAI(BinaryReader reader)
+        {
+            Projectile.rotation = reader.ReadSingle();
+            Projectile.spriteDirection = reader.ReadInt32();
+            OffsetLength = reader.ReadSingle();
+            time = reader.ReadInt32();
+            firingDelay = reader.ReadInt32();
+            launchDelay = reader.ReadInt32();
+            MovingUp = reader.ReadBoolean();
         }
     }
 }

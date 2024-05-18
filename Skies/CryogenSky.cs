@@ -108,15 +108,7 @@ namespace CalamityMod.Skies
             if (CryogenIndex >= 0 && Main.npc[CryogenIndex].active && Main.npc[CryogenIndex].type == cryogenType)
                 return true;
 
-            CryogenIndex = -1;
-            for (int i = 0; i < Main.npc.Length; i++)
-            {
-                if (Main.npc[i].active && Main.npc[i].type == cryogenType)
-                {
-                    CryogenIndex = i;
-                    break;
-                }
-            }
+            CryogenIndex = NPC.FindFirstNPC(cryogenType);
 
             return CryogenIndex != -1;
         }

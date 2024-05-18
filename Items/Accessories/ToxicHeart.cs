@@ -40,9 +40,8 @@ namespace CalamityMod.Items.Accessories
             {
                 if (random == 0)
                 {
-                    for (int l = 0; l < Main.maxNPCs; l++)
+                    foreach (NPC nPC in Main.ActiveNPCs)
                     {
-                        NPC nPC = Main.npc[l];
                         if (nPC.IsAnEnemy() && !nPC.dontTakeDamage && !nPC.buffImmune[plagueDebuff] && Vector2.Distance(player.Center, nPC.Center) <= 300f)
                         {
                             if (nPC.FindBuffIndex(plagueDebuff) == -1)
@@ -53,7 +52,7 @@ namespace CalamityMod.Items.Accessories
                             {
                                 if (player.whoAmI == Main.myPlayer)
                                 {
-                                    Projectile.NewProjectileDirect(source, nPC.Center, Vector2.Zero, ModContent.ProjectileType<DirectStrike>(), auraDamage, 0f, player.whoAmI, l);
+                                    Projectile.NewProjectileDirect(source, nPC.Center, Vector2.Zero, ModContent.ProjectileType<DirectStrike>(), auraDamage, 0f, player.whoAmI, nPC.whoAmI);
                                 }
                             }
                         }

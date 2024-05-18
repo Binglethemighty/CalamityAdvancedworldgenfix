@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using CalamityMod.Tiles.Abyss.AbyssAmbient;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
@@ -10,13 +11,11 @@ using Terraria.ModLoader;
 
 namespace CalamityMod.Tiles.Abyss
 {
-    public class PyreMantle : ModTile
+    public class PyreMantle : ModTile, IMergeableTile
     {
         public static readonly SoundStyle MineSound = new("CalamityMod/Sounds/Custom/VoidstoneMine", 3) { Volume = 0.4f };
 
-        public byte[,] tileAdjacency;
-        public byte[,] secondTileAdjacency;
-        public byte[,] thirdTileAdjacency;
+        List<TileFraming.MergeFrameData> IMergeableTile.TileAdjacencies { get; } = [];
 
         public override void SetStaticDefaults()
         {
@@ -33,9 +32,9 @@ namespace CalamityMod.Tiles.Abyss
             MinPick = 180;
             AddMapEntry(new Color(19, 20, 32));
 
-            TileFraming.SetUpUniversalMerge(Type, TileID.Dirt, out tileAdjacency);
-            TileFraming.SetUpUniversalMerge(Type, TileID.Stone, out secondTileAdjacency);
-            TileFraming.SetUpUniversalMerge(Type, ModContent.TileType<AbyssGravel>(), out thirdTileAdjacency);
+            this.RegisterUniversalMerge(TileID.Dirt, "CalamityMod/Tiles/Merges/DirtMerge");
+            this.RegisterUniversalMerge(TileID.Stone, "CalamityMod/Tiles/Merges/StoneMerge");
+            this.RegisterUniversalMerge(ModContent.TileType<AbyssGravel>(), "CalamityMod/Tiles/Merges/AbyssGravelMerge");
         }
 
         public override bool CreateDust(int i, int j, ref int type)
@@ -69,21 +68,6 @@ namespace CalamityMod.Tiles.Abyss
                 if (Main.netMode == NetmodeID.Server)
                     NetMessage.SendTileSquare(-1, i, j - 1, 3, TileChangeType.None);
             }
-        }
-
-        public override void PostDraw(int i, int j, SpriteBatch spriteBatch)
-        {
-            TileFraming.DrawUniversalMergeFrames(i, j, thirdTileAdjacency, "CalamityMod/Tiles/Merges/AbyssGravelMerge");
-            TileFraming.DrawUniversalMergeFrames(i, j, secondTileAdjacency, "CalamityMod/Tiles/Merges/StoneMerge");
-            TileFraming.DrawUniversalMergeFrames(i, j, tileAdjacency, "CalamityMod/Tiles/Merges/DirtMerge");
-        }
-
-        public override bool TileFrame(int i, int j, ref bool resetFrame, ref bool noBreak)
-        {
-            TileFraming.GetAdjacencyData(i, j, TileID.Dirt, out tileAdjacency[i, j]);
-            TileFraming.GetAdjacencyData(i, j, TileID.Stone, out secondTileAdjacency[i, j]);
-            TileFraming.GetAdjacencyData(i, j, ModContent.TileType<AbyssGravel>(), out thirdTileAdjacency[i, j]);
-            return true;
         }
     }
 }

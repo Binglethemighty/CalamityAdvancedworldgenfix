@@ -117,9 +117,8 @@ namespace CalamityMod.Projectiles.Summon
                 }
                 if (!chaseNPC)
                 {
-                    for (int j = 0; j < Main.maxNPCs; j++)
+                    foreach (NPC npcTarget in Main.ActiveNPCs)
                     {
-                        NPC npcTarget = Main.npc[j];
                         if (npcTarget.CanBeChasedBy(Projectile, false))
                         {
                             float targetDist = Vector2.Distance(npcTarget.Center, Projectile.Center);

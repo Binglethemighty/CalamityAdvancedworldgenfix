@@ -396,9 +396,6 @@ namespace CalamityMod.NPCs.VanillaNPCAIOverrides.Bosses
                     // Set velocity for charge
                     if (attackPicker == 1)
                     {
-                        // Set damage
-                        npc.damage = setDamage;
-
                         npc.ai[0] = 1f;
                         npc.ai[1] = 0f;
                         npc.ai[2] = 0f;
@@ -662,9 +659,6 @@ namespace CalamityMod.NPCs.VanillaNPCAIOverrides.Bosses
                     // Set velocity for charge
                     if (phase2AttackPicker == 1)
                     {
-                        // Set damage
-                        npc.damage = setDamage;
-
                         npc.ai[0] = 6f;
                         npc.ai[1] = 0f;
                         npc.ai[2] = 0f;
@@ -976,9 +970,6 @@ namespace CalamityMod.NPCs.VanillaNPCAIOverrides.Bosses
                     // Set velocity for charge
                     if (phase3AttackPicker == 1)
                     {
-                        // Set damage
-                        npc.damage = setDamage;
-
                         npc.ai[0] = 11f;
                         npc.ai[1] = 0f;
                         npc.ai[2] = 0f;
@@ -1600,10 +1591,6 @@ namespace CalamityMod.NPCs.VanillaNPCAIOverrides.Bosses
                     switch (num27)
                     {
                         case 1:
-
-                            // Set damage
-                            npc.damage = setDamage;
-
                             npc.ai[0] = 1f;
                             npc.ai[1] = 0f;
                             npc.ai[2] = 0f;
@@ -1873,10 +1860,6 @@ namespace CalamityMod.NPCs.VanillaNPCAIOverrides.Bosses
                     switch (num32)
                     {
                         case 1:
-
-                            // Set damage
-                            npc.damage = setDamage;
-
                             npc.ai[0] = 6f;
                             npc.ai[1] = 0f;
                             npc.ai[2] = 0f;
@@ -2104,10 +2087,6 @@ namespace CalamityMod.NPCs.VanillaNPCAIOverrides.Bosses
                     switch (num37)
                     {
                         case 1:
-
-                            // Set damage
-                            npc.damage = setDamage;
-
                             npc.ai[0] = 11f;
                             npc.ai[1] = 0f;
                             npc.ai[2] = 0f;

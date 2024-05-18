@@ -1,4 +1,5 @@
-﻿using CalamityMod.Projectiles.Environment;
+﻿using System.Collections.Generic;
+using CalamityMod.Projectiles.Environment;
 using CalamityMod.Tiles.Abyss;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
@@ -11,10 +12,9 @@ using Terraria.ModLoader;
 namespace CalamityMod.Tiles.Ores
 {
     [LegacyName("ChaoticOre")]
-    public class ScoriaOre : ModTile
+    public class ScoriaOre : ModTile, IMergeableTile
     {
-        public byte[,] TileAdjacency;
-        public byte[,] secondTileAdjacency;
+        List<TileFraming.MergeFrameData> IMergeableTile.TileAdjacencies { get; } = [];
 
         public override void SetStaticDefaults()
         {
@@ -34,8 +34,8 @@ namespace CalamityMod.Tiles.Ores
             MinPick = 210;
             HitSound = SoundID.Tink;
 
-            TileFraming.SetUpUniversalMerge(Type, ModContent.TileType<AbyssGravel>(), out TileAdjacency);
-            TileFraming.SetUpUniversalMerge(Type, ModContent.TileType<PyreMantle>(), out secondTileAdjacency);
+            this.RegisterUniversalMerge(ModContent.TileType<AbyssGravel>(), "CalamityMod/Tiles/Merges/AbyssGravelMerge");
+            this.RegisterUniversalMerge(ModContent.TileType<PyreMantle>(), "CalamityMod/Tiles/Merges/PyreMantleMerge");
         }
 
         public override void NearbyEffects(int i, int j, bool closer)
@@ -88,15 +88,7 @@ namespace CalamityMod.Tiles.Ores
             g = 0.00f;
             b = 0.00f;
         }
-
-        public override bool TileFrame(int i, int j, ref bool resetFrame, ref bool noBreak)
-        {
-            TileFraming.GetAdjacencyData(i, j, ModContent.TileType<AbyssGravel>(), out TileAdjacency[i, j]);
-            TileFraming.GetAdjacencyData(i, j, ModContent.TileType<PyreMantle>(), out secondTileAdjacency[i, j]);
-            return true;
-        }
-
-
+        
         public override void PostDraw(int i, int j, SpriteBatch spriteBatch)
         {
             int xPos = Main.tile[i, j].TileFrameX;
@@ -108,9 +100,6 @@ namespace CalamityMod.Tiles.Ores
             Tile trackTile = Main.tile[i, j];
             double num6 = Main.time * 0.08;
             TileFraming.SlopedGlowmask(i, j, 0, glowmask, drawOffset, null, GetDrawColour(i, j, drawColour), default);
-
-            TileFraming.DrawUniversalMergeFrames(i, j, secondTileAdjacency, "CalamityMod/Tiles/Merges/PyreMantleMerge");
-            TileFraming.DrawUniversalMergeFrames(i, j, TileAdjacency, "CalamityMod/Tiles/Merges/AbyssGravelMerge");
         }
 
         private Color GetDrawColour(int i, int j, Color colour)

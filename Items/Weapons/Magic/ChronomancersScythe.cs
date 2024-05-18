@@ -1,17 +1,16 @@
 ﻿using CalamityMod.Items.Materials;
-using CalamityMod.Projectiles.Melee;
-using CalamityMod.Rarities;
+using CalamityMod.Projectiles.Magic;
 using Microsoft.Xna.Framework;
 using Terraria;
 using Terraria.DataStructures;
 using Terraria.ID;
 using Terraria.ModLoader;
 
-namespace CalamityMod.Items.Weapons.Melee
+namespace CalamityMod.Items.Weapons.Magic
 {
     public class ChronomancersScythe : ModItem, ILocalizedModType
     {
-        public new string LocalizationCategory => "Items.Weapons.Melee";
+        public new string LocalizationCategory => "Items.Weapons.Magic";
         public override void SetStaticDefaults()
         {
             ItemID.Sets.ItemsThatAllowRepeatedRightClick[Item.type] = true;
@@ -21,7 +20,7 @@ namespace CalamityMod.Items.Weapons.Melee
         {
             Item.width = 45;
             Item.height = 45;
-            Item.DamageType = DamageClass.MeleeNoSpeed;
+            Item.DamageType = DamageClass.Magic;
             Item.noMelee = true;
             Item.noUseGraphic = true;
             Item.channel = true;
@@ -32,6 +31,7 @@ namespace CalamityMod.Items.Weapons.Melee
             Item.autoReuse = false;
             Item.useStyle = ItemUseStyleID.Shoot;
             Item.UseSound = SoundID.Item71;
+            Item.mana = 10;
 
             Item.value = CalamityGlobalItem.RarityPurpleBuyPrice;
             Item.rare = ItemRarityID.Purple;

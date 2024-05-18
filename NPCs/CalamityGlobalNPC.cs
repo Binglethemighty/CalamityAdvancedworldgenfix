@@ -127,6 +127,7 @@ namespace CalamityMod.NPCs
         // Fireball, Cinnamon Roll and Hellfire Treads effects
         public bool IncreasedHeatEffects_Fireball = false;
         public bool IncreasedHeatEffects_CinnamonRoll = false;
+        public bool IncreasedHeatEffects_FlameWakerBoots = false;
         public bool IncreasedHeatEffects_HellfireTreads = false;
 
         // Toxic Heart effect
@@ -225,9 +226,10 @@ namespace CalamityMod.NPCs
         public const int knockbackResistanceMin = 180;
         public int knockbackResistanceTimer = 0;
 
-        // Used for particle drawing on NPCs affected by vanilla Cobalt/Mythril weapons
-        public bool isNerfedByCobalt = false;
-        public bool isNerfedByMythril = false;
+        // Used for NPCs affected by vanilla Cobalt/Mythril weapons
+        public const int cobaltAndMythrilNerfTime = 600;
+        public int cobaltNerfTimer = 0;
+        public int mythrilNerfTimer = 0;
 
         // Debuffs
         public int vaporfied = 0;
@@ -406,6 +408,7 @@ namespace CalamityMod.NPCs
             myClone.IncreasedElectricityEffects_Transformer = IncreasedElectricityEffects_Transformer;
             myClone.IncreasedHeatEffects_Fireball = IncreasedHeatEffects_Fireball;
             myClone.IncreasedHeatEffects_CinnamonRoll = IncreasedHeatEffects_CinnamonRoll;
+            myClone.IncreasedHeatEffects_FlameWakerBoots = IncreasedHeatEffects_FlameWakerBoots;
             myClone.IncreasedHeatEffects_HellfireTreads = IncreasedHeatEffects_HellfireTreads;
             myClone.IncreasedSicknessEffects_ToxicHeart = IncreasedSicknessEffects_ToxicHeart;
             myClone.IncreasedSicknessAndWaterEffects_EvergreenGin = IncreasedSicknessAndWaterEffects_EvergreenGin;
@@ -445,8 +448,8 @@ namespace CalamityMod.NPCs
             myClone.bossCanBeKnockedBack = bossCanBeKnockedBack;
             myClone.knockbackResistanceTimer = knockbackResistanceTimer;
 
-            myClone.isNerfedByCobalt = isNerfedByCobalt;
-            myClone.isNerfedByMythril = isNerfedByMythril;
+            myClone.cobaltNerfTimer = cobaltNerfTimer;
+            myClone.mythrilNerfTimer = mythrilNerfTimer;
 
             myClone.vaporfied = vaporfied;
             myClone.timeSlow = timeSlow;
@@ -626,11 +629,10 @@ namespace CalamityMod.NPCs
                     npc.lifeRegen = 0;
 
                 int projectileCount = 0;
-                for (int j = 0; j < Main.maxProjectiles; j++)
+                foreach (Projectile p in Main.ActiveProjectiles)
                 {
-                    if (Main.projectile[j].active &&
-                        (Main.projectile[j].type == ProjectileType<LionfishProj>() || Main.projectile[j].type == ProjectileType<LeviathanTooth>() || Main.projectile[j].type == ProjectileType<JawsProjectile>()) &&
-                        Main.projectile[j].ai[0] == 1f && Main.projectile[j].ai[1] == npc.whoAmI)
+                    if ((p.type == ProjectileType<LionfishProj>() || p.type == ProjectileType<LeviathanTooth>() || p.type == ProjectileType<JawsProjectile>()) &&
+                        p.ai[0] == 1f && p.ai[1] == npc.whoAmI)
                     {
                         projectileCount++;
                     }
@@ -651,10 +653,10 @@ namespace CalamityMod.NPCs
                     npc.lifeRegen = 0;
 
                 int projectileCount = 0;
-                for (int j = 0; j < Main.maxProjectiles; j++)
+                foreach (Projectile p in Main.ActiveProjectiles)
                 {
-                    if (Main.projectile[j].active && Main.projectile[j].type == ProjectileType<BonebreakerProjectile>() &&
-                        Main.projectile[j].ai[0] == 1f && Main.projectile[j].ai[1] == npc.whoAmI)
+                    if (p.type == ProjectileType<BonebreakerProjectile>() &&
+                        p.ai[0] == 1f && p.ai[1] == npc.whoAmI)
                     {
                         projectileCount++;
                     }
@@ -673,12 +675,12 @@ namespace CalamityMod.NPCs
             {
                 int projectileCount = 0;
                 int owner = 255;
-                for (int j = 0; j < Main.maxProjectiles; j++)
+                foreach (Projectile p in Main.ActiveProjectiles)
                 {
-                    if (Main.projectile[j].active && Main.projectile[j].type == ProjectileType<Shellfish>() &&
-                        Main.projectile[j].ai[0] == 1f && Main.projectile[j].ai[1] == npc.whoAmI)
+                    if (p.type == ProjectileType<Shellfish>() &&
+                        p.ai[0] == 1f && p.ai[1] == npc.whoAmI)
                     {
-                        owner = Main.projectile[j].owner;
+                        owner = p.owner;
                         projectileCount++;
                         if (projectileCount >= 5)
                         {
@@ -715,13 +717,13 @@ namespace CalamityMod.NPCs
             if (clamDebuff > 0)
             {
                 int projectileCount = 0;
-                for (int j = 0; j < Main.maxProjectiles; j++)
+                foreach (Projectile p in Main.ActiveProjectiles)
                 {
-                    if (Main.projectile[j].active && Main.projectile[j].ai[0] == 1f && Main.projectile[j].ai[1] == npc.whoAmI)
+                    if (p.ai[0] == 1f && p.ai[1] == npc.whoAmI)
                     {
-                        if (Main.projectile[j].type == ProjectileType<SnapClamProj>())
+                        if (p.type == ProjectileType<SnapClamProj>())
                             projectileCount += 2;
-                        if (Main.projectile[j].type == ProjectileType<SnapClamStealth>())
+                        if (p.type == ProjectileType<SnapClamStealth>())
                             projectileCount++;
                     }
                 }
@@ -732,10 +734,10 @@ namespace CalamityMod.NPCs
             if (irradiated > 0)
             {
                 int projectileCount = 0;
-                for (int j = 0; j < Main.maxProjectiles; j++)
+                foreach (Projectile p in Main.ActiveProjectiles)
                 {
-                    if (Main.projectile[j].active && Main.projectile[j].type == ProjectileType<WaterLeechProj>() &&
-                        Main.projectile[j].ai[0] == 1f && Main.projectile[j].ai[1] == npc.whoAmI)
+                    if (p.type == ProjectileType<WaterLeechProj>() &&
+                        p.ai[0] == 1f && p.ai[1] == npc.whoAmI)
                     {
                         projectileCount++;
                     }
@@ -850,6 +852,8 @@ namespace CalamityMod.NPCs
                 electricityDamageMult += 0.5;
 
             if (IncreasedHeatEffects_Fireball)
+                heatDamageMult += 0.25;
+            if (IncreasedHeatEffects_FlameWakerBoots)
                 heatDamageMult += 0.25;
             if (IncreasedHeatEffects_CinnamonRoll)
                 heatDamageMult += 0.5;
@@ -1242,7 +1246,7 @@ namespace CalamityMod.NPCs
                     break;
 
                 case NPCID.AncientCultistSquidhead:
-                    npc.lifeMax = 4000;
+                    npc.lifeMax = 3200;
                     break;
 
                 case NPCID.DukeFishron:
@@ -3195,7 +3199,7 @@ namespace CalamityMod.NPCs
             if (CalamityLists.EaterofWorldsIDs.Contains(npc.type))
                 modifiers.FinalDamage *= 1f - MathHelper.Lerp(BossRushEvent.BossRushActive ? 0.8f : 0f, 0.99f, MathHelper.Clamp(1f - newAI[1] / EaterOfWorldsAI.DRIncreaseTime, 0f, 1f));
             if (CalamityLists.DestroyerIDs.Contains(npc.type))
-                modifiers.FinalDamage *= 1f - MathHelper.Lerp(0f, 0.99f, MathHelper.Clamp(1f - newAI[1] / DestroyerAI.DRIncraeseTime, 0f, 1f));
+                modifiers.FinalDamage *= 1f - MathHelper.Lerp(0f, 0.99f, MathHelper.Clamp(1f - newAI[1] / DestroyerAI.DRIncreaseTime, 0f, 1f));
             if (CalamityLists.AstrumDeusIDs.Contains(npc.type))
                 modifiers.FinalDamage *= 1f - MathHelper.Lerp(0f, 0.99f, MathHelper.Clamp(1f - newAI[1] / (newAI[0] != 0f ? 300f : 600f), 0f, 1f));
         }
@@ -5080,6 +5084,11 @@ namespace CalamityMod.NPCs
             if (RancorBurnTime > 0)
                 RancorBurnTime--;
 
+            if (cobaltNerfTimer > 0)
+                cobaltNerfTimer--;
+            if (mythrilNerfTimer > 0)
+                mythrilNerfTimer--;
+
             if (veriumDoomTimer > 0)
                 veriumDoomTimer--;
             if (veriumDoomTimer == 0 && veriumDoomMarked)
@@ -5469,15 +5478,15 @@ namespace CalamityMod.NPCs
             {
                 int bullseyeType = ProjectileType<SpiritOriginBullseye>();
                 Projectile bullseye = null;
-                for (int i = 0; i < Main.maxProjectiles; i++)
+                foreach (Projectile p in Main.ActiveProjectiles)
                 {
-                    if (Main.projectile[i].type != bullseyeType || !Main.projectile[i].active || Main.projectile[i].owner != player.whoAmI)
+                    if (p.type != bullseyeType || p.owner != player.whoAmI)
                         continue;
 
                     // Only choose a bullseye if it is attached to the NPC that is being hit.
-                    if (npc.whoAmI == (int)Main.projectile[i].ai[0])
+                    if (npc.whoAmI == (int)p.ai[0])
                     {
-                        bullseye = Main.projectile[i];
+                        bullseye = p;
                         break;
                     }
                 }
@@ -5819,10 +5828,9 @@ namespace CalamityMod.NPCs
 
                 if (Main.netMode != NetmodeID.MultiplayerClient)
                 {
-                    for (int j = 0; j < Main.maxNPCs; j++)
+                    foreach (NPC nPC in Main.ActiveNPCs)
                     {
-                        NPC nPC = Main.npc[j];
-                        if (nPC.active && !nPC.buffImmune[BuffType<Plague>()] && npc.Distance(nPC.Center) < 100f && !nPC.dontTakeDamage && nPC.lifeMax > 5 && !nPC.friendly && !nPC.townNPC)
+                        if (!nPC.buffImmune[BuffType<Plague>()] && npc.Distance(nPC.Center) < 100f && !nPC.dontTakeDamage && nPC.lifeMax > 5 && !nPC.friendly && !nPC.townNPC)
                             nPC.AddBuff(BuffType<Plague>(), 300);
                     }
                 }
@@ -6069,7 +6077,7 @@ namespace CalamityMod.NPCs
             if (spawnInfo.Player.ZoneUnderworldHeight && !calamityBiomeZone && CalamityConfig.Instance.RemoveLavaDropsFromLavaSlimes && Main.expertMode)
             {
                 pool.Add(NPCType<LavaSlimeNoLavaDrop>(), SpawnCondition.Underworld.Chance);
-                pool[NPCID.LavaSlime] = 0f;
+                pool.Remove(NPCID.LavaSlime);
             }
 
             // Spawn Green Jellyfish in prehm and Blue Jellyfish in hardmode
@@ -6376,9 +6384,12 @@ namespace CalamityMod.NPCs
                 }
             }
 
-            // Cobalt and Mythril weapon particle effects
-            if (isNerfedByCobalt)
+            // Cobalt weapons reduce NPC defense
+            if (cobaltNerfTimer > 0)
             {
+                miscDefenseLoss = (int)(npc.defense * 0.25);
+
+                // Particle effects
                 if (Main.rand.NextBool(5))
                 {
                     Vector2 spawnLocation = new Vector2(Main.rand.NextFloat(npc.position.X, npc.position.X + npc.width), Main.rand.NextFloat(npc.position.Y, npc.position.Y + npc.height));
@@ -6389,8 +6400,16 @@ namespace CalamityMod.NPCs
                 }
             }
 
-            if (isNerfedByMythril)
+            // Mythril weapons reduce NPC contact damage
+            if (mythrilNerfTimer > 0)
             {
+                // Ensure that it isn't trying to set a non-zero damage value if the NPC's damage is currently 0
+                if (npc.damage == 0)
+                    npc.damage = 0;
+                else
+                    npc.damage = (int)(npc.defDamage * 0.9);
+
+                // Particle effects
                 if (Main.rand.NextBool(5))
                 {
                     Vector2 spawnLocation = new Vector2(Main.rand.NextFloat(npc.position.X, npc.position.X + npc.width), Main.rand.NextFloat(npc.position.Y, npc.position.Y + npc.height));
@@ -6787,7 +6806,9 @@ namespace CalamityMod.NPCs
 
                     Vector2 halfSize = npc.frame.Size() / 2;
 
-                    spriteBatch.Draw(TextureAssets.Npc[npc.type].Value, new Vector2(position.X - screenPos.X + (float)(npc.width / 2) - (float)TextureAssets.Npc[npc.type].Width() * npc.scale / 2f + halfSize.X * npc.scale, position.Y - screenPos.Y + (float)npc.height - (float)TextureAssets.Npc[npc.type].Height() * npc.scale / (float)Main.npcFrameCount[npc.type] + 4f + halfSize.Y * npc.scale + npc.gfxOffY), npc.frame, alphaColor, npc.rotation, halfSize, npc.scale, spriteEffects, 0f);
+                    int width = TextureAssets.Npc[npc.type] is null ? 0 : TextureAssets.Npc[npc.type].Width();
+                    int height = TextureAssets.Npc[npc.type] is null ? 0 : TextureAssets.Npc[npc.type].Height();
+                    spriteBatch.Draw(TextureAssets.Npc[npc.type].Value, new Vector2(position.X - screenPos.X + (float)(npc.width / 2) - (float)width * npc.scale / 2f + halfSize.X * npc.scale, position.Y - screenPos.Y + (float)npc.height - (float)height * npc.scale / (float)Main.npcFrameCount[npc.type] + 4f + halfSize.Y * npc.scale + npc.gfxOffY), npc.frame, alphaColor, npc.rotation, halfSize, npc.scale, spriteEffects, 0f);
                 }
             }
             else
@@ -6929,14 +6950,6 @@ namespace CalamityMod.NPCs
                 if (npc.spriteDirection == 1)
                     spriteEffects = SpriteEffects.FlipHorizontally;
 
-                if (npc.type == NPCID.TheDestroyerBody)
-                {
-                    if (npc.ai[2] == 0f)
-                        npc.frame.Y = 0;
-                    else
-                        npc.frame.Y = frameHeight;
-                }
-
                 Color segmentDrawColor = npc.GetAlpha(drawColor);
 
                 // Check if Destroyer is behind tiles and, if so, how much of the segment is behind tiles and adjust color accordingly
@@ -6968,7 +6981,7 @@ namespace CalamityMod.NPCs
                     bool phase5 = destroyerLifeRatio < (death ? 0.2f : 0.1f);
 
                     // Spawn DR check
-                    bool hasSpawnDR = newAI[1] < DestroyerAI.DRIncraeseTime && newAI[1] > 60f;
+                    bool hasSpawnDR = newAI[1] < DestroyerAI.DRIncreaseTime && newAI[1] > 60f;
 
                     // Gradual color transition from ground to flight and vice versa
                     // 0f = Red, 1f = Purple
@@ -7162,7 +7175,9 @@ namespace CalamityMod.NPCs
                             if (npc.spriteDirection == 1)
                                 spriteEffects = SpriteEffects.FlipHorizontally;
 
-                            spriteBatch.Draw(TextureAssets.Npc[npc.type].Value, new Vector2(position.X - screenPos.X + (float)(npc.width / 2) - (float)TextureAssets.Npc[npc.type].Width() * npc.scale / 2f + halfSize.X * npc.scale, position.Y - screenPos.Y + (float)npc.height - (float)TextureAssets.Npc[npc.type].Height() * npc.scale / (float)Main.npcFrameCount[npc.type] + 4f + halfSize.Y * npc.scale + npc.gfxOffY), npc.frame, currentColor, npc.rotation, halfSize, npc.scale, spriteEffects, 0f);
+                            int width = TextureAssets.Npc[npc.type] is null ? 0 : TextureAssets.Npc[npc.type].Width();
+                            int height = TextureAssets.Npc[npc.type] is null ? 0 : TextureAssets.Npc[npc.type].Height();
+                            spriteBatch.Draw(TextureAssets.Npc[npc.type].Value, new Vector2(position.X - screenPos.X + (float)(npc.width / 2) - (float)width * npc.scale / 2f + halfSize.X * npc.scale, position.Y - screenPos.Y + (float)npc.height - (float)height * npc.scale / (float)Main.npcFrameCount[npc.type] + 4f + halfSize.Y * npc.scale + npc.gfxOffY), npc.frame, currentColor, npc.rotation, halfSize, npc.scale, spriteEffects, 0f);
                         }
                     }
                 }
@@ -7212,7 +7227,9 @@ namespace CalamityMod.NPCs
 
                             position.Y -= npc.height / 2;
 
-                            spriteBatch.Draw(TextureAssets.Npc[npc.type].Value, new Vector2(position.X - screenPos.X + (float)(npc.width / 2) - (float)TextureAssets.Npc[npc.type].Width() * npc.scale / 2f + halfSize.X * npc.scale, position.Y - screenPos.Y + (float)npc.height - (float)TextureAssets.Npc[npc.type].Height() * npc.scale / (float)Main.npcFrameCount[npc.type] + 4f + halfSize.Y * npc.scale + npc.gfxOffY), npc.frame, currentColor, npc.rotation, halfSize, npc.scale, spriteEffects, 0f);
+                            int width = TextureAssets.Npc[npc.type] is null ? 0 : TextureAssets.Npc[npc.type].Width();
+                            int height = TextureAssets.Npc[npc.type] is null ? 0 : TextureAssets.Npc[npc.type].Height();
+                            spriteBatch.Draw(TextureAssets.Npc[npc.type].Value, new Vector2(position.X - screenPos.X + (float)(npc.width / 2) - (float)width * npc.scale / 2f + halfSize.X * npc.scale, position.Y - screenPos.Y + (float)npc.height - (float)height * npc.scale / (float)Main.npcFrameCount[npc.type] + 4f + halfSize.Y * npc.scale + npc.gfxOffY), npc.frame, currentColor, npc.rotation, halfSize, npc.scale, spriteEffects, 0f);
                         }
 
                         float secondAfterimageSetHealthValue = (int)(Main.npc[NPC.crimsonBoss].lifeMax * 0.8f);
@@ -7293,7 +7310,9 @@ namespace CalamityMod.NPCs
                                 position.X -= npc.width / 2;
                                 position.Y -= npc.height / 2;
 
-                                spriteBatch.Draw(TextureAssets.Npc[npc.type].Value, new Vector2(position.X - screenPos.X + (float)(npc.width / 2) - (float)TextureAssets.Npc[npc.type].Width() * npc.scale / 2f + halfSize.X * npc.scale, position.Y - screenPos.Y + (float)npc.height - (float)TextureAssets.Npc[npc.type].Height() * npc.scale / (float)Main.npcFrameCount[npc.type] + 4f + halfSize.Y * npc.scale + npc.gfxOffY), npc.frame, currentColor, npc.rotation, halfSize, npc.scale, spriteEffects, 0f);
+                                int width = TextureAssets.Npc[npc.type] is null ? 0 : TextureAssets.Npc[npc.type].Width();
+                                int height = TextureAssets.Npc[npc.type] is null ? 0 : TextureAssets.Npc[npc.type].Height();
+                                spriteBatch.Draw(TextureAssets.Npc[npc.type].Value, new Vector2(position.X - screenPos.X + (float)(npc.width / 2) - (float)width * npc.scale / 2f + halfSize.X * npc.scale, position.Y - screenPos.Y + (float)npc.height - (float)height * npc.scale / (float)Main.npcFrameCount[npc.type] + 4f + halfSize.Y * npc.scale + npc.gfxOffY), npc.frame, currentColor, npc.rotation, halfSize, npc.scale, spriteEffects, 0f);
                             }
                         }
                     }
@@ -7806,9 +7825,9 @@ namespace CalamityMod.NPCs
         #region Player Counts
         public static bool AnyLivingPlayers()
         {
-            for (int i = 0; i < Main.maxPlayers; i++)
+            foreach (Player player in Main.ActivePlayers)
             {
-                if (Main.player[i] != null && Main.player[i].active && !Main.player[i].dead && !Main.player[i].ghost)
+                if (!player.dead && !player.ghost)
                 {
                     return true;
                 }
@@ -7823,15 +7842,7 @@ namespace CalamityMod.NPCs
                 return 1;
             }
 
-            int players = 0;
-            for (int i = 0; i < Main.maxPlayers; i++)
-            {
-                if (Main.player[i] != null && Main.player[i].active)
-                {
-                    players++;
-                }
-            }
-            return players;
+            return Main.CurrentFrameFlags.ActivePlayersCount;
         }
         #endregion
 
@@ -7897,12 +7908,11 @@ namespace CalamityMod.NPCs
                                     return;
 
                                 Projectile proj = null;
-                                for (int i = 0; i < Main.maxProjectiles; i++)
+                                foreach (Projectile p in Main.ActiveProjectiles)
                                 {
-                                    proj = Main.projectile[i];
-                                    if (Main.projectile[i].active && Main.projectile[i].bobber && Main.projectile[i].owner == player.whoAmI)
+                                    proj = p;
+                                    if (p.bobber && p.owner == player.whoAmI)
                                     {
-                                        proj = Main.projectile[i];
                                         break;
                                     }
                                 }

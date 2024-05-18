@@ -59,6 +59,7 @@ namespace CalamityMod.Projectiles.Melee
 
         public override bool PreDraw(ref Color lightColor)
         {
+            
             Texture2D texture = ModContent.Request<Texture2D>("CalamityMod/Items/Weapons/Melee/StreamGouge").Value;
             Vector2 spearDrawPosition = SpearCenter - Main.screenPosition;
             Vector2 spearOrigin = texture.Size() * 0.5f;
@@ -76,19 +77,17 @@ namespace CalamityMod.Projectiles.Melee
 
             // Black portal.
             Color color = Color.Lerp(baseColor, Color.Black, 0.55f).MultiplyRGB(Color.DarkGray) * Projectile.Opacity;
-            Main.EntitySpriteDraw(portalTexture, drawPosition, null, color, rotation, origin, Projectile.scale * 1.2f, SpriteEffects.None, 0);
-            Main.EntitySpriteDraw(portalTexture, drawPosition, null, color, -rotation, origin, Projectile.scale * 1.2f, SpriteEffects.None, 0);
-
-            Main.spriteBatch.SetBlendState(BlendState.Additive);
+            Main.EntitySpriteDraw(portalTexture, drawPosition, null, color with { A = 0 }, rotation, origin, Projectile.scale * 1.2f, SpriteEffects.None, 0);
+            Main.EntitySpriteDraw(portalTexture, drawPosition, null, color with { A = 0 }, -rotation, origin, Projectile.scale * 1.2f, SpriteEffects.None, 0);
 
             // Cyan portal.
             color = Color.Lerp(baseColor, Color.Cyan, 0.55f) * Projectile.Opacity * 1.4f;
-            Main.EntitySpriteDraw(portalTexture, drawPosition, null, color, rotation * 0.6f, origin, Projectile.scale * 1.2f, SpriteEffects.None, 0);
+            Main.EntitySpriteDraw(portalTexture, drawPosition, null, color with { A = 0 }, rotation * 0.6f, origin, Projectile.scale * 1.2f, SpriteEffects.None, 0);
 
             // Magenta portal.
             color = Color.Lerp(baseColor, Color.Fuchsia, 0.55f) * Projectile.Opacity * 1.4f;
-            Main.EntitySpriteDraw(portalTexture, drawPosition, null, color, rotation * -0.7f, origin, Projectile.scale * 1.2f, SpriteEffects.None, 0);
-            Main.spriteBatch.SetBlendState(BlendState.AlphaBlend);
+            Main.EntitySpriteDraw(portalTexture, drawPosition, null, color with { A = 0 }, rotation * -0.7f, origin, Projectile.scale * 1.2f, SpriteEffects.None, 0);
+            
             return false;
         }
 

@@ -1,4 +1,5 @@
-﻿using CalamityMod.Dusts;
+﻿using System.Collections.Generic;
+using CalamityMod.Dusts;
 using CalamityMod.Tiles.Astral;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
@@ -8,13 +9,13 @@ using Terraria.ModLoader;
 
 namespace CalamityMod.Tiles
 {
-    public class AstralBrick : ModTile
+    public class AstralBrick : ModTile, IMergeableTile
     {
         private const short subsheetWidth = 324;
         private const short subsheetHeight = 90;
 
-        public byte[,] tileAdjacency;
-        public byte[,] secondTileAdjacency;
+        List<TileFraming.MergeFrameData> IMergeableTile.TileAdjacencies { get; } = [];
+        
         public override void SetStaticDefaults()
         {
             Main.tileSolid[Type] = true;
@@ -22,8 +23,8 @@ namespace CalamityMod.Tiles
             HitSound = SoundID.Tink;
             AddMapEntry(new Color(128, 128, 158));
 
-            TileFraming.SetUpUniversalMerge(Type, TileID.Dirt, out tileAdjacency);
-            TileFraming.SetUpUniversalMerge(Type, ModContent.TileType<AstralDirt>(), out secondTileAdjacency);
+            this.RegisterUniversalMerge(TileID.Dirt, "CalamityMod/Tiles/Merges/DirtMerge");
+            this.RegisterUniversalMerge(ModContent.TileType<AstralDirt>(), "CalamityMod/Tiles/Merges/AstralDirtMerge");
         }
 
         public override bool CreateDust(int i, int j, ref int type)
@@ -34,8 +35,6 @@ namespace CalamityMod.Tiles
 
         public override bool TileFrame(int i, int j, ref bool resetFrame, ref bool noBreak)
         {
-            TileFraming.GetAdjacencyData(i, j, TileID.Dirt, out tileAdjacency[i, j]);
-            TileFraming.GetAdjacencyData(i, j, ModContent.TileType<AstralDirt>(), out secondTileAdjacency[i, j]);
             return TileFraming.BetterGemsparkFraming(i, j, resetFrame);
         }
 
@@ -64,9 +63,6 @@ namespace CalamityMod.Tiles
             Tile trackTile = Main.tile[i, j];
 
             TileFraming.SlopedGlowmask(i, j, 0, glowmask, drawOffset, null, GetDrawColour(i, j, drawColour), default);
-
-            TileFraming.DrawUniversalMergeFrames(i, j, secondTileAdjacency, "CalamityMod/Tiles/Merges/AstralDirtMerge");
-            TileFraming.DrawUniversalMergeFrames(i, j, tileAdjacency, "CalamityMod/Tiles/Merges/DirtMerge");
         }
 
         private Color GetDrawColour(int i, int j, Color colour)

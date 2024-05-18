@@ -35,11 +35,10 @@ namespace CalamityMod.TileEntities
             // If one is, pop up.
             Vector2 projectorCenterPos = Center;
             float distSQ = PopupDistance * PopupDistance;
-            for (int i = 0; i < Main.maxPlayers; ++i)
+            foreach (Player p in Main.ActivePlayers)
             {
-                Player p = Main.player[i];
-                if (!p.active) // The lack of a dead check is intentional. Dead players keep hologram boxes on for amusement.
-                    continue;
+                // The lack of a dead check is intentional. Dead players keep hologram boxes on for amusement.
+
                 if (p.DistanceSQ(projectorCenterPos) < distSQ)
                 {
                     PoppingUp = true;
@@ -72,12 +71,8 @@ namespace CalamityMod.TileEntities
         // If this projector breaks, anyone who's viewing it is no longer viewing it.
         public override void OnKill()
         {
-            for (int i = 0; i < Main.maxPlayers; ++i)
+            foreach (Player p in Main.ActivePlayers)
             {
-                Player p = Main.player[i];
-                if (!p.active)
-                    continue;
-
                 // Use reflection to stop TML from spitting an error here.
                 // Try-catching will not stop this error, TML will print it to console anyway. The error is harmless.
                 ModPlayer[] mpStorageArray = (ModPlayer[])typeof(Player).GetField("modPlayers", BindingFlags.Instance | BindingFlags.NonPublic).GetValue(p);

@@ -75,16 +75,8 @@ namespace CalamityMod.NPCs.PrimordialWyrm
                 NPC.realLife = (int)NPC.ai[2];
 
             // Check if other segments are still alive. If not, die.
-            bool shouldDespawn = true;
             int wyrmHeadID = ModContent.NPCType<PrimordialWyrmHead>();
-            for (int i = 0; i < Main.maxNPCs; i++)
-            {
-                if (Main.npc[i].active && Main.npc[i].type == wyrmHeadID)
-                {
-                    shouldDespawn = false;
-                    break;
-                }
-            }
+            bool shouldDespawn = !NPC.AnyNPCs(wyrmHeadID);
             if (!shouldDespawn)
             {
                 if (NPC.ai[1] <= 0f)

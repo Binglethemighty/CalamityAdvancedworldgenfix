@@ -118,19 +118,18 @@ namespace CalamityMod.NPCs.Abyss
             }
 
             if (NPC.target < 0 || NPC.target == Main.maxPlayers || Main.player[NPC.target].dead)
-            {
-                NPC.TargetClosest(true);
-            }
+                NPC.TargetClosest();
+
             if (NPC.justHit || detectsPlayer || Main.player[NPC.target].chaosState || adultWyrmAlive || (Main.player[NPC.target].Center - NPC.Center).Length() < Main.player[NPC.target].Calamity().GetAbyssAggro(160f))
             {
                 detectsPlayer = true;
                 NPC.damage = Main.expertMode ? 340 : 170;
             }
             else
-            {
                 NPC.damage = 0;
-            }
+
             NPC.chaseable = detectsPlayer;
+
             if (detectsPlayer)
             {
                 if (NPC.soundDelay <= 0)
@@ -142,14 +141,12 @@ namespace CalamityMod.NPCs.Abyss
             else
             {
                 if (Main.rand.NextBool(900))
-                {
                     SoundEngine.PlaySound(roar, NPC.Center);
-                }
             }
+
             if (NPC.ai[2] > 0f)
-            {
                 NPC.realLife = (int)NPC.ai[2];
-            }
+
             if (Main.netMode != NetmodeID.MultiplayerClient)
             {
                 if (!TailSpawned && NPC.ai[0] == 0f)
@@ -161,18 +158,13 @@ namespace CalamityMod.NPCs.Abyss
                         if (segments >= 0 && segments < minLength)
                         {
                             if (segments % 2 == 0)
-                            {
                                 lol = NPC.NewNPC(NPC.GetSource_FromAI(), (int)NPC.position.X + (NPC.width / 2), (int)NPC.position.Y + (NPC.height / 2), ModContent.NPCType<EidolonWyrmBody>(), NPC.whoAmI);
-                            }
                             else
-                            {
                                 lol = NPC.NewNPC(NPC.GetSource_FromAI(), (int)NPC.position.X + (NPC.width / 2), (int)NPC.position.Y + (NPC.height / 2), ModContent.NPCType<EidolonWyrmBodyAlt>(), NPC.whoAmI);
-                            }
                         }
                         else
-                        {
                             lol = NPC.NewNPC(NPC.GetSource_FromAI(), (int)NPC.position.X + (NPC.width / 2), (int)NPC.position.Y + (NPC.height / 2), ModContent.NPCType<EidolonWyrmTail>(), NPC.whoAmI);
-                        }
+
                         Main.npc[lol].realLife = NPC.whoAmI;
                         Main.npc[lol].ai[2] = (float)NPC.whoAmI;
                         Main.npc[lol].ai[1] = (float)Previous;
@@ -180,17 +172,16 @@ namespace CalamityMod.NPCs.Abyss
                         NetMessage.SendData(MessageID.SyncNPC, -1, -1, null, lol, 0f, 0f, 0f, 0);
                         Previous = lol;
                     }
+
                     TailSpawned = true;
                 }
             }
+
             if (NPC.velocity.X < 0f)
-            {
                 NPC.spriteDirection = -1;
-            }
             else if (NPC.velocity.X > 0f)
-            {
                 NPC.spriteDirection = 1;
-            }
+
             if (Main.player[NPC.target].dead)
             {
                 NPC.TargetClosest(false);
@@ -208,14 +199,16 @@ namespace CalamityMod.NPCs.Abyss
                     }
                 }
             }
+
             NPC.alpha -= 42;
             if (NPC.alpha < 0)
-            {
                 NPC.alpha = 0;
-            }
+
             if (Vector2.Distance(Main.player[NPC.target].Center, NPC.Center) > 6400f)
             {
-                NPC.active = false;
+                NPC.TargetClosest(false);
+                if (Vector2.Distance(Main.player[NPC.target].Center, NPC.Center) > 6400f)
+                    NPC.active = false;
             }
 
             float currentSpeed = speed;

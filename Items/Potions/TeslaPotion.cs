@@ -38,7 +38,6 @@ namespace CalamityMod.Items.Potions
 
         public override void AddRecipes()
         {
-            Condition evil2Dead = new(CalamityUtils.GetText("Condition.DownedEvil2Boss"), () => DownedBossSystem.downedHiveMind || DownedBossSystem.downedPerforator);
             CreateRecipe(5).
                 AddIngredient(ItemID.BottledWater).
                 AddIngredient<AerialiteOre>(2).
@@ -46,7 +45,7 @@ namespace CalamityMod.Items.Potions
                 AddIngredient<PearlShard>().
                 AddIngredient<StormlionMandible>().
                 AddTile(TileID.Bottles).
-                AddDecraftCondition(evil2Dead).
+                AddDecraftCondition(CalamityConditions.DownedHiveMindOrPerforator).
                 Register();
 
             CreateRecipe().

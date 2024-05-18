@@ -21,10 +21,22 @@ namespace CalamityMod.Projectiles.Rogue
             Projectile.height = 30;
             Projectile.friendly = true;
             Projectile.penetrate = 1;
-            Projectile.aiStyle = ProjAIStyleID.ThrownProjectile;
             Projectile.timeLeft = 300;
-            AIType = ProjectileID.ThrowingKnife;
             Projectile.DamageType = RogueDamageClass.Instance;
+        }
+
+        public override void AI()
+        {
+            Projectile.ai[0]++;
+
+            Projectile.rotation += MathHelper.ToRadians(Projectile.velocity.X * 1.25f);
+            if (Projectile.ai[0] > 45)
+            {
+                Projectile.velocity.X *= 0.97f;
+                Projectile.velocity.Y += 0.28f;
+                if (Projectile.velocity.Y > 18f)
+                    Projectile.velocity.Y = 18f;
+            }
         }
 
         public override void OnHitNPC(NPC target, NPC.HitInfo hit, int damageDone)
@@ -41,6 +53,20 @@ namespace CalamityMod.Projectiles.Rogue
             if (Projectile.Calamity().stealthStrike)
                 player.AddBuff(BuffID.Honey, 600);
             SpawnProjectiles();
+        }
+
+        public override void OnKill(int timeLeft)
+        {
+            SoundEngine.PlaySound(SoundID.NPCDeath1, Projectile.position);
+            SpawnProjectiles();
+
+            //Dust on impact
+            int dust_splash = 0;
+            while (dust_splash < 9)
+            {
+                Dust.NewDust(Projectile.position, Projectile.width, Projectile.height, DustID.Copper, -Projectile.velocity.X * 0.15f, -Projectile.velocity.Y * 0.15f, 159, default, 1.5f);
+                dust_splash += 1;
+            }
         }
 
         public void SpawnProjectiles()
@@ -71,18 +97,6 @@ namespace CalamityMod.Projectiles.Rogue
             Texture2D tex = Terraria.GameContent.TextureAssets.Projectile[Projectile.type].Value;
             Main.EntitySpriteDraw(tex, Projectile.Center - Main.screenPosition, null, Projectile.GetAlpha(lightColor), Projectile.rotation, tex.Size() / 2f, Projectile.scale, SpriteEffects.None, 0);
             return false;
-        }
-
-        public override void OnKill(int timeLeft)
-        {
-            SoundEngine.PlaySound(SoundID.NPCDeath1, Projectile.position);
-            //Dust on impact
-            int dust_splash = 0;
-            while (dust_splash < 9)
-            {
-                Dust.NewDust(Projectile.position, Projectile.width, Projectile.height, DustID.Copper, -Projectile.velocity.X * 0.15f, -Projectile.velocity.Y * 0.15f, 159, default, 1.5f);
-                dust_splash += 1;
-            }
         }
     }
 }

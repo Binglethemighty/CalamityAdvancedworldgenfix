@@ -174,11 +174,11 @@ namespace CalamityMod.Projectiles.Summon
         public static Projectile LocateHead(Projectile projectile)
         {
             int headType = ModContent.ProjectileType<MechwormHead>();
-            for (int i = 0; i < Main.maxProjectiles; i++)
+            foreach (Projectile p in Main.ActiveProjectiles)
             {
-                if (Main.projectile[i].type != headType || !Main.projectile[i].active || Main.projectile[i].owner != projectile.owner)
+                if (p.type != headType || p.owner != projectile.owner)
                     continue;
-                return Main.projectile[i];
+                return p;
             }
             return null;
         }

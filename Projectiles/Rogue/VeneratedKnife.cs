@@ -37,16 +37,15 @@ namespace CalamityMod.Projectiles.Rogue
             {
                 float minDist = 999f;
                 int index = 0;
-                for (int i = 0; i < Main.npc.Length; i++)
+                foreach (NPC npc in Main.ActiveNPCs)
                 {
-                    NPC npc = Main.npc[i];
                     if (npc.CanBeChasedBy(Projectile, false))
                     {
                         float dist = (Projectile.Center - npc.Center).Length();
                         if (dist < minDist)
                         {
                             minDist = dist;
-                            index = i;
+                            index = npc.whoAmI;
                         }
                     }
                 }

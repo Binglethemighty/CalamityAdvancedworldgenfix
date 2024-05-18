@@ -320,9 +320,8 @@ namespace CalamityMod.NPCs.Other
                 NPC.ai[3] = 0f;
                 NPC.aiStyle = (urAMemeNow ? -1 : aiChoice);
                 NPC.netUpdate = true;
-                for (int i = 0; i < Main.maxProjectiles; i++)
+                foreach (Projectile proj in Main.ActiveProjectiles)
                 {
-                    Projectile proj = Main.projectile[i];
                     if (proj.type == ModContent.ProjectileType<AresDeathBeamStart>() || proj.type == ModContent.ProjectileType<AresDeathBeamTelegraph>())
                     {
                         proj.Kill();

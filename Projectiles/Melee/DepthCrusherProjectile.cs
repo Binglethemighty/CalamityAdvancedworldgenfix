@@ -105,7 +105,7 @@ namespace CalamityMod.Projectiles.Melee
             }
 
             Projectile.rotation += (0.4f * (MathF.Abs(Projectile.velocity.Y) * 0.2f + 0.6f)) * Projectile.direction;
-            if (Projectile.velocity.Y < 20)
+            if (Projectile.velocity.Y < 16)
                 Projectile.velocity.Y += Projectile.numHits >= 3 ? 0.7f : 0.4f;
             if (Projectile.numHits >= 3)
             {
@@ -119,7 +119,7 @@ namespace CalamityMod.Projectiles.Melee
             if (Projectile.velocity.Y > 0)
                 Projectile.velocity.X *= 0.975f;
 
-            if (Collision.SolidCollision(Projectile.Center, 15, 15))
+            if (Collision.SolidCollision(Projectile.Center, 25, 25))
             {
                 Projectile.tileCollide = true;
             }
@@ -133,9 +133,9 @@ namespace CalamityMod.Projectiles.Melee
             if (!setDamage)
             {
                 if (Projectile.velocity.Y > 0)
-                    Projectile.velocity.Y = -9;
+                    Projectile.velocity.Y -= 6;
                 else
-                    Projectile.velocity.Y = -7;
+                    Projectile.velocity.Y = -6;
             }
 
             for (int i = 0; i < 15; i++)
@@ -195,7 +195,7 @@ namespace CalamityMod.Projectiles.Melee
                 SoundEngine.PlaySound(HitSound, Projectile.Center);
                 for (int i = 0; i < 3; i++)
                 {
-                    Projectile.NewProjectile(Projectile.GetSource_FromThis(), Projectile.Center, new Vector2(0, -5).RotatedByRandom(0.6f) * Main.rand.NextFloat(0.9f, 1.1f), ModContent.ProjectileType<DepthCrusherSplitProjectile>(), startDamage / 4, Projectile.knockBack / 4, Projectile.owner);
+                    Projectile.NewProjectile(Projectile.GetSource_FromThis(), Projectile.Bottom, new Vector2(0, -5).RotatedByRandom(0.6f) * Main.rand.NextFloat(0.9f, 1.1f), ModContent.ProjectileType<DepthCrusherSplitProjectile>(), (int)(startDamage * 0.3f), Projectile.knockBack / 4, Projectile.owner);
                 }
                 Projectile.Kill();
             }

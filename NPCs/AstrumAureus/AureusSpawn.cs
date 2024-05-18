@@ -115,24 +115,21 @@ namespace CalamityMod.NPCs.AstrumAureus
 
             // Push away from each other
             float pushVelocity = 0.5f;
-            for (int i = 0; i < Main.maxNPCs; i++)
+            foreach (NPC n in Main.ActiveNPCs)
             {
-                if (Main.npc[i].active)
+                if (n.whoAmI != NPC.whoAmI && n.type == NPC.type)
                 {
-                    if (i != NPC.whoAmI && Main.npc[i].type == NPC.type)
+                    if (Vector2.Distance(NPC.Center, n.Center) < (160f + 30f * (NPC.scale - 1f)))
                     {
-                        if (Vector2.Distance(NPC.Center, Main.npc[i].Center) < (160f + 30f * (NPC.scale - 1f)))
-                        {
-                            if (NPC.position.X < Main.npc[i].position.X)
-                                NPC.velocity.X = NPC.velocity.X - pushVelocity;
-                            else
-                                NPC.velocity.X = NPC.velocity.X + pushVelocity;
+                        if (NPC.position.X < n.position.X)
+                            NPC.velocity.X = NPC.velocity.X - pushVelocity;
+                        else
+                            NPC.velocity.X = NPC.velocity.X + pushVelocity;
 
-                            if (NPC.position.Y < Main.npc[i].position.Y)
-                                NPC.velocity.Y = NPC.velocity.Y - pushVelocity;
-                            else
-                                NPC.velocity.Y = NPC.velocity.Y + pushVelocity;
-                        }
+                        if (NPC.position.Y < n.position.Y)
+                            NPC.velocity.Y = NPC.velocity.Y - pushVelocity;
+                        else
+                            NPC.velocity.Y = NPC.velocity.Y + pushVelocity;
                     }
                 }
             }

@@ -217,7 +217,7 @@ namespace CalamityMod.Items
                 { ItemID.ShadowFlameBow, Do(PointBlank, DamageExact(55)) },
                 { ItemID.ShadowFlameHexDoll, Do(DamageExact(40), ShootSpeedExact(30)) },
                 { ItemID.ShadowFlameKnife, Do(DamageExact(70)) },
-                { ItemID.SharpTears, Do(DamageExact(49)) },
+                { ItemID.SharpTears, Do(DamageExact(49)) }, // Blood Thorn
                 { ItemID.Shotgun, Do(PointBlank, DamageExact(36), AutoReuse) },
                 { ItemID.Shroomerang, Do(ShootSpeedExact(11)) },
                 { ItemID.SilverBullet, Do(DamageExact(8)) },
@@ -601,6 +601,7 @@ namespace CalamityMod.Items
                 { ItemID.SpicyPepper, Do(Value(Item.sellPrice(copper: 40))) },
                 { ItemID.Starfruit, Do(Value(Item.sellPrice(copper: 40))) },
                 { ItemID.PortableStool, Do(Value(Item.sellPrice(copper: 20))) }, // Step Stool
+                { ItemID.UncumberingStone, Do(Worthless) },
                 { ItemID.ViciousMushroom, Do(Worthless) },
                 { ItemID.VileMushroom, Do(Worthless) },
                 #endregion

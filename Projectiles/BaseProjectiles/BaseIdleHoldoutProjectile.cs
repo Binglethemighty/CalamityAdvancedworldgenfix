@@ -51,9 +51,9 @@ namespace CalamityMod.Projectiles.BaseProjectiles
 
                 bool bladeIsPresent = false;
                 int holdoutType = ItemProjectileRelationship[itemID];
-                for (int i = 0; i < Main.maxProjectiles; i++)
+                foreach (Projectile p in Main.ActiveProjectiles)
                 {
-                    if (Main.projectile[i].type != holdoutType || Main.projectile[i].owner != player.whoAmI || !Main.projectile[i].active)
+                    if (p.type != holdoutType || p.owner != player.whoAmI)
                         continue;
 
                     bladeIsPresent = true;

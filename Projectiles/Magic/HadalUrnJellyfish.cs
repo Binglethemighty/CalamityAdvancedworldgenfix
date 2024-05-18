@@ -75,17 +75,17 @@ namespace CalamityMod.Projectiles.Magic
             //Detect if any enemies are very close
             int maxDistance = 10;
 
-            for (int i = 0; i < Main.maxNPCs; i++)
+            foreach (NPC n in Main.ActiveNPCs)
             {
-                if (Main.npc[i].CanBeChasedBy(Projectile, false))
+                if (n.CanBeChasedBy(Projectile, false))
                 {
-                    float extraDistance = (Main.npc[i].width / 2) + (Main.npc[i].height / 2);
+                    float extraDistance = (n.width / 2) + (n.height / 2);
 
                     bool canHit = true;
                     if (extraDistance < maxDistance)
-                        canHit = Collision.CanHit(Projectile.Center, 1, 1, Main.npc[i].Center, 1, 1);
+                        canHit = Collision.CanHit(Projectile.Center, 1, 1, n.Center, 1, 1);
 
-                    if (Projectile.WithinRange(Main.npc[i].Center, maxDistance + extraDistance) && canHit)
+                    if (Projectile.WithinRange(n.Center, maxDistance + extraDistance) && canHit)
                     {
                         neartarget = true;
                     }

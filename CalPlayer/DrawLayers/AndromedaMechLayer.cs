@@ -34,11 +34,11 @@ namespace CalamityMod.CalPlayer.DrawLayers
 
             int robot = -1;
             int andromedaMechID = ModContent.ProjectileType<GiantIbanRobotOfDoom>();
-            for (int i = 0; i < Main.projectile.Length; i++)
+            foreach (Projectile p in Main.ActiveProjectiles)
             {
-                if (Main.projectile[i].active && Main.projectile[i].type == andromedaMechID && Main.projectile[i].owner == drawPlayer.whoAmI)
+                if (p.type == andromedaMechID && p.owner == drawPlayer.whoAmI)
                 {
-                    robot = i;
+                    robot = p.whoAmI;
                     break;
                 }
             }

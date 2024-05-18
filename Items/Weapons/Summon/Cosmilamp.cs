@@ -45,12 +45,12 @@ namespace CalamityMod.Items.Weapons.Summon
             if (player.altFunctionUse != 2)
             {
                 // Reset the timer for all lamps, to re-align the formation.
-                for (int i = 0; i < Main.maxProjectiles; i++)
+                foreach (Projectile pro in Main.ActiveProjectiles)
                 {
-                    if (Main.projectile[i].type == type && Main.projectile[i].owner == player.whoAmI && Main.projectile[i].active)
+                    if (pro.type == type && pro.owner == player.whoAmI)
                     {
-                        Main.projectile[i].ModProjectile<CosmilampMinion>().Timer = 0f;
-                        Main.projectile[i].netUpdate = true;
+                        pro.ModProjectile<CosmilampMinion>().Timer = 0f;
+                        pro.netUpdate = true;
                     }
                 }
 

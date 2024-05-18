@@ -31,8 +31,12 @@ namespace CalamityMod.Items.Pets
             Item.Calamity().devItem = true;
         }
 
-        public override bool AltFunctionUse(Player player) => true;
-
-        public override bool Shoot(Player player, EntitySource_ItemUse_WithAmmo source, Vector2 position, Vector2 velocity, int type, int damage, float knockback) => false;
+        public override void UseStyle(Player player, Rectangle heldItemFrame)
+        {
+            if (player.whoAmI == Main.myPlayer && player.itemTime == 0)
+            {
+                player.AddBuff(Item.buffType, 3600, true);
+            }
+        }
     }
 }

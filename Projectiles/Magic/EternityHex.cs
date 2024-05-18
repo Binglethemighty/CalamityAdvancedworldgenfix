@@ -177,11 +177,8 @@ namespace CalamityMod.Projectiles.Magic
             TargetNPCIndex = newTarget.whoAmI;
 
             // Adjust the target index for the other components of the projectile.
-            for (int i = 0; i < Main.projectile.Length; i++)
+            foreach (Projectile proj in Main.ActiveProjectiles)
             {
-                Projectile proj = Main.projectile[i];
-                if (!proj.active)
-                    continue;
                 if (proj.owner != Projectile.owner)
                     continue;
                 if (proj.type != ModContent.ProjectileType<EternityCrystal>() && proj.type != ModContent.ProjectileType<EternityCircle>())

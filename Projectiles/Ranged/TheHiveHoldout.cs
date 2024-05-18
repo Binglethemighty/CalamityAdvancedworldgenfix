@@ -8,6 +8,7 @@ using Terraria;
 using Terraria.Audio;
 using Terraria.DataStructures;
 using Terraria.ID;
+using static CalamityMod.Items.Weapons.Ranged.TheHive;
 using static Terraria.ModLoader.ModContent;
 
 namespace CalamityMod.Projectiles.Ranged
@@ -25,31 +26,27 @@ namespace CalamityMod.Projectiles.Ranged
         // It'll carry over to the projectiles that it shoots.
         public static int DustEffectsID { get; set; }
         public static Color EffectsColor { get; set; }
-        public static Color StaticEffectsColor = Color.Lime;
+        public static Color StaticEffectsColor { get; set; } = Color.Lime;
 
-        private ref float ShootingTimer => ref Projectile.ai[0];
-        private bool FireNuke;
-        private float PostFireCooldown = 0;
-        private bool HasLetGo = false;
-        private SlotId HiveHum;
-        private const float MaxCharge = 90f;
+        public ref float ShootingTimer => ref Projectile.ai[0];
+        public ref float PostFireCooldown => ref Projectile.ai[1];
+        public bool HasLetGo
+        {
+            get => Projectile.ai[2] == 1f;
+            set => Projectile.ai[2] = value == true ? 1f : 0f;
+        }
+
+        public bool FireNuke => ShootingTimer > MaxCharge;
+        public SlotId HiveHum { get; set; }
 
         public override void KillHoldoutLogic()
         {
-            if (HeldItem.type != ItemType<TheHive>())
-            {
-                Projectile.Kill();
-                Projectile.netUpdate = true;
-            }
-
             if (HasLetGo)
                 PostFiringCooldown();
         }
 
         public override void HoldoutAI()
         {
-            FireNuke = ShootingTimer > MaxCharge;
-
             // If there's no player, or the player is the server, or the owner's stunned, there'll be no holdout.
             if (Owner.CantUseHoldout() && !HasLetGo)
             {
@@ -57,8 +54,8 @@ namespace CalamityMod.Projectiles.Ranged
                 {
                     hum?.Stop();
                 }
-                ShootRocket();
-                NetUpdate();
+                if (HeldItem.type == ItemType<TheHive>())
+                    ShootRocket();
                 HasLetGo = true;
             }
 
@@ -106,7 +103,7 @@ namespace CalamityMod.Projectiles.Ranged
             }
         }
 
-        private void ShootRocket()
+        public void ShootRocket()
         {
             // We use the velocity of this projectile as its direction vector.
             Vector2 shootDirection = Projectile.velocity.SafeNormalize(Vector2.Zero);
@@ -177,8 +174,6 @@ namespace CalamityMod.Projectiles.Ranged
                 PostFireCooldown = 30;
             }
 
-            NetUpdate();
-
             // Inside here go all the things that dedicated servers shouldn't spend resources on.
             // Like visuals and sounds.
             if (Main.dedServ)
@@ -214,8 +209,9 @@ namespace CalamityMod.Projectiles.Ranged
             OffsetLengthFromArm -= FireNuke ? 16f : 6f;
         }
 
-        private void PostFiringCooldown()
+        public void PostFiringCooldown()
         {
+            Owner.channel = true;
             if (PostFireCooldown > 0)
             {
                 PostFireCooldown--;
@@ -230,19 +226,9 @@ namespace CalamityMod.Projectiles.Ranged
             else
             {
                 if (SoundEngine.TryGetActiveSound(HiveHum, out var hum) && hum.IsPlaying)
-                {
                     hum?.Stop();
-                }
                 Projectile.Kill();
-                NetUpdate();
             }
-        }
-
-        private void NetUpdate()
-        {
-            Projectile.netUpdate = true;
-            if (Projectile.netSpam >= 10)
-                Projectile.netSpam = 9;
         }
 
         public override void OnSpawn(IEntitySource source)
@@ -267,7 +253,7 @@ namespace CalamityMod.Projectiles.Ranged
             Vector2 rotationPoint = texture.Size() * 0.5f;
             SpriteEffects flipSprite = (Projectile.spriteDirection * Owner.gravDir == -1) ? SpriteEffects.FlipHorizontally : SpriteEffects.None;
 
-            if (!Owner.CantUseHoldout())
+            if (!Owner.CantUseHoldout() && PostFireCooldown <= 0)
             {
                 float rumble = Utils.GetLerpValue(0f, MaxCharge, ShootingTimer, true) * ShootingTimer >= MaxCharge ? 2 : 0.8f;
                 drawPosition += Main.rand.NextVector2Circular(rumble, rumble);

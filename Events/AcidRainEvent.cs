@@ -65,10 +65,10 @@ namespace CalamityMod.Events
         {
             get
             {
-                for (int i = 0; i < Main.npc.Length; i++)
+                foreach (NPC npc in Main.ActiveNPCs)
                 {
-                    if (Main.npc[i].active && (PossibleMinibossesAS.Select(miniboss => miniboss.Key).Contains(Main.npc[i].type) ||
-                        PossibleMinibossesPolter.Select(miniboss => miniboss.Key).Contains(Main.npc[i].type)))
+                    if ((PossibleMinibossesAS.Select(miniboss => miniboss.Key).Contains(npc.type) ||
+                        PossibleMinibossesPolter.Select(miniboss => miniboss.Key).Contains(npc.type)))
                     {
                         return true;
                     }
@@ -107,14 +107,8 @@ namespace CalamityMod.Events
         {
             get
             {
-                int playerCount = 0;
-                for (int i = 0; i < Main.player.Length; i++)
-                {
-                    if (Main.player[i].active)
-                    {
-                        playerCount++;
-                    }
-                }
+                int playerCount = Main.CurrentFrameFlags.ActivePlayersCount;
+
                 if (DownedBossSystem.downedPolterghast)
                     return (int)(Math.Log(playerCount + Math.E - 1) * 170f);
                 else if (DownedBossSystem.downedAquaticScourge)
@@ -189,12 +183,7 @@ namespace CalamityMod.Events
             if (AcidRainEventIsOngoing || (!NPC.downedBoss1 && !Main.hardMode && !DownedBossSystem.downedAquaticScourge) || BossRushEvent.BossRushActive)
                 return;
 
-            int playerCount = 0;
-            for (int i = 0; i < Main.player.Length; i++)
-            {
-                if (Main.player[i].active)
-                    playerCount++;
-            }
+            int playerCount = Main.CurrentFrameFlags.ActivePlayersCount;
 
             if (playerCount > 0)
             {
@@ -243,12 +232,8 @@ namespace CalamityMod.Events
             if (!HasStartedAcidicDownpour)
             {
                 int sulphSeaWidth = SulphurousSea.BiomeWidth;
-                for (int playerIndex = 0; playerIndex < Main.maxPlayers; playerIndex++)
+                foreach (Player player in Main.ActivePlayers)
                 {
-                    Player player = Main.player[playerIndex];
-                    if (!player.active)
-                        continue;
-
                     // An artificial biome can be made, and therefore, the event could be started by an artificial biome.
                     // While fighting the event in an artificial biome is not bad, having it be started by a patch of Sulphurous Sand
                     // would definitely be strange.
@@ -387,11 +372,9 @@ namespace CalamityMod.Events
             if ((int)Main.time == (int)(Main.nightLength - 1f) && !Main.dayTime && Main.rand.NextBool(increasedEventChance ? 3 : 300))
             {
                 bool shouldNotStartEvent = false;
-                for (int playerIndex = 0; playerIndex < Main.maxPlayers; playerIndex++)
+                foreach (Player player in Main.ActivePlayers)
                 {
-                    if (!Main.player[playerIndex].active)
-                        continue;
-                    if (Main.player[playerIndex].Calamity().noStupidNaturalARSpawns)
+                    if (player.Calamity().noStupidNaturalARSpawns)
                     {
                         shouldNotStartEvent = true;
                         break;
@@ -407,9 +390,9 @@ namespace CalamityMod.Events
             // Attempt to force an Acid Rain immediately after the EoC is dead when someone wanders to the sea.
             if (NPC.downedBoss1 && !DownedBossSystem.downedEoCAcidRain && !HasBeenForceStartedByEoCDefeat)
             {
-                for (int playerIndex = 0; playerIndex < Main.maxPlayers; playerIndex++)
+                foreach (Player player in Main.ActivePlayers)
                 {
-                    if (Main.player[playerIndex].active && Main.player[playerIndex].Calamity().ZoneSulphur)
+                    if (player.Calamity().ZoneSulphur)
                     {
                         HasBeenForceStartedByEoCDefeat = true;
                         TryStartEvent();

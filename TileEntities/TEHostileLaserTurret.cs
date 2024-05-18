@@ -85,10 +85,9 @@ namespace CalamityMod.TileEntities
             Vector2 ret = InvalidTarget;
             float distSQToBeat = MaxRange * MaxRange;
 
-            for (int i = 0; i < Main.maxPlayers; ++i)
+            foreach (Player p in Main.ActivePlayers)
             {
-                Player p = Main.player[i];
-                if (!p.active || p.dead)
+                if (p.dead)
                     continue;
 
                 float distSQ = p.DistanceSQ(targetingCenter);
@@ -96,7 +95,7 @@ namespace CalamityMod.TileEntities
                 {
                     distSQToBeat = distSQ;
                     ret = p.Center;
-                    indexToSet = i;
+                    indexToSet = p.whoAmI;
                 }
             }
 

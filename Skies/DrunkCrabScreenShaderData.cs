@@ -47,14 +47,7 @@ namespace CalamityMod.Skies
 
                 if (!shouldForceDeactivateCirrusShader)
                 {
-                    for (int i = 0; i < Main.npc.Length; i++)
-                    {
-                        if (Main.npc[i].active && Main.npc[i].type == CirrusType)
-                        {
-                            CirrusIndex = i;
-                            break;
-                        }
-                    }
+                    CirrusIndex = NPC.FindFirstNPC(CirrusType);
                 }
             }
             else
@@ -62,16 +55,7 @@ namespace CalamityMod.Skies
                 if (CrabIndex >= 0 && Main.npc[CrabIndex].active && Main.npc[CrabIndex].type == CrabType)
                     return;
 
-                CrabIndex = -1;
-
-                for (int i = 0; i < Main.npc.Length; i++)
-                {
-                    if (Main.npc[i].active && Main.npc[i].type == CrabType)
-                    {
-                        CrabIndex = i;
-                        break;
-                    }
-                }
+                CrabIndex = NPC.FindFirstNPC(CrabType);
             }
         }
 

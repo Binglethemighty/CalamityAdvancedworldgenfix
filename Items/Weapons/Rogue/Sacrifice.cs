@@ -39,18 +39,18 @@ namespace CalamityMod.Items.Weapons.Rogue
         {
             if (player.altFunctionUse == 2)
             {
-                for (int i = 0; i < Main.maxProjectiles; i++)
+                foreach (Projectile p in Main.ActiveProjectiles)
                 {
-                    if (Main.projectile[i].type != type || !Main.projectile[i].active || Main.projectile[i].owner != player.whoAmI)
+                    if (p.type != type || p.owner != player.whoAmI)
                         continue;
 
-                    if (Main.projectile[i].ai[0] != 1f)
+                    if (p.ai[0] != 1f)
                         continue;
 
-                    NPC attachedNPC = Main.npc[(int)Main.projectile[i].ai[1]];
-                    Main.projectile[i].ai[0] = 2f;
-                    Main.projectile[i].ModProjectile<SacrificeProjectile>().AbleToHealOwner = attachedNPC.type != NPCID.TargetDummy && attachedNPC.type != ModContent.NPCType<SuperDummyNPC>();
-                    Main.projectile[i].netUpdate = true;
+                    NPC attachedNPC = Main.npc[(int)p.ai[1]];
+                    p.ai[0] = 2f;
+                    p.ModProjectile<SacrificeProjectile>().AbleToHealOwner = attachedNPC.type != NPCID.TargetDummy && attachedNPC.type != ModContent.NPCType<SuperDummyNPC>();
+                    p.netUpdate = true;
                 }
                 //TODO: Add something here to avoid stealth being consumed
                 return false;

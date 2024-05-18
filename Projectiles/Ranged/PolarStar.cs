@@ -46,6 +46,7 @@ namespace CalamityMod.Projectiles.Ranged
             Projectile.DamageType = DamageClass.Ranged;
             Projectile.usesLocalNPCImmunity = true;
             Projectile.localNPCHitCooldown = -1;
+            Projectile.tileCollide = true;
         }
 
         public override void AI()
@@ -125,30 +126,6 @@ namespace CalamityMod.Projectiles.Ranged
                 Projectile.velocity = Vector2.Zero;
                 DoSlowdown = false;
             }
-        }
-        public override bool OnTileCollide(Vector2 oldVelocity)
-        {
-            Time = 2;
-
-            if (tileBounces >= 2)
-                Projectile.Kill();
-            else
-                tileBounces++;
-
-            for (int i = 0; i <= 5; i++)
-            {
-                SquishyLightParticle energy = new(Projectile.Center, Projectile.velocity.RotatedByRandom(100) * Main.rand.NextFloat(0.08f, 0.15f), Main.rand.NextFloat(0.4f, 0.7f), EffectsColor, Main.rand.Next(40, 50 + 1), 0.25f, 2f);
-                GeneralParticleHandler.SpawnParticle(energy);
-            }
-            if (Projectile.velocity.X != oldVelocity.X)
-            {
-                Projectile.velocity.X = -oldVelocity.X;
-            }
-            if (Projectile.velocity.Y != oldVelocity.Y)
-            {
-                Projectile.velocity.Y = -oldVelocity.Y;
-            }
-            return false;
         }
         public override void OnKill(int timeLeft)
         {

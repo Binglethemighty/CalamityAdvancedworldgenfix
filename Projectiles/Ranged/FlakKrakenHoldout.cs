@@ -134,8 +134,6 @@ namespace CalamityMod.Projectiles.Ranged
 
                         SoundEngine.PlaySound(new SoundStyle("CalamityMod/Sounds/Item/FlakKrakenShoot") { Volume = 0.6f }, GunTipPosition);
                     }
-
-                    NetUpdate();
                 }
 
                 // When it has shot all the projectiles in the burst, reset all the variables and back to shooting.
@@ -143,7 +141,6 @@ namespace CalamityMod.Projectiles.Ranged
                 {
                     ShootingTimer = 0f;
                     TimerBetweenBursts = 0f;
-                    NetUpdate();
                 }
             }
 
@@ -154,13 +151,6 @@ namespace CalamityMod.Projectiles.Ranged
         {
             base.OnSpawn(source);
             FrontArmStretch = Player.CompositeArmStretchAmount.ThreeQuarters;
-        }
-
-        public void NetUpdate()
-        {
-            Projectile.netUpdate = true;
-            if (Projectile.netSpam >= 10)
-                Projectile.netSpam = 9;
         }
     }
 }

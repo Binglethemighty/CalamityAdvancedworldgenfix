@@ -38,10 +38,9 @@ namespace CalamityMod.Items.Accessories
             get
             {
                 bool result = false;
-                for (int i = 0; i < Main.maxPlayers; i++)
+                foreach (Player player in Main.ActivePlayers)
                 {
-                    Player player = Main.player[i];
-                    if (player is null || !player.active || player.outOfRange || player.dead)
+                    if (player.outOfRange || player.dead)
                         continue;
 
                     CalamityPlayer modPlayer = player.Calamity();
@@ -118,10 +117,9 @@ namespace CalamityMod.Items.Accessories
             // Visibility is not net synced, for example.
             bool alreadyDrawnShieldForPlayer = false;
 
-            for (int i = 0; i < Main.maxPlayers; i++)
+            foreach (Player player in Main.ActivePlayers)
             {
-                Player player = Main.player[i];
-                if (player is null || !player.active || player.outOfRange || player.dead)
+                if (player.outOfRange || player.dead)
                     continue;
 
                 CalamityPlayer modPlayer = player.Calamity();
@@ -135,6 +133,7 @@ namespace CalamityMod.Items.Accessories
 
                 // Scale the shield is drawn at.
                 // The "i" parameter is to make different player's shields not be perfectly synced.
+                int i = player.whoAmI;
                 float scale = 0.15f + 0.03f * (0.5f + 0.5f * (float)Math.Sin(Main.GlobalTimeWrappedHourly * 0.5f + i * 0.2f));
 
                 if (!alreadyDrawnShieldForPlayer)

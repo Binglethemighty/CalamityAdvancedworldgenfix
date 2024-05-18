@@ -57,10 +57,8 @@ namespace CalamityMod.Projectiles.Summon
             }
 
 
-            for (int i = 0; i < Main.maxNPCs; i++)
+            foreach (var npc in Main.ActiveNPCs)
             {
-                NPC npc = Main.npc[i];
-
                 if (npc.CanBeChasedBy())
                 {
                     float between = Vector2.Distance(npc.Center, Projectile.Center);

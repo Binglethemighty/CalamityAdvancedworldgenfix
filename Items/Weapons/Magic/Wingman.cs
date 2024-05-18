@@ -14,7 +14,7 @@ namespace CalamityMod.Items.Weapons.Magic
         {
             Item.width = 44;
             Item.height = 42;
-            Item.damage = 71;
+            Item.damage = 82;
             Item.DamageType = DamageClass.Magic;
             Item.mana = 5;
             Item.useTime = 15;
@@ -35,7 +35,12 @@ namespace CalamityMod.Items.Weapons.Magic
         public override bool CanUseItem(Player player) => player.ownedProjectileCounts[Item.shoot] < 2;
 
         // Makes the rotation of the mouse around the player sync in multiplayer.
-        public override void HoldItem(Player player) => player.Calamity().mouseRotationListener = true;
+        public override void HoldItem(Player player)
+        {
+            var modPlayer = player.Calamity();
+            modPlayer.mouseRotationListener = true;
+            modPlayer.rightClickListener = true;
+        }
 
         public override bool Shoot(Player player, EntitySource_ItemUse_WithAmmo source, Vector2 position, Vector2 velocity, int type, int damage, float knockback)
         {

@@ -511,13 +511,7 @@ namespace CalamityMod.NPCs.Leviathan
                 float restingPlayerDistance = (float)Math.Sqrt(restingPlayerXDist * restingPlayerXDist + restingPlayerYDist * restingPlayerYDist);
 
                 NPC.ai[1] += 1f;
-                int activePlayerAmt = 0;
-                for (int i = 0; i < 255; i++)
-                {
-                    if (Main.player[i].active && !Main.player[i].dead && (NPC.Center - Main.player[i].Center).Length() < 1000f)
-                        activePlayerAmt++;
-                }
-                NPC.ai[1] += activePlayerAmt / 2;
+                NPC.ai[1] += Main.CurrentFrameFlags.ActivePlayersCount / 2;
 
                 bool spawnedBubble = false;
                 float bubbleDelay = 20f;

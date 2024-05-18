@@ -73,11 +73,9 @@ namespace CalamityMod.Projectiles.Ranged
                     int possibleTarget = -1;
                     float closestDistance = 700f;
 
-                    for (int i = 0; i < Main.maxNPCs; i++)
+                    foreach (NPC npc in Main.ActiveNPCs)
                     {
-                        NPC npc = Main.npc[i];
-
-                        if (npc.active && npc.chaseable && npc.lifeMax > 5 && !npc.dontTakeDamage && !npc.friendly &&
+                        if (npc.chaseable && npc.lifeMax > 5 && !npc.dontTakeDamage && !npc.friendly &&
                             !npc.immortal && Collision.CanHit(Projectile.Center, 0, 0, npc.Center, 0, 0))
                         {
                             float distance = Vector2.Distance(Projectile.Center, npc.Center);
@@ -85,7 +83,7 @@ namespace CalamityMod.Projectiles.Ranged
                             if (closestDistance > distance)
                             {
                                 closestDistance = distance;
-                                possibleTarget = i;
+                                possibleTarget = npc.whoAmI;
                             }
                         }
                     }

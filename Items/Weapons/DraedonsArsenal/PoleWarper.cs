@@ -56,9 +56,9 @@ namespace CalamityMod.Items.Weapons.DraedonsArsenal
 
             float magnetCount = 0f;
 
-            for (int i = 0; i < Main.projectile.Length; i++)
+            foreach (Projectile p in Main.ActiveProjectiles)
             {
-                if (Main.projectile[i].type == type && Main.projectile[i].active && Main.projectile[i].owner == player.whoAmI)
+                if (p.type == type && p.owner == player.whoAmI)
                 {
                     magnetCount++;
                 }
@@ -67,12 +67,12 @@ namespace CalamityMod.Items.Weapons.DraedonsArsenal
             // Adjust the offset of all existing magnets such that they form a psuedo-circle.
             // This offset is used when determining where a magnet should move to relative to its true destination (such as the player or an enemy).
             int magnetIndex = 0;
-            for (int i = 0; i < Main.projectile.Length; i++)
+            foreach (Projectile p in Main.ActiveProjectiles)
             {
-                if (Main.projectile[i].type == type && Main.projectile[i].active && Main.projectile[i].owner == player.whoAmI)
+                if (p.type == type && p.owner == player.whoAmI)
                 {
-                    ((PoleWarperSummon)Main.projectile[i].ModProjectile).Time = 0f;
-                    ((PoleWarperSummon)Main.projectile[i].ModProjectile).AngularOffset = MathHelper.TwoPi * magnetIndex / magnetCount;
+                    ((PoleWarperSummon)p.ModProjectile).Time = 0f;
+                    ((PoleWarperSummon)p.ModProjectile).AngularOffset = MathHelper.TwoPi * magnetIndex / magnetCount;
                     magnetIndex++;
                 }
             }

@@ -162,8 +162,13 @@ namespace CalamityMod.NPCs.Abyss
             NPC.height = (int)(NPC.height * 3f);
             NPC.position -= NPC.Size * 0.5f; //hitbox expansion + adjustments
             SoundEngine.PlaySound(SoundID.Item14, NPC.Center); //bomb sound
-            foreach (Player player in Main.player.Where(player => player.active && !player.dead && NPC.Hitbox.Intersects(player.Hitbox)))
+            foreach (Player player in Main.ActivePlayers)
+            {
+                if (player.dead || !NPC.Hitbox.Intersects(player.Hitbox))
+                    continue;
+
                 player.Hurt(PlayerDeathReason.ByNPC(NPC.whoAmI), explosionDamage, NPC.direction);
+            }
             for (int k = 0; k < 8; k++)
             {
                 int dust = Dust.NewDust(NPC.position, NPC.width, NPC.height, DustID.MoonBoulder, 0f, -1f, 0, default, 1f);

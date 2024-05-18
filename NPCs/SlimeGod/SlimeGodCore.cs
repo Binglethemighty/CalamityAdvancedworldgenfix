@@ -500,19 +500,16 @@ namespace CalamityMod.NPCs.SlimeGod
             float ignoreAllSlimesDistanceThreshold = 3200f;
 
             // Find all slimes within a generous area.
-            for (int i = 0; i < Main.maxNPCs; i++)
+            foreach (NPC n in Main.ActiveNPCs)
             {
-                int npcType = Main.npc[i].type;
+                int npcType = n.type;
                 if (npcType != largeCrimulanPaladin && npcType != splitCrimulanPaladin && npcType != largeEbonianPaladin && npcType != splitEbonianPaladin)
                     continue;
 
-                if (!Main.npc[i].active)
+                if (!NPC.WithinRange(n.Center, ignoreAllSlimesDistanceThreshold))
                     continue;
 
-                if (!NPC.WithinRange(Main.npc[i].Center, ignoreAllSlimesDistanceThreshold))
-                    continue;
-
-                largeSlimes.Add(Main.npc[i]);
+                largeSlimes.Add(n);
             }
 
             // If no slimes were found, don't bother doing any more calculations. Just use the player's center.

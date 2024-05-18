@@ -255,19 +255,18 @@ namespace CalamityMod.Projectiles.Summon.Umbrella
                     return selectedTarget.whoAmI;
             }
 
-            for (int i = 0; i < Main.maxNPCs; i++)
+            foreach (NPC npc in Main.ActiveNPCs)
             {
-                NPC npc = Main.npc[i];
-                if (npc.CanBeChasedBy(this) && (npc.boss || !blackListedTargets.Contains(i)))
-                {
-                    float npcDist = npc.Distance(center);
-                    if (npcDist <= MagicHat.Range && (npcDist <= closestDist || closestDist == -1f))
-                    {
-                        closestDist = npcDist;
-                        target = i;
-                    }
-                }
-            }
+				if (npc.CanBeChasedBy(this) && (npc.boss || !blackListedTargets.Contains(npc.whoAmI)))
+				{
+					float npcDist = npc.Distance(center);
+					if (npcDist <= MagicHat.Range && (npcDist <= closestDist || closestDist == -1f))
+					{
+						closestDist = npcDist;
+						target = npc.whoAmI;
+					}
+				}
+			}
 
             return target;
         }

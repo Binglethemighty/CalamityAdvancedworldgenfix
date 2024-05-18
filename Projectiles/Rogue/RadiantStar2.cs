@@ -41,30 +41,30 @@ namespace CalamityMod.Projectiles.Rogue
                 float projY = Projectile.Center.Y;
                 float homeRange = Projectile.Calamity().stealthStrike ? 1800f : 600f;
                 float homingSpeed = 0.25f;
-                for (int i = 0; i < Main.maxNPCs; i++)
+                foreach (NPC n in Main.ActiveNPCs)
                 {
-                    if (Main.npc[i].CanBeChasedBy(Projectile, false) && Collision.CanHit(Projectile.Center, 1, 1, Main.npc[i].Center, 1, 1) && !CalamityPlayer.areThereAnyDamnBosses)
+                    if (n.CanBeChasedBy(Projectile, false) && Collision.CanHit(Projectile.Center, 1, 1, n.Center, 1, 1) && !CalamityPlayer.areThereAnyDamnBosses)
                     {
-                        float npcCenterX = Main.npc[i].position.X + (float)(Main.npc[i].width / 2);
-                        float npcCenterY = Main.npc[i].position.Y + (float)(Main.npc[i].height / 2);
+                        float npcCenterX = n.position.X + (float)(n.width / 2);
+                        float npcCenterY = n.position.Y + (float)(n.height / 2);
                         float targetDist = Math.Abs(Projectile.position.X + (float)(Projectile.width / 2) - npcCenterX) + Math.Abs(Projectile.position.Y + (float)(Projectile.height / 2) - npcCenterY);
                         if (targetDist < homeRange)
                         {
-                            if (Main.npc[i].position.X < projX)
+                            if (n.position.X < projX)
                             {
-                                Main.npc[i].velocity.X += homingSpeed;
+                                n.velocity.X += homingSpeed;
                             }
                             else
                             {
-                                Main.npc[i].velocity.X -= homingSpeed;
+                                n.velocity.X -= homingSpeed;
                             }
-                            if (Main.npc[i].position.Y < projY)
+                            if (n.position.Y < projY)
                             {
-                                Main.npc[i].velocity.Y += homingSpeed;
+                                n.velocity.Y += homingSpeed;
                             }
                             else
                             {
-                                Main.npc[i].velocity.Y -= homingSpeed;
+                                n.velocity.Y -= homingSpeed;
                             }
                         }
                     }

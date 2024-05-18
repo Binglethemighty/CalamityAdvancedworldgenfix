@@ -361,10 +361,9 @@ namespace CalamityMod.Items.Accessories
                     if (bestGrapplePos != Point.Zero)
                     {
                         //Clear any hooks that might have been flying before then.
-                        for (int i = 0; i < Main.maxProjectiles; ++i)
+                        foreach (Projectile p in Main.ActiveProjectiles)
                         {
-                            Projectile p = Main.projectile[i];
-                            if (!p.active || p.owner != Player.whoAmI || p.type != ProjectileType<WulfrumHook>())
+                            if (p.owner != Player.whoAmI || p.type != ProjectileType<WulfrumHook>())
                                 continue;
 
                             if (p.ModProjectile is WulfrumHook)
@@ -412,10 +411,9 @@ namespace CalamityMod.Items.Accessories
             if (triggersSet.Grapple && Player.releaseHook)
             {
                 //Clear any previous non-wulfrum hooks / Any hooks that just got shot (should already be handled by the global proj
-                for (int i = 0; i < Main.maxProjectiles; ++i)
+                foreach (Projectile p in Main.ActiveProjectiles)
                 {
-                    Projectile p = Main.projectile[i];
-                    if (!p.active || p.owner != Player.whoAmI || p.aiStyle != 7 || p.type == ProjectileType<WulfrumHook>())
+                    if (p.owner != Player.whoAmI || p.aiStyle != 7 || p.type == ProjectileType<WulfrumHook>())
                         continue;
 
                     p.Kill();
@@ -443,10 +441,9 @@ namespace CalamityMod.Items.Accessories
             //Jumping out of the hook
             if (triggersSet.Jump && Player.releaseJump)
             {
-                for (int i = 0; i < Main.maxProjectiles; ++i)
+                foreach (Projectile p in Main.ActiveProjectiles)
                 {
-                    Projectile p = Main.projectile[i];
-                    if (!p.active || p.owner != Player.whoAmI || p.type != ProjectileType<WulfrumHook>())
+                    if (p.owner != Player.whoAmI || p.type != ProjectileType<WulfrumHook>())
                         continue;
 
                     //Only clear hooks that are attached to stuff

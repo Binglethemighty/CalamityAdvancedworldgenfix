@@ -50,10 +50,9 @@ namespace CalamityMod.Projectiles.Summon
             Projectile nextSegment = new Projectile();
             BlackDragonHead head = new BlackDragonHead();
 
-            for (int i = 0; i < Main.maxProjectiles; i++)
+            foreach (Projectile projectile in Main.ActiveProjectiles)
             {
-                var projectile = Main.projectile[i];
-                if (projectile.type == ModContent.ProjectileType<BlackDragonBody>() && projectile.owner == Projectile.owner && projectile.active)
+                if (projectile.type == ModContent.ProjectileType<BlackDragonBody>() && projectile.owner == Projectile.owner)
                 {
                     if (projectile.ModProjectile<BlackDragonBody>().segmentIndex == segmentIndex - 1)
                     {
@@ -61,7 +60,7 @@ namespace CalamityMod.Projectiles.Summon
                         nextSegment = projectile;
                     }
                 }
-                if (projectile.type == ModContent.ProjectileType<BlackDragonHead>() && projectile.owner == Projectile.owner && projectile.active)
+                if (projectile.type == ModContent.ProjectileType<BlackDragonHead>() && projectile.owner == Projectile.owner)
                 {
                     if (segmentIndex == 1)
                     {
@@ -96,10 +95,9 @@ namespace CalamityMod.Projectiles.Summon
         {
             if (Main.player[Projectile.owner].ownedProjectileCounts[ModContent.ProjectileType<BlackDragonHead>()] > 0)
             {
-                for (int i = 0; i < Main.maxProjectiles; i++)
+                foreach (Projectile projectile in Main.ActiveProjectiles)
                 {
-                    var projectile = Main.projectile[i];
-                    if (projectile.type == ModContent.ProjectileType<BlackDragonHead>() && projectile.owner == Projectile.owner && projectile.active)
+                    if (projectile.type == ModContent.ProjectileType<BlackDragonHead>() && projectile.owner == Projectile.owner)
                     {
                         projectile.Kill();
                     }

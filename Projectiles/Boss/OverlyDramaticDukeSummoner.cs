@@ -107,9 +107,9 @@ namespace CalamityMod.Projectiles.Boss
                 Projectile.alpha = (int)MathHelper.Lerp(0f, 255f, (Projectile.ai[0] - 600f) / 120f);
 
                 bool canSpawnBoomer = false;
-                for (int i = 0; i < Main.player.Length; i++)
+                foreach (Player player in Main.ActivePlayers)
                 {
-                    if (!Main.player[i].dead && Projectile.Distance(Main.player[i].Center) < 12000f)
+                    if (!player.dead && Projectile.Distance(player.Center) < 12000f)
                     {
                         canSpawnBoomer = true;
                         break;

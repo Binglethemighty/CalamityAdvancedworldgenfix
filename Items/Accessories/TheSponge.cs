@@ -47,10 +47,9 @@ namespace CalamityMod.Items.Accessories
             get
             {
                 bool result = false;
-                for (int i = 0; i < Main.maxPlayers; i++)
+                foreach (Player player in Main.ActivePlayers)
                 {
-                    Player player = Main.player[i];
-                    if (player is null || !player.active || player.outOfRange || player.dead)
+                    if (player.outOfRange || player.dead)
                         continue;
 
                     CalamityPlayer modPlayer = player.Calamity();
@@ -178,10 +177,9 @@ namespace CalamityMod.Items.Accessories
             // Visibility is not net synced, for example.
             bool alreadyDrawnShieldForPlayer = false;
 
-            for (int i = 0; i < Main.maxPlayers; i++)
+            foreach (Player player in Main.ActivePlayers)
             {
-                Player player = Main.player[i];
-                if (player is null || !player.active || player.outOfRange || player.dead)
+                if (player.outOfRange || player.dead)
                     continue;
 
                 CalamityPlayer modPlayer = player.Calamity();
@@ -194,6 +192,7 @@ namespace CalamityMod.Items.Accessories
 
                 // Scale the shield is drawn at. The Sponge shield gently grows and shrinks; it should be largely imperceptible.
                 // The "i" parameter is to make different player's shields not be perfectly synced.
+                int i = player.whoAmI;
                 float baseScale = 0.155f;
                 float maxExtraScale = 0.025f;
                 float extraScalePulseInterpolant = MathF.Pow(4f, MathF.Sin(Main.GlobalTimeWrappedHourly * 0.791f + i) - 1);

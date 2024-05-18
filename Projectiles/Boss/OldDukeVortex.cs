@@ -124,10 +124,8 @@ namespace CalamityMod.Projectiles.Boss
 
                 float distanceRequired = 800f * Projectile.scale;
                 float succPower = Main.zenithWorld ? 1f : 0.5f;
-                for (int i = 0; i < Main.maxPlayers; i++)
+                foreach (Player player in Main.ActivePlayers)
                 {
-                    Player player = Main.player[i];
-
                     float distance = Vector2.Distance(player.Center, Projectile.Center);
                     if (distance < distanceRequired && player.grappling[0] == -1)
                     {

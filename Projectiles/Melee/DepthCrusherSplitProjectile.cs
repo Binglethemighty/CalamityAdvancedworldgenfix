@@ -42,7 +42,7 @@ namespace CalamityMod.Projectiles.Melee
             }
             if (Time > 20 && Time < (randTimer - 70))
             {
-                CalamityUtils.HomeInOnNPC(Projectile, true, 280f, MathHelper.Clamp(1f + Time * 0.06f, 1, 10), 20f);
+                CalamityUtils.HomeInOnNPC(Projectile, true, 384f, MathHelper.Clamp(1f + Time * 0.12f, 1, 11), 20f);
             }
             else if (Time >= (randTimer - 70))
             {

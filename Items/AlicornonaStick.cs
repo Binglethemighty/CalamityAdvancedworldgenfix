@@ -26,9 +26,9 @@ namespace CalamityMod.Items
         {
             int offset = player.direction == 1 ? 5 : -Item.width - 5;
             Rectangle itemRect = new Rectangle((int)player.Center.X + offset, (int)player.position.Y - 10, Item.width, Item.height);
-            foreach (NPC npc in Main.npc)
+            foreach (NPC npc in Main.ActiveNPCs)
             {
-                if (npc.active && npc != null && !npc.dontTakeDamage && npc.type != ModContent.NPCType<THELORDE>())
+                if (!npc.dontTakeDamage && npc.type != ModContent.NPCType<THELORDE>())
                 {
                     if (itemRect.Intersects(npc.getRect()))
                     {

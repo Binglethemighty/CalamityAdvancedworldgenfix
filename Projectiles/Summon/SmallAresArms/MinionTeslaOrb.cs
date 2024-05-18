@@ -74,15 +74,15 @@ namespace CalamityMod.Projectiles.Summon.SmallAresArms
 
         public Projectile GetOrbToAttachTo()
         {
-            for (int i = 0; i < Main.maxProjectiles; i++)
+            foreach (Projectile p in Main.ActiveProjectiles)
             {
-                if (Main.projectile[i].type != Projectile.type || Main.projectile[i].ai[0] != Identity + 1f || !Main.projectile[i].active)
+                if (p.type != Projectile.type || p.ai[0] != Identity + 1f)
                     continue;
 
-                if (!Main.projectile[i].WithinRange(Projectile.Center, AresExoskeleton.TeslaOrbDetatchDistance))
+                if (!p.WithinRange(Projectile.Center, AresExoskeleton.TeslaOrbDetatchDistance))
                     continue;
 
-                return Main.projectile[i];
+                return p;
             }
 
             return null;

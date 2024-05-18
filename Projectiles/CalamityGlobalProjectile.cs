@@ -3587,17 +3587,17 @@ namespace CalamityMod.Projectiles
                 float maxDistance = 460f;
                 bool homeIn = false;
 
-                for (int i = 0; i < Main.maxNPCs; i++)
+                foreach (NPC n in Main.ActiveNPCs)
                 {
-                    if (Main.npc[i].CanBeChasedBy(projectile, false))
+                    if (n.CanBeChasedBy(projectile, false))
                     {
-                        float extraDistance = (float)(Main.npc[i].width / 2) + (Main.npc[i].height / 2);
+                        float extraDistance = (float)(n.width / 2) + (n.height / 2);
 
-                        bool canHit = Collision.CanHit(projectile.Center, 1, 1, Main.npc[i].Center, 1, 1);
+                        bool canHit = Collision.CanHit(projectile.Center, 1, 1, n.Center, 1, 1);
 
-                        if (Vector2.Distance(Main.npc[i].Center, projectile.Center) < (maxDistance + extraDistance) && canHit)
+                        if (Vector2.Distance(n.Center, projectile.Center) < (maxDistance + extraDistance) && canHit)
                         {
-                            center = Main.npc[i].Center;
+                            center = n.Center;
                             homeIn = true;
                             break;
                         }
@@ -4390,15 +4390,15 @@ namespace CalamityMod.Projectiles
 
             if (projectile.type == ProjectileID.ThornBall)
             {
-                float startTurningBrownGateValue = 420f;
-                float timeToReachFullBrown = 180f;
-                float timeToReachThornExplosion = startTurningBrownGateValue + timeToReachFullBrown;
+                float startWarningColorGateValue = 420f;
+                float timeToReachFullIntensity = 180f;
+                float timeToReachThornExplosion = startWarningColorGateValue + timeToReachFullIntensity;
                 Color initialColor = lightColor;
-                Color finalColor = new Color(125, 75, 75);
+                Color finalColor = Color.Lerp(new Color(125, 75, 75), Color.Red, (float)Math.Abs(Math.Sin((projectile.ai[1] - startWarningColorGateValue) * (MathHelper.Pi / 45))));
                 finalColor.A = (byte)(255 - projectile.alpha);
-                if (projectile.ai[1] > startTurningBrownGateValue)
+                if (projectile.ai[1] > startWarningColorGateValue)
                 {
-                    float colorTransitionRatio = (projectile.ai[1] - startTurningBrownGateValue) / timeToReachFullBrown;
+                    float colorTransitionRatio = (projectile.ai[1] - startWarningColorGateValue) / timeToReachFullIntensity;
                     Color dehydratedColor = Color.Lerp(initialColor, finalColor, colorTransitionRatio);
                     return dehydratedColor;
                 }
@@ -4433,6 +4433,40 @@ namespace CalamityMod.Projectiles
                 return RavenMinionAI.DoRavenMinionDrawing(projectile, ref lightColor);
 
             #endregion
+
+            if (projectile.type == ProjectileID.DeerclopsIceSpike && (CalamityWorld.revenge || BossRushEvent.BossRushActive))
+            {
+                bool masterMode = Main.masterMode || BossRushEvent.BossRushActive;
+                bool death = CalamityWorld.death || BossRushEvent.BossRushActive;
+
+                Texture2D texture = TextureAssets.Projectile[projectile.type].Value;
+                Rectangle value26 = texture.Frame(1, 5, 0, projectile.frame);
+                Vector2 origin12 = new Vector2(16f, value26.Height / 2);
+                Color alpha5 = projectile.GetAlpha(lightColor);
+                Vector2 vector39 = new Vector2(projectile.scale);
+                float fadeOutGateValue = masterMode ? 80f : death ? 50f : 10f;
+                float killGateValue = masterMode ? 90f : death ? 60f : 20f;
+                float lerpValue5 = Utils.GetLerpValue(killGateValue, killGateValue - 10f, projectile.ai[0], clamped: true);
+                vector39.Y *= lerpValue5;
+                Vector4 vector40 = lightColor.ToVector4();
+                Vector4 vector41 = new Color(67, 17, 17).ToVector4();
+                vector41 *= vector40;
+
+                SpriteEffects spriteEffects = SpriteEffects.None;
+                if (projectile.spriteDirection == -1)
+                    spriteEffects = SpriteEffects.FlipHorizontally;
+
+                Main.EntitySpriteDraw(TextureAssets.Extra[98].Value, projectile.Center - Main.screenPosition + new Vector2(0f, projectile.gfxOffY) - projectile.velocity * projectile.scale * 0.5f, null, projectile.GetAlpha(new Color(vector41.X, vector41.Y, vector41.Z, vector41.W)), projectile.rotation + MathHelper.PiOver2, TextureAssets.Extra[98].Value.Size() / 2f, projectile.scale * 0.9f, spriteEffects);
+                Color color49 = projectile.GetAlpha(Color.White) * Utils.Remap(projectile.ai[0], 0f, killGateValue, 0.5f, 0f);
+                color49.A = 0;
+
+                for (int i = 0; i < 4; i++)
+                    Main.EntitySpriteDraw(texture, projectile.Center - Main.screenPosition + new Vector2(0f, projectile.gfxOffY) + projectile.rotation.ToRotationVector2().RotatedBy(MathHelper.PiOver2 * (float)i) * 2f * vector39, value26, color49, projectile.rotation, origin12, vector39, spriteEffects);
+
+                Main.EntitySpriteDraw(texture, projectile.Center - Main.screenPosition + new Vector2(0f, projectile.gfxOffY), value26, alpha5, projectile.rotation, origin12, vector39, spriteEffects);
+
+                return false;
+            }
 
             if (projectile.type == ProjectileID.DemonSickle)
             {
@@ -4856,16 +4890,15 @@ namespace CalamityMod.Projectiles
 
             float lowestHealthCheck = 0f;
             int healTarget = projectile.owner;
-            for (int i = 0; i < Main.maxPlayers; i++)
+            foreach (Player otherPlayer in Main.ActivePlayers)
             {
-                Player otherPlayer = Main.player[i];
-                if (otherPlayer.active && !otherPlayer.dead && ((!player.hostile && !otherPlayer.hostile) || player.team == otherPlayer.team))
+                if (!otherPlayer.dead && ((!player.hostile && !otherPlayer.hostile) || player.team == otherPlayer.team))
                 {
                     float playerDist = Vector2.Distance(projectile.Center, otherPlayer.Center);
                     if (playerDist < distanceRequired && (otherPlayer.statLifeMax2 - otherPlayer.statLife) > lowestHealthCheck)
                     {
                         lowestHealthCheck = otherPlayer.statLifeMax2 - otherPlayer.statLife;
-                        healTarget = i;
+                        healTarget = otherPlayer.whoAmI;
                     }
                 }
             }

@@ -102,7 +102,7 @@ namespace CalamityMod.UI.DraedonSummoning
         {
             // If not viewing the specific tile entity's interface anymore, if the ID is for some reason invalid, or if the player is not equipped to continue viewing the UI
             // don't do anything other than resetting necessary data.
-            if (!TileEntity.ByID.ContainsKey(ViewedTileEntityID) || TileEntity.ByID[ViewedTileEntityID] is not TECodebreaker codebreakerTileEntity || !Main.LocalPlayer.WithinRange(codebreakerTileEntity.Center, 270f) || !Main.playerInventory)
+            if (!TileEntity.ByID.ContainsKey(ViewedTileEntityID) || TileEntity.ByID[ViewedTileEntityID] is not TECodebreaker codebreakerTileEntity || !Main.LocalPlayer.WithinRange(codebreakerTileEntity.Center, 270f) || !Main.playerInventory || Main.LocalPlayer.channel)
             {
                 VerificationButtonScale = 1f;
                 CancelButtonScale = 0.75f;

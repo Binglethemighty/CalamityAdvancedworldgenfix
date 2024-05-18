@@ -39,16 +39,16 @@ namespace CalamityMod.Projectiles.Typeless
             {
                 int targetIdx = -1;
                 float npcRange = 150f;
-                for (int i = 0; i < Main.maxNPCs; i++)
+                foreach (NPC n in Main.ActiveNPCs)
                 {
-                    if (Main.npc[i].active && Main.npc[i].CanBeChasedBy(Projectile, false))
+                    if (n.CanBeChasedBy(Projectile, false))
                     {
-                        Vector2 npcPos = Main.npc[i].Center;
+                        Vector2 npcPos = n.Center;
                         float npcDist = Vector2.Distance(npcPos, Projectile.Center);
                         if (npcDist < npcRange && targetIdx == -1 && Collision.CanHitLine(Projectile.Center, 1, 1, npcPos, 1, 1))
                         {
                             npcRange = npcDist;
-                            targetIdx = i;
+                            targetIdx = n.whoAmI;
                         }
                     }
                 }

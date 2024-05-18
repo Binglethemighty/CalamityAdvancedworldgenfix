@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using CalamityMod.Buffs.DamageOverTime;
 using CalamityMod.Graphics.Primitives;
 using Microsoft.Xna.Framework;
@@ -22,7 +23,7 @@ namespace CalamityMod.Projectiles.Melee
         public override void SetStaticDefaults()
         {
             ProjectileID.Sets.TrailingMode[Projectile.type] = 2;
-            ProjectileID.Sets.TrailCacheLength[Projectile.type] = 36;
+            ProjectileID.Sets.TrailCacheLength[Projectile.type] = 90;
         }
 
         public override void SetDefaults()
@@ -42,6 +43,14 @@ namespace CalamityMod.Projectiles.Melee
 
         public override void AI()
         {
+            // Frame 1 effect: Prevent zeroed out garbage from messing up the trail rendering.
+            if (Projectile.localAI[1] == 0f)
+            {
+                Projectile.localAI[1] = 1f;
+                for (int i = 0; i < Projectile.oldPos.Length; ++i)
+                    Projectile.oldPos[i] = Projectile.position;
+            }
+
             Projectile.rotation = Projectile.velocity.ToRotation() + MathHelper.Pi * Time / Lifetime;
 
             Vector2 baseDirection = (MathHelper.TwoPi * Time / Lifetime - MathHelper.PiOver2).ToRotationVector2();
@@ -128,7 +137,12 @@ namespace CalamityMod.Projectiles.Melee
             Main.spriteBatch.EnterShaderRegion();
             GameShaders.Misc["CalamityMod:PrismaticStreak"].SetShaderTexture(ModContent.Request<Texture2D>("CalamityMod/ExtraTextures/Trails/ScarletDevilStreak"));
 
-            PrimitiveRenderer.RenderTrail(Projectile.oldPos, new(WidthFunction, ColorFunction, (_) => Projectile.Size * 0.5f + generalOffset, shader: GameShaders.Misc["CalamityMod:PrismaticStreak"]), 65);
+            // Photon Ripper tracks 90 positions in oldPos.
+            // Provide 60 points for smoothing, but only render 12
+            int numPointsRendered = 12;
+            int numPointsProvided = 60;
+            var positionsToUse = Projectile.oldPos.Take(numPointsProvided).ToArray();
+            PrimitiveRenderer.RenderTrail(positionsToUse, new(WidthFunction, ColorFunction, (_) => Projectile.Size * 0.5f + generalOffset, shader: GameShaders.Misc["CalamityMod:PrismaticStreak"], smoothen: false), numPointsRendered);
             Main.spriteBatch.ExitShaderRegion();
             return true;
         }

@@ -69,15 +69,15 @@ namespace CalamityMod.Projectiles.Rogue
                 float maxDistance = 600f;
                 bool homeIn = false;
 
-                for (int i = 0; i < Main.maxNPCs; i++)
+                foreach (NPC n in Main.ActiveNPCs)
                 {
-                    if (Main.npc[i].CanBeChasedBy(Projectile, false) && Collision.CanHit(Projectile.Center, 1, 1, Main.npc[i].Center, 1, 1))
+                    if (n.CanBeChasedBy(Projectile, false) && Collision.CanHit(Projectile.Center, 1, 1, n.Center, 1, 1))
                     {
-                        float extraDistance = (float)(Main.npc[i].width / 2) + (float)(Main.npc[i].height / 2);
+                        float extraDistance = (float)(n.width / 2) + (float)(n.height / 2);
 
-                        if (Vector2.Distance(Main.npc[i].Center, Projectile.Center) < (maxDistance + extraDistance))
+                        if (Vector2.Distance(n.Center, Projectile.Center) < (maxDistance + extraDistance))
                         {
-                            center = Main.npc[i].Center;
+                            center = n.Center;
                             homeIn = true;
                             break;
                         }

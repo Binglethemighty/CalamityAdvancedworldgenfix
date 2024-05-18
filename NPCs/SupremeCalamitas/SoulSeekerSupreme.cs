@@ -145,9 +145,8 @@ namespace CalamityMod.NPCs.SupremeCalamitas
             int shootRate = BossRushEvent.BossRushActive ? 120 : 180;
             if (timer > shootRate)
             {
-                for (int i = 0; i < Main.maxNPCs; i++)
+                foreach (NPC seeker in Main.ActiveNPCs)
                 {
-                    NPC seeker = Main.npc[i];
                     if (seeker.type == NPC.type)
                     {
                         if (seeker == NPC)

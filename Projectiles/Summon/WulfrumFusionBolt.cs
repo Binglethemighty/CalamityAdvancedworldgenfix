@@ -68,10 +68,8 @@ namespace CalamityMod.Projectiles.Summon
             float bestScore = 0;
             NPC bestTarget = null;
 
-            for (int i = 0; i < Main.maxNPCs; i++)
+            foreach (NPC potentialTarget in Main.ActiveNPCs)
             {
-                NPC potentialTarget = Main.npc[i];
-
                 if (!potentialTarget.CanBeChasedBy(null, false))
                     continue;
 

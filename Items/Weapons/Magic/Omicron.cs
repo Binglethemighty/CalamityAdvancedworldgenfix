@@ -1,4 +1,6 @@
-﻿using CalamityMod.Items.Materials;
+﻿using CalamityMod.CalPlayer;
+using CalamityMod.DataStructures;
+using CalamityMod.Items.Materials;
 using CalamityMod.Projectiles.Magic;
 using CalamityMod.Rarities;
 using CalamityMod.Tiles.Furniture.CraftingStations;
@@ -12,6 +14,10 @@ namespace CalamityMod.Items.Weapons.Magic
 {
     public class Omicron : ModItem, ILocalizedModType
     {
+        public static float FireRate = 15f;
+        public static float StarterWinup = 60f;
+        public static float WingmanFireRate = 10f;
+        
         public new string LocalizationCategory => "Items.Weapons.Magic";
 
         public override void SetDefaults()
@@ -37,7 +43,14 @@ namespace CalamityMod.Items.Weapons.Magic
         public override bool CanUseItem(Player player) => player.ownedProjectileCounts[Item.shoot] <= 0 && player.ownedProjectileCounts[ModContent.ProjectileType<OmicronWingman>()] < 2;
 
         // Makes the rotation of the mouse around the player sync in multiplayer.
-        public override void HoldItem(Player player) => player.Calamity().mouseRotationListener = true;
+        public override void HoldItem(Player player)
+        {
+            CalamityPlayer calPlayer = player.Calamity();
+            calPlayer.mouseWorldListener = true;
+            calPlayer.mouseRotationListener = true;
+            calPlayer.rightClickListener = true;
+        }
+
         public override bool Shoot(Player player, EntitySource_ItemUse_WithAmmo source, Vector2 position, Vector2 velocity, int type, int damage, float knockback)
         {
             for (int i = 0; i < 2; i++)

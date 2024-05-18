@@ -55,16 +55,16 @@ namespace CalamityMod.Projectiles.Rogue
                 {
                     int index = -1;
                     float otherConstant = 300f;
-                    for (int i = 0; i < Main.maxNPCs; i++)
+                    foreach (NPC n in Main.ActiveNPCs)
                     {
-                        if (Main.npc[i].active && Main.npc[i].CanBeChasedBy(Projectile, false))
+                        if (n.CanBeChasedBy(Projectile, false))
                         {
-                            Vector2 npcCenter = Main.npc[i].Center;
+                            Vector2 npcCenter = n.Center;
                             float targetDist = Vector2.Distance(npcCenter, Projectile.Center);
                             if (targetDist < otherConstant && index == -1 && Collision.CanHitLine(Projectile.Center, 1, 1, npcCenter, 1, 1))
                             {
                                 otherConstant = targetDist;
-                                index = i;
+                                index = n.whoAmI;
                             }
                         }
                     }

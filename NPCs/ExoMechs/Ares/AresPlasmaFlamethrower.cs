@@ -195,8 +195,8 @@ namespace CalamityMod.NPCs.ExoMechs.Ares
             // Whether Ares should be buffed while in berserk phase
             bool shouldGetBuffedByBerserkPhase = berserk && !otherMechIsBerserk;
 
-            // Target variable
-            Player player = Main.player[Main.npc[CalamityGlobalNPC.draedonExoMechPrime].target];
+            // Target variables
+            int targetIndex = Main.npc[CalamityGlobalNPC.draedonExoMechPrime].target;
 
             if (NPC.ai[2] > 0f)
                 NPC.realLife = (int)NPC.ai[2];
@@ -236,8 +236,8 @@ namespace CalamityMod.NPCs.ExoMechs.Ares
             if (passivePhase)
                 predictionAmt *= 0.5f;
 
-            Vector2 predictionVector = player.velocity * predictionAmt;
-            Vector2 rotationVector = player.Center + predictionVector - NPC.Center;
+            Vector2 predictionVector = Main.player[targetIndex].velocity * predictionAmt;
+            Vector2 rotationVector = Main.player[targetIndex].Center + predictionVector - NPC.Center;
 
             float projectileVelocity = passivePhase ? 9.6f : 12f;
             if (lastMechAlive)
@@ -259,7 +259,7 @@ namespace CalamityMod.NPCs.ExoMechs.Ares
             NPC.rotation = NPC.rotation.AngleTowards(rotation, rateOfRotation);
 
             // Direction
-            int direction = Math.Sign(player.Center.X - NPC.Center.X);
+            int direction = Math.Sign(Main.player[targetIndex].Center.X - NPC.Center.X);
             if (direction != 0)
             {
                 NPC.direction = direction;
@@ -284,35 +284,31 @@ namespace CalamityMod.NPCs.ExoMechs.Ares
             float setTimerTo = (int)(plasmaBoltPhaseGateValue * 0.95f) - 1;
 
             // Despawn if target is dead
-            if (player.dead)
+            if (Main.player[targetIndex].dead)
             {
-                player = Main.player[Main.npc[CalamityGlobalNPC.draedonExoMechPrime].target];
-                if (player.dead)
-                {
-                    AIState = (float)Phase.Nothing;
-                    calamityGlobalNPC.newAI[1] = setTimerTo;
-                    calamityGlobalNPC.newAI[2] = 0f;
-                    NPC.dontTakeDamage = true;
+                AIState = (float)Phase.Nothing;
+                calamityGlobalNPC.newAI[1] = setTimerTo;
+                calamityGlobalNPC.newAI[2] = 0f;
+                NPC.dontTakeDamage = true;
 
+                NPC.velocity.Y -= 1f;
+                if ((double)NPC.position.Y < Main.topWorld + 16f)
                     NPC.velocity.Y -= 1f;
-                    if ((double)NPC.position.Y < Main.topWorld + 16f)
-                        NPC.velocity.Y -= 1f;
 
-                    if ((double)NPC.position.Y < Main.topWorld + 16f)
+                if ((double)NPC.position.Y < Main.topWorld + 16f)
+                {
+                    for (int a = 0; a < Main.maxNPCs; a++)
                     {
-                        for (int a = 0; a < Main.maxNPCs; a++)
-                        {
-                            if (Main.npc[a].type == NPC.type || Main.npc[a].type == ModContent.NPCType<Artemis.Artemis>() || Main.npc[a].type == ModContent.NPCType<AresBody>() ||
-                                Main.npc[a].type == ModContent.NPCType<AresLaserCannon>() || Main.npc[a].type == ModContent.NPCType<Apollo.Apollo>() ||
-                                Main.npc[a].type == ModContent.NPCType<AresTeslaCannon>() || Main.npc[a].type == ModContent.NPCType<AresGaussNuke>() ||
-                                Main.npc[a].type == ModContent.NPCType<ThanatosHead>() || Main.npc[a].type == ModContent.NPCType<ThanatosBody1>() ||
-                                Main.npc[a].type == ModContent.NPCType<ThanatosBody2>() || Main.npc[a].type == ModContent.NPCType<ThanatosTail>())
-                                Main.npc[a].active = false;
-                        }
+                        if (Main.npc[a].type == NPC.type || Main.npc[a].type == ModContent.NPCType<Artemis.Artemis>() || Main.npc[a].type == ModContent.NPCType<AresBody>() ||
+                            Main.npc[a].type == ModContent.NPCType<AresLaserCannon>() || Main.npc[a].type == ModContent.NPCType<Apollo.Apollo>() ||
+                            Main.npc[a].type == ModContent.NPCType<AresTeslaCannon>() || Main.npc[a].type == ModContent.NPCType<AresGaussNuke>() ||
+                            Main.npc[a].type == ModContent.NPCType<ThanatosHead>() || Main.npc[a].type == ModContent.NPCType<ThanatosBody1>() ||
+                            Main.npc[a].type == ModContent.NPCType<ThanatosBody2>() || Main.npc[a].type == ModContent.NPCType<ThanatosTail>())
+                            Main.npc[a].active = false;
                     }
-
-                    return;
                 }
+
+                return;
             }
 
             // Default vector to fly to
@@ -351,7 +347,7 @@ namespace CalamityMod.NPCs.ExoMechs.Ares
             bool boltsSplitLess = fireMoreBolts && !lastMechAlive;
 
             // If Plasma Cannon can fire projectiles, cannot fire if too close to the target and in deathray spiral phase
-            bool canFire = Vector2.Distance(NPC.Center, player.Center) > 320f || calamityGlobalNPC_Body.newAI[0] != (float)AresBody.Phase.Deathrays;
+            bool canFire = Vector2.Distance(NPC.Center, Main.player[targetIndex].Center) > 320f || calamityGlobalNPC_Body.newAI[0] != (float)AresBody.Phase.Deathrays;
 
             // Telegraph duration for deathray spiral
             float deathrayTelegraphDuration = bossRush ? AresBody.deathrayTelegraphDuration_BossRush : death ? AresBody.deathrayTelegraphDuration_Death :
@@ -450,7 +446,7 @@ namespace CalamityMod.NPCs.ExoMechs.Ares
                                 if (boltsSplitLess)
                                     Projectile.NewProjectile(NPC.GetSource_FromAI(), NPC.Center + offset, plasmaBoltVelocity, type, damage, 0f, Main.myPlayer, -1f);
                                 else
-                                    Projectile.NewProjectile(NPC.GetSource_FromAI(), NPC.Center + offset, plasmaBoltVelocity, type, damage, 0f, Main.myPlayer, player.Center.X, player.Center.Y);
+                                    Projectile.NewProjectile(NPC.GetSource_FromAI(), NPC.Center + offset, plasmaBoltVelocity, type, damage, 0f, Main.myPlayer, Main.player[targetIndex].Center.X, Main.player[targetIndex].Center.Y);
                             }
 
                             // Recoil

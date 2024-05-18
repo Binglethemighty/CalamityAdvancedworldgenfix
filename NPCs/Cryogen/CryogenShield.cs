@@ -62,7 +62,7 @@ namespace CalamityMod.NPCs.Cryogen
             NPC.DeathSound = Main.zenithWorld ? SoundID.NPCDeath14 : BreakSound;
 
             NPC.Opacity += 0.01f;
-            if (NPC.Opacity > 1f)
+            if (NPC.Opacity >= 1f)
             {
                 NPC.damage = NPC.defDamage;
                 NPC.Opacity = 1f;
@@ -86,6 +86,7 @@ namespace CalamityMod.NPCs.Cryogen
                     NPC.position.Y = NPC.position.Y - (NPC.height / 2);
                     return;
                 }
+
                 NPC.life = 0;
                 NPC.HitEffect();
                 NPC.active = false;
@@ -111,7 +112,7 @@ namespace CalamityMod.NPCs.Cryogen
             if (hitboxBotRight < minDist)
                 minDist = hitboxBotRight;
 
-            return minDist <= (100f * NPC.scale) && NPC.Opacity == 1f;
+            return minDist <= (100f * NPC.scale) && NPC.Opacity >= 1f;
         }
 
         public override void OnHitPlayer(Player target, Player.HurtInfo hurtInfo)

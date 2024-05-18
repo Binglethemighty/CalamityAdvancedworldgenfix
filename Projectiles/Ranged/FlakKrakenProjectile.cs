@@ -61,6 +61,8 @@ namespace CalamityMod.Projectiles.Ranged
 
         public override void AI()
         {
+            Owner ??= Main.player[Projectile.owner];
+            
             // Enforces the gravity.
             if (IsShrapnel)
             {
@@ -124,15 +126,9 @@ namespace CalamityMod.Projectiles.Ranged
             trailDust.noGravity = true;
             trailDust.noLight = true;
             trailDust.alpha = (int)Utils.Remap(Projectile.timeLeft, 30f, 0f, 127f, 0f);
-
-            Lighting.AddLight(Projectile.Center, Color.White.ToVector3() * (IsShrapnel ? 0.3f : 1f));
         }
 
-        public override void OnSpawn(IEntitySource source)
-        {
-            Owner = Main.player[Projectile.owner];
-            Projectile.scale = 1.5f;
-        }
+        public override void OnSpawn(IEntitySource source) => Projectile.scale = 1.5f;
 
         public override void OnHitNPC(NPC target, NPC.HitInfo hit, int damageDone)
         {
@@ -169,7 +165,7 @@ namespace CalamityMod.Projectiles.Ranged
             {
                 bool usedClusterRockets = RocketID == ItemID.ClusterRocketI || RocketID == ItemID.ClusterRocketII;
                 int flakAmount = usedClusterRockets ? ClusterShrapnelAmount : ShrapnelAmount;
-                for (int i = 0; i < flakAmount; i++)
+                for (int i = 0; i < flakAmount && Main.myPlayer == Projectile.owner; i++)
                 {
                     Projectile shrapnel = Projectile.NewProjectileDirect(
                         Projectile.GetSource_FromThis(),

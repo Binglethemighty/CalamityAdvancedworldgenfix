@@ -736,22 +736,16 @@ namespace CalamityMod.ILEditing
                 Main.spriteBatch.SetBlendState(BlendState.Additive);
 
                 // Draw Projectiles.
-                for (int i = 0; i < Main.maxProjectiles; i++)
+                foreach (Projectile p in Main.ActiveProjectiles)
                 {
-                    if (!Main.projectile[i].active)
-                        continue;
-
-                    if (Main.projectile[i].ModProjectile is IAdditiveDrawer d)
+                    if (p.ModProjectile is IAdditiveDrawer d)
                         d.AdditiveDraw(Main.spriteBatch);
                 }
 
                 // Draw NPCs.
-                for (int i = 0; i < Main.maxNPCs; i++)
+                foreach (NPC n in Main.ActiveNPCs)
                 {
-                    if (!Main.npc[i].active)
-                        continue;
-
-                    if (Main.npc[i].ModNPC is IAdditiveDrawer d)
+                    if (n.ModNPC is IAdditiveDrawer d)
                         d.AdditiveDraw(Main.spriteBatch);
                 }
 

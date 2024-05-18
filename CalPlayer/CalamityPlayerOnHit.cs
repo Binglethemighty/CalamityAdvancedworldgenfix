@@ -77,6 +77,7 @@ namespace CalamityMod.CalPlayer
 
             target.Calamity().IncreasedHeatEffects_Fireball = fireball;
             target.Calamity().IncreasedHeatEffects_CinnamonRoll = cinnamonRoll;
+            target.Calamity().IncreasedHeatEffects_FlameWakerBoots = flameWakerBoots;
             target.Calamity().IncreasedHeatEffects_HellfireTreads = hellfireTreads;
 
             target.Calamity().IncreasedSicknessEffects_ToxicHeart = toxicHeart;
@@ -86,8 +87,7 @@ namespace CalamityMod.CalPlayer
             switch (item.type)
             {
                 case ItemID.CobaltSword:
-                    target.Calamity().miscDefenseLoss = (int)(target.defense * 0.25);
-                    target.Calamity().isNerfedByCobalt = true;
+                    target.Calamity().cobaltNerfTimer = CalamityGlobalNPC.cobaltAndMythrilNerfTime;
                     break;
 
                 case ItemID.PalladiumSword:
@@ -97,8 +97,7 @@ namespace CalamityMod.CalPlayer
                     break;
 
                 case ItemID.MythrilSword:
-                    target.damage = (int)(target.defDamage * 0.9);
-                    target.Calamity().isNerfedByMythril = true;
+                    target.Calamity().mythrilNerfTimer = CalamityGlobalNPC.cobaltAndMythrilNerfTime;
                     break;
 
                 case ItemID.OrichalcumSword:
@@ -154,6 +153,9 @@ namespace CalamityMod.CalPlayer
                     // TODO: find an EPIC lightsaber sound
                     break;
             }
+
+            if (flameWakerBoots)
+                target.AddBuff(BuffID.OnFire, 120);
 
             if (hellfireTreads)
             {
@@ -217,8 +219,7 @@ namespace CalamityMod.CalPlayer
             switch (proj.type)
             {
                 case ProjectileID.CobaltNaginata:
-                    target.Calamity().miscDefenseLoss = (int)(target.defense * 0.25);
-                    target.Calamity().isNerfedByCobalt = true;
+                    target.Calamity().cobaltNerfTimer = CalamityGlobalNPC.cobaltAndMythrilNerfTime;
                     break;
 
                 case ProjectileID.PalladiumPike:
@@ -228,8 +229,7 @@ namespace CalamityMod.CalPlayer
                     break;
 
                 case ProjectileID.MythrilHalberd:
-                    target.damage = (int)(target.defDamage * 0.9);
-                    target.Calamity().isNerfedByMythril = true;
+                    target.Calamity().mythrilNerfTimer = CalamityGlobalNPC.cobaltAndMythrilNerfTime;
                     break;
 
                 case ProjectileID.OrichalcumHalberd:
@@ -304,6 +304,9 @@ namespace CalamityMod.CalPlayer
                     target.AddBuff(BuffID.Frostburn, 60);
                     break;
             }
+
+            if (flameWakerBoots)
+                target.AddBuff(BuffID.OnFire, 120);
 
             if ((proj.arrow && Player.hasMoltenQuiver) || hellfireTreads)
             {
@@ -1448,16 +1451,15 @@ namespace CalamityMod.CalPlayer
 
                         float lowestHealthCheck = 0f;
                         int healTarget = Player.whoAmI;
-                        for (int i = 0; i < Main.maxPlayers; i++)
+                        foreach (Player otherPlayer in Main.ActivePlayers)
                         {
-                            Player otherPlayer = Main.player[i];
-                            if (otherPlayer.active && !otherPlayer.dead && ((!Player.hostile && !otherPlayer.hostile) || Player.team == otherPlayer.team))
+                            if (!otherPlayer.dead && ((!Player.hostile && !otherPlayer.hostile) || Player.team == otherPlayer.team))
                             {
                                 float playerDist = Vector2.Distance(target.Center, otherPlayer.Center);
                                 if (playerDist < BalancingConstants.LifeStealRange && (otherPlayer.statLifeMax2 - otherPlayer.statLife) > lowestHealthCheck)
                                 {
                                     lowestHealthCheck = otherPlayer.statLifeMax2 - otherPlayer.statLife;
-                                    healTarget = i;
+                                    healTarget = otherPlayer.whoAmI;
                                 }
                             }
                         }
@@ -1499,7 +1501,7 @@ namespace CalamityMod.CalPlayer
                                 if (playerDist < BalancingConstants.LifeStealRange && (otherPlayer.statLifeMax2 - otherPlayer.statLife) > lowestHealthCheck)
                                 {
                                     lowestHealthCheck = otherPlayer.statLifeMax2 - otherPlayer.statLife;
-                                    healTarget = i;
+                                    healTarget = otherPlayer.whoAmI;
                                 }
                             }
                         }

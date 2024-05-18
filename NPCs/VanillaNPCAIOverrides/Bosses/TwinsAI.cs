@@ -129,7 +129,7 @@ namespace CalamityMod.NPCs.VanillaNPCAIOverrides.Bosses
             }
 
             // Phase HP ratios
-            float phase2LifeRatio = masterMode ? 0.85f : 0.7f;
+            float phase2LifeRatio = oblivionAlive ? 0.5f : masterMode ? 0.85f : 0.7f;
             float finalPhaseLifeRatio = masterMode ? 0.4f : 0.25f;
 
             // Movement variables
@@ -170,7 +170,7 @@ namespace CalamityMod.NPCs.VanillaNPCAIOverrides.Bosses
 
             // Despawn
             bool oblivionWasAlive = npc.localAI[3] == 1f && !oblivionAlive;
-            bool oblivionFightDespawn = (oblivionAlive && lifeRatio < 0.7f) || oblivionWasAlive || (oblivionAlive && !spazAlive && lifeRatio < 0.9f);
+            bool oblivionFightDespawn = (oblivionAlive && lifeRatio < 0.75f) || oblivionWasAlive || (oblivionAlive && !spazAlive && lifeRatio < 0.95f);
             if (Main.player[npc.target].dead || oblivionFightDespawn)
             {
                 npc.velocity.Y -= 0.04f;
@@ -1108,7 +1108,7 @@ namespace CalamityMod.NPCs.VanillaNPCAIOverrides.Bosses
             }
 
             // Phase HP ratios
-            float phase2LifeRatio = masterMode ? 0.85f : 0.7f;
+            float phase2LifeRatio = oblivionAlive ? 0.5f : masterMode ? 0.85f : 0.7f;
             float finalPhaseLifeRatio = masterMode ? 0.4f : 0.25f;
 
             // Movement variables
@@ -1151,7 +1151,7 @@ namespace CalamityMod.NPCs.VanillaNPCAIOverrides.Bosses
 
             // Despawn
             bool oblivionWasAlive = npc.localAI[3] == 1f && !oblivionAlive;
-            bool oblivionFightDespawn = (oblivionAlive && lifeRatio < 0.7f) || oblivionWasAlive || (oblivionAlive && !retAlive && lifeRatio < 0.9f);
+            bool oblivionFightDespawn = (oblivionAlive && lifeRatio < 0.75f) || oblivionWasAlive || (oblivionAlive && !retAlive && lifeRatio < 0.95f);
             if (Main.player[npc.target].dead || oblivionFightDespawn)
             {
                 npc.velocity.Y -= 0.04f;

@@ -201,19 +201,19 @@ namespace CalamityMod.NPCs.Ravager
             bool leftClawActive = false;
             bool freeHeadActive = false;
 
-            for (int i = 0; i < Main.maxNPCs; i++)
+            foreach (NPC n in Main.ActiveNPCs)
             {
-                if (Main.npc[i].active && Main.npc[i].type == ModContent.NPCType<RavagerHead>())
+                if (n.type == ModContent.NPCType<RavagerHead>())
                     headActive = true;
-                if (Main.npc[i].active && Main.npc[i].type == ModContent.NPCType<RavagerClawRight>())
+                if (n.type == ModContent.NPCType<RavagerClawRight>())
                     rightClawActive = true;
-                if (Main.npc[i].active && Main.npc[i].type == ModContent.NPCType<RavagerClawLeft>())
+                if (n.type == ModContent.NPCType<RavagerClawLeft>())
                     leftClawActive = true;
-                if (Main.npc[i].active && Main.npc[i].type == ModContent.NPCType<RavagerLegRight>())
+                if (n.type == ModContent.NPCType<RavagerLegRight>())
                     rightLegActive = true;
-                if (Main.npc[i].active && Main.npc[i].type == ModContent.NPCType<RavagerLegLeft>())
+                if (n.type == ModContent.NPCType<RavagerLegLeft>())
                     leftLegActive = true;
-                if (Main.npc[i].active && Main.npc[i].type == ModContent.NPCType<RavagerHead2>())
+                if (n.type == ModContent.NPCType<RavagerHead2>())
                     freeHeadActive = true;
             }
 
@@ -619,13 +619,13 @@ namespace CalamityMod.NPCs.Ravager
 
                         if (expertMode)
                         {
-                            for (int i = 0; i < Main.maxNPCs; i++)
+                            foreach (NPC n in Main.ActiveNPCs)
                             {
-                                if (Main.npc[i].type == ModContent.NPCType<RockPillar>() && Main.npc[i].ai[0] == 0f)
+                                if (n.type == ModContent.NPCType<RockPillar>() && n.ai[0] == 0f)
                                 {
-                                    Main.npc[i].ai[1] = -1f;
-                                    Main.npc[i].direction = NPC.direction;
-                                    Main.npc[i].netUpdate = true;
+                                    n.ai[1] = -1f;
+                                    n.direction = NPC.direction;
+                                    n.netUpdate = true;
                                 }
                             }
 

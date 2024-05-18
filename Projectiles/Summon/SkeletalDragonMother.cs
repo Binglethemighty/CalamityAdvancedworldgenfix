@@ -112,13 +112,13 @@ namespace CalamityMod.Projectiles.Summon
                 if (Projectile.Distance(player.Center) > 3250f)
                 {
                     Projectile.Center = player.Center;
-                    for (int i = 0; i < Main.projectile.Length; i++)
+                    foreach (Projectile p in Main.ActiveProjectiles)
                     {
-                        if (Main.projectile[i].active && Main.projectile[i].owner == Projectile.owner &&
-                            Main.projectile[i].type == ModContent.ProjectileType<SkeletalDragonChild>())
+                        if (p.owner == Projectile.owner &&
+                            p.type == ModContent.ProjectileType<SkeletalDragonChild>())
                         {
-                            Main.projectile[i].Center = player.Center;
-                            Main.projectile[i].netUpdate = true;
+                            p.Center = player.Center;
+                            p.netUpdate = true;
                         }
                     }
                     Projectile.netUpdate = true;

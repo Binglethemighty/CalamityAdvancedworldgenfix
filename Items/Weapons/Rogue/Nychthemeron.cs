@@ -32,10 +32,9 @@ namespace CalamityMod.Items.Weapons.Rogue
 
         public override bool AltFunctionUse(Player player)
         {
-            for (int i = 0; i < Main.maxProjectiles; i++)
+            foreach (Projectile p in Main.ActiveProjectiles)
             {
-                Projectile p = Main.projectile[i];
-                if (p.type == ModContent.ProjectileType<NychthemeronProjectile>() && p.owner == player.whoAmI)
+                if (p.type == Item.shoot && p.owner == player.whoAmI)
                 {
                     p.ai[0] = 1f;
                 }
@@ -93,12 +92,11 @@ namespace CalamityMod.Items.Weapons.Rogue
 
             // Ideally new projectiles will fill in the most recently vacated spots in the pattern
             int[] activeSlots = new int[10] { -1, -1, -1, -1, -1, -1, -1, -1, -1, -1 };
-            for (int i = 0; i < Main.maxProjectiles; i++)
+            foreach (Projectile proj in Main.ActiveProjectiles)
             {
-                Projectile proj = Main.projectile[i];
-                if (proj.type == ModContent.ProjectileType<NychthemeronOrb>() && proj.owner == player.whoAmI && proj.active && proj.localAI[0] == 0f && activeSlots[(int)proj.localAI[1]] == -1)
+                if (proj.type == ModContent.ProjectileType<NychthemeronOrb>() && proj.owner == player.whoAmI && proj.localAI[0] == 0f && activeSlots[(int)proj.localAI[1]] == -1)
                 {
-                    activeSlots[(int)proj.localAI[1]] = i;
+                    activeSlots[(int)proj.localAI[1]] = proj.whoAmI;
                 }
             }
 

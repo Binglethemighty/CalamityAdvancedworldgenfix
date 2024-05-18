@@ -123,9 +123,8 @@ namespace CalamityMod.Projectiles.Summon
                 }
                 else
                 {
-                    for (int i = 0; i < Main.npc.Length; i++)
+                    foreach (NPC npc in Main.ActiveNPCs)
                     {
-                        NPC npc = Main.npc[i];
                         if (npc.CanBeChasedBy(Projectile, false))
                         {
                             bool lineOfSight = Collision.CanHit(Projectile.position, Projectile.width, Projectile.height, npc.position, npc.width, npc.height);

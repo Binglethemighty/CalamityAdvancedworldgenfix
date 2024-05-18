@@ -71,20 +71,20 @@ namespace CalamityMod.Projectiles.Summon
                         if (Main.rand.NextBool(360))
                             dust.scale = 1.5f;
                     }
-                    for (int i = 0; i < Main.maxProjectiles; i++)
+                    foreach (Projectile p in Main.ActiveProjectiles)
                     {
-                        if (Main.projectile[i].active && Main.projectile[i].type == ModContent.ProjectileType<DormantBrimseekerBab>() &&
-                            Main.projectile[i].owner == Projectile.owner && Main.projectile[i].localAI[1] == 0f)
+                        if (p.type == ModContent.ProjectileType<DormantBrimseekerBab>() &&
+                            p.owner == Projectile.owner && p.localAI[1] == 0f)
                         {
-                            if (Main.projectile[i].Distance(Projectile.Center) < Projectile.localAI[1])
+                            if (p.Distance(Projectile.Center) < Projectile.localAI[1])
                             {
                                 for (int j = 0; j < 30; j++)
                                 {
-                                    Dust dust = Dust.NewDustPerfect(Main.projectile[i].Center, (int)CalamityDusts.Brimstone);
+                                    Dust dust = Dust.NewDustPerfect(p.Center, (int)CalamityDusts.Brimstone);
                                     dust.velocity = Vector2.UnitY.RotatedByRandom(MathHelper.TwoPi) * 7f;
                                 }
-                                Main.projectile[i].localAI[1] = 1f;
-                                SoundEngine.PlaySound(SoundID.Item45, Main.projectile[i].Center);
+                                p.localAI[1] = 1f;
+                                SoundEngine.PlaySound(SoundID.Item45, p.Center);
                             }
                         }
                     }
@@ -99,18 +99,18 @@ namespace CalamityMod.Projectiles.Summon
         }
         public override void OnKill(int timeLeft)
         {
-            for (int i = 0; i < Main.projectile.Length; i++)
+            foreach (Projectile p in Main.ActiveProjectiles)
             {
-                if (Main.projectile[i].active && Main.projectile[i].type == ModContent.ProjectileType<DormantBrimseekerBab>() &&
-                    Main.projectile[i].owner == Projectile.owner && Main.projectile[i].localAI[1] == 1f)
+                if (p.type == ModContent.ProjectileType<DormantBrimseekerBab>() &&
+                    p.owner == Projectile.owner && p.localAI[1] == 1f)
                 {
                     for (int j = 0; j < 30; j++)
                     {
                         Dust dust = Dust.NewDustPerfect(Projectile.Center, (int)CalamityDusts.Brimstone);
                         dust.velocity = Vector2.One.RotatedByRandom(MathHelper.TwoPi) * 7f;
                     }
-                    SoundEngine.PlaySound(SoundID.Item29, Main.projectile[i].Center);
-                    Main.projectile[i].localAI[1] = 0f;
+                    SoundEngine.PlaySound(SoundID.Item29, p.Center);
+                    p.localAI[1] = 0f;
                 }
             }
         }

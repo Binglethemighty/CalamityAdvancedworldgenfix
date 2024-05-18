@@ -56,12 +56,12 @@ namespace CalamityMod.Items.Weapons.Typeless
             };
             if (player.ownedProjectileCounts[Item.shoot] > 0)
             {
-                for (int i = 0; i < Main.projectile.Length; i++)
+                foreach (Projectile p in Main.ActiveProjectiles)
                 {
-                    if (Main.projectile[i].type == Item.shoot)
+                    if (p.type == Item.shoot)
                     {
-                        Main.projectile[i].Center = Main.MouseWorld;
-                        Main.projectile[i].netUpdate = true;
+                        p.Center = Main.MouseWorld;
+                        p.netUpdate = true;
                     }
                 }
             }

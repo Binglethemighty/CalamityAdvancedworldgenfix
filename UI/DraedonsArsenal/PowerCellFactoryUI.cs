@@ -41,8 +41,8 @@ namespace CalamityMod.UI.DraedonsArsenal
                 return;
             }
 
-            // If the player's inventory isn't open, or they have a chest open, immediately destroy this UI.
-            if (!Main.playerInventory || p.chest != -1)
+            // If the player's inventory isn't open, or they have a chest open, OR they are using a channelled item, immediately destroy this UI.
+            if (!Main.playerInventory || p.chest != -1 || p.channel)
             {
                 mp.CurrentlyViewedFactoryID = -1;
                 return;

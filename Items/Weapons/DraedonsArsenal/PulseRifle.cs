@@ -27,7 +27,7 @@ namespace CalamityMod.Items.Weapons.DraedonsArsenal
         {
             CalamityGlobalItem modItem = Item.Calamity();
 
-            Item.width = 98;
+            Item.width = 100;
             Item.height = 32;
             Item.DamageType = DamageClass.Ranged;
             Item.damage = BaseDamage;
@@ -37,7 +37,7 @@ namespace CalamityMod.Items.Weapons.DraedonsArsenal
             Item.autoReuse = true;
 
             Item.useStyle = ItemUseStyleID.Shoot;
-            Item.UseSound = null;
+            Item.UseSound = FireSound;
             Item.noMelee = true;
 
             Item.value = CalamityGlobalItem.RarityDarkBlueBuyPrice;
@@ -53,7 +53,6 @@ namespace CalamityMod.Items.Weapons.DraedonsArsenal
 
         public override bool Shoot(Player player, EntitySource_ItemUse_WithAmmo source, Vector2 position, Vector2 velocity, int type, int damage, float knockback)
         {
-            SoundEngine.PlaySound(FireSound);
             Projectile.NewProjectile(source, position, velocity, ModContent.ProjectileType<PulseRifleShot>(), damage, knockback, player.whoAmI, 0f, 0f);
 
             return false;

@@ -129,18 +129,18 @@ namespace CalamityMod.Projectiles.Rogue
         {
             if (Projectile.owner == Main.myPlayer)
             {
-                for (int i = 0; i < Main.maxProjectiles; i++)
+                foreach (Projectile p in Main.ActiveProjectiles)
                 {
-                    if (!Main.projectile[i].active || Main.projectile[i].owner != Projectile.owner)
+                    if (p.owner != Projectile.owner)
                         continue;
-                    if (Main.projectile[i].ModProjectile is NiceCock)
+                    if (p.ModProjectile is NiceCock)
                     {
                         if (!activate)
-                            Main.projectile[i].Kill();
+                            p.Kill();
                         else
                         {
-                            Main.projectile[i].ModProjectile<NiceCock>().homing = true;
-                            Main.projectile[i].extraUpdates += 2;
+                            p.ModProjectile<NiceCock>().homing = true;
+                            p.extraUpdates += 2;
                         }
                     }
                 }
@@ -151,14 +151,14 @@ namespace CalamityMod.Projectiles.Rogue
         {
             int fireballCount = 0;
             // Count how many fireballs exist already around the given target
-            for (int i = 0; i < Main.maxProjectiles; i++)
+            foreach (Projectile p in Main.ActiveProjectiles)
             {
                 // Keep the loop as short as possible
-                if (!Main.projectile[i].active || Main.projectile[i].owner != Projectile.owner || !Main.projectile[i].CountsAsClass<ThrowingDamageClass>() || targetIndex != (int)Main.projectile[i].ai[1])
+                if (p.owner != Projectile.owner || !p.CountsAsClass<ThrowingDamageClass>() || targetIndex != (int)p.ai[1])
                     continue;
-                if (Main.projectile[i].ModProjectile is NiceCock)
+                if (p.ModProjectile is NiceCock)
                 {
-                    if (Main.projectile[i].ModProjectile<NiceCock>().homing)
+                    if (p.ModProjectile<NiceCock>().homing)
                         continue;
                     fireballCount++;
                 }
@@ -166,16 +166,16 @@ namespace CalamityMod.Projectiles.Rogue
             // Adjust the angle of the existing fireballs around a target
             float angleVariance = MathHelper.TwoPi / fireballCount;
             float angle = 0f;
-            for (int i = 0; i < Main.maxProjectiles; i++)
+            foreach (Projectile p in Main.ActiveProjectiles)
             {
-                if (!Main.projectile[i].active || Main.projectile[i].owner != Projectile.owner || !Main.projectile[i].CountsAsClass<ThrowingDamageClass>() || targetIndex != (int)Main.projectile[i].ai[1])
+                if (p.owner != Projectile.owner || !p.CountsAsClass<ThrowingDamageClass>() || targetIndex != (int)p.ai[1])
                     continue;
-                if (Main.projectile[i].ModProjectile is NiceCock)
+                if (p.ModProjectile is NiceCock)
                 {
-                    if (Main.projectile[i].ModProjectile<NiceCock>().homing)
+                    if (p.ModProjectile<NiceCock>().homing)
                         continue;
-                    Main.projectile[i].ai[0] = angle;
-                    Main.projectile[i].netUpdate = true;
+                    p.ai[0] = angle;
+                    p.netUpdate = true;
                     angle += angleVariance;
                 }
             }

@@ -540,24 +540,21 @@ namespace CalamityMod.NPCs.Abyss
             }
 
             float pushVelocity = 0.05f;
-            for (int i = 0; i < Main.maxNPCs; i++)
+            foreach (NPC otherNPC in Main.ActiveNPCs)
             {
-                if (Main.npc[i].active)
+                if (otherNPC.whoAmI != NPC.whoAmI && otherNPC.type == NPC.type)
                 {
-                    if (i != NPC.whoAmI && Main.npc[i].type == NPC.type)
+                    if (Vector2.Distance(NPC.Center, otherNPC.Center) < 160f)
                     {
-                        if (Vector2.Distance(NPC.Center, Main.npc[i].Center) < 160f)
-                        {
-                            if (NPC.position.X < Main.npc[i].position.X)
-                                NPC.velocity.X -= pushVelocity;
-                            else
-                                NPC.velocity.X += pushVelocity;
+                        if (NPC.position.X < otherNPC.position.X)
+                            NPC.velocity.X -= pushVelocity;
+                        else
+                            NPC.velocity.X += pushVelocity;
 
-                            if (NPC.position.Y < Main.npc[i].position.Y)
-                                NPC.velocity.Y -= pushVelocity;
-                            else
-                                NPC.velocity.Y += pushVelocity;
-                        }
+                        if (NPC.position.Y < otherNPC.position.Y)
+                            NPC.velocity.Y -= pushVelocity;
+                        else
+                            NPC.velocity.Y += pushVelocity;
                     }
                 }
             }

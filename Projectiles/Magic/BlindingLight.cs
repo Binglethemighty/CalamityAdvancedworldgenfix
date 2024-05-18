@@ -61,10 +61,9 @@ namespace CalamityMod.Projectiles.Magic
         {
             int lightBlade = ModContent.ProjectileType<LightBlade>();
             int extraDamage = 0;
-            for (int i = 0; i < Main.maxProjectiles; ++i)
+            foreach (Projectile otherProj in Main.ActiveProjectiles)
             {
-                Projectile otherProj = Main.projectile[i];
-                if (otherProj is null || !otherProj.active || otherProj.owner != Projectile.owner || otherProj.type != lightBlade)
+                if (otherProj.owner != Projectile.owner || otherProj.type != lightBlade)
                     continue;
 
                 // Can only consume blades within the flash radius (which should be most if not all of them anyway)
@@ -79,10 +78,9 @@ namespace CalamityMod.Projectiles.Magic
         private void DivideDamageAmongstTargets()
         {
             int numTargets = 0;
-            for (int i = 0; i < Main.maxNPCs; ++i)
+            foreach (var npc in Main.ActiveNPCs)
             {
-                NPC npc = Main.npc[i];
-                if (npc is null || !npc.active || npc.friendly || npc.dontTakeDamage || npc.immortal)
+                if (npc.friendly || npc.dontTakeDamage || npc.immortal)
                     continue;
                 if (Projectile.Colliding(default, npc.Hitbox))
                     ++numTargets;

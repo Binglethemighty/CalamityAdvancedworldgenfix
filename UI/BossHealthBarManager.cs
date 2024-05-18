@@ -330,17 +330,17 @@ namespace CalamityMod.UI
                 if (npc.ai[0] == 2f)
                     life = 0L;
 
-                for (int i = 0; i < Main.maxNPCs; i++)
+                foreach (NPC n in Main.ActiveNPCs)
                 {
-                    bool isMoonLordPiece = Main.npc[i].type == NPCID.MoonLordHand || Main.npc[i].type == NPCID.MoonLordHead;
-                    if (!Main.npc[i].active || !isMoonLordPiece || Main.npc[i].ai[3] != npc.whoAmI)
+                    bool isMoonLordPiece = n.type == NPCID.MoonLordHand || n.type == NPCID.MoonLordHead;
+                    if (!isMoonLordPiece || n.ai[3] != npc.whoAmI)
                         continue;
 
                     // Don't count HP towards the total if the NPC is in its dead state.
-                    if (Main.npc[i].Calamity().newAI[0] == 1f)
+                    if (n.Calamity().newAI[0] == 1f)
                         continue;
 
-                    life += checkingForMaxLife ? Main.npc[i].lifeMax : Main.npc[i].life;
+                    life += checkingForMaxLife ? n.lifeMax : n.life;
                 }
 
                 return life;
@@ -364,15 +364,15 @@ namespace CalamityMod.UI
 
         public override void Update(IBigProgressBar currentBar, ref BigProgressBarInfo info)
         {
-            for (int i = 0; i < Main.maxNPCs; i++)
+            foreach (NPC n in Main.ActiveNPCs)
             {
-                // Ignore inactive NPCs and NPCs that should not be given a bar, even if it meets other criteria.
-                if (!Main.npc[i].active || BossExclusionList.Contains(Main.npc[i].type))
+                // Ignore NPCs that should not be given a bar, even if it meets other criteria.
+                if (BossExclusionList.Contains(n.type))
                     continue;
 
-                bool isEoWSegment = Main.npc[i].type == NPCID.EaterofWorldsBody || Main.npc[i].type == NPCID.EaterofWorldsTail;
-                if ((Main.npc[i].IsABoss() && !isEoWSegment) || MinibossHPBarList.Contains(Main.npc[i].type) || Main.npc[i].Calamity().CanHaveBossHealthBar)
-                    AttemptToAddBar(i);
+                bool isEoWSegment = n.type == NPCID.EaterofWorldsBody || n.type == NPCID.EaterofWorldsTail;
+                if ((n.IsABoss() && !isEoWSegment) || MinibossHPBarList.Contains(n.type) || n.Calamity().CanHaveBossHealthBar)
+                    AttemptToAddBar(n.whoAmI);
             }
 
             for (int i = 0; i < Bars.Count; i++)
@@ -466,12 +466,12 @@ namespace CalamityMod.UI
                         return life;
 
                     // Otherwise, check if any of said relationship NPCs are enraged.
-                    for (int i = 0; i < Main.maxNPCs; i++)
+                    foreach (NPC n in Main.ActiveNPCs)
                     {
-                        if (!Main.npc[i].active || Main.npc[i].life <= 0 || !OneToMany[NPCType].Contains(Main.npc[i].type))
+                        if (n.life <= 0 || !OneToMany[NPCType].Contains(n.type))
                             continue;
 
-                        life += Main.npc[i].life;
+                        life += n.life;
                     }
 
                     return life;
@@ -498,12 +498,12 @@ namespace CalamityMod.UI
                         return maxLife;
 
                     // Otherwise, check if any of said relationship NPCs are enraged.
-                    for (int i = 0; i < Main.maxNPCs; i++)
+                    foreach (NPC n in Main.ActiveNPCs)
                     {
-                        if (!Main.npc[i].active || Main.npc[i].life <= 0 || !OneToMany[NPCType].Contains(Main.npc[i].type))
+                        if (n.life <= 0 || !OneToMany[NPCType].Contains(n.type))
                             continue;
 
-                        maxLife += Main.npc[i].lifeMax;
+                        maxLife += n.lifeMax;
                     }
 
                     return maxLife;
@@ -524,12 +524,12 @@ namespace CalamityMod.UI
                         return false;
 
                     // Otherwise, check if any of said relationship NPCs are enraged.
-                    for (int i = 0; i < Main.maxNPCs; i++)
+                    foreach (NPC n in Main.ActiveNPCs)
                     {
-                        if (!Main.npc[i].active || Main.npc[i].life <= 0 || !OneToMany[NPCType].Contains(Main.npc[i].type))
+                        if (n.life <= 0 || !OneToMany[NPCType].Contains(n.type))
                             continue;
 
-                        if (Main.npc[i].Calamity().CurrentlyEnraged)
+                        if (n.Calamity().CurrentlyEnraged)
                             return true;
                     }
                     return false;
@@ -550,12 +550,12 @@ namespace CalamityMod.UI
                         return false;
 
                     // Otherwise, check if any of said relationship NPCs are increasing their defense or DR.
-                    for (int i = 0; i < Main.maxNPCs; i++)
+                    foreach (NPC n in Main.ActiveNPCs)
                     {
-                        if (!Main.npc[i].active || Main.npc[i].life <= 0 || !OneToMany[NPCType].Contains(Main.npc[i].type))
+                        if (n.life <= 0 || !OneToMany[NPCType].Contains(n.type))
                             continue;
 
-                        if (Main.npc[i].Calamity().CurrentlyIncreasingDefenseOrDR)
+                        if (n.Calamity().CurrentlyIncreasingDefenseOrDR)
                             return true;
                     }
                     return false;

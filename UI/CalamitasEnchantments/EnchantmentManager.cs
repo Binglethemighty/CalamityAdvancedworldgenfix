@@ -222,9 +222,9 @@ namespace CalamityMod.UI.CalamitasEnchants
                         player.Calamity().bladeArmEnchant = true;
                         bool armsArePresent = false;
                         int armType = ModContent.ProjectileType<TaintedBladeSlasher>();
-                        for (int i = 0; i < Main.maxProjectiles; i++)
+                        foreach (Projectile p in Main.ActiveProjectiles)
                         {
-                            if (Main.projectile[i].type != armType || Main.projectile[i].owner != player.whoAmI || !Main.projectile[i].active)
+                            if (p.type != armType || p.owner != player.whoAmI)
                                 continue;
 
                             armsArePresent = true;
@@ -282,9 +282,9 @@ namespace CalamityMod.UI.CalamitasEnchants
 
                         bool orbIsPresent = false;
                         int orbType = ModContent.NPCType<LecherousOrb>();
-                        for (int i = 0; i < Main.maxNPCs; i++)
+                        foreach (NPC n in Main.ActiveNPCs)
                         {
-                            if (Main.npc[i].type != orbType || Main.npc[i].target != player.whoAmI || !Main.npc[i].active)
+                            if (n.type != orbType || n.target != player.whoAmI)
                                 continue;
 
                             orbIsPresent = true;

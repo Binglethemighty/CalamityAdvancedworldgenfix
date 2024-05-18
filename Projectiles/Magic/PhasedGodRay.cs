@@ -17,7 +17,7 @@ namespace CalamityMod.Projectiles.Magic
         // They are extremely carefully chosen and barely work as is!
         private const float WaveTheta = 0.09f;
         private const int WaveTwistFrames = 9;
-        private ref float WaveFrameState => ref Projectile.localAI[1];
+        private ref float WaveFrameState => ref Projectile.ai[0];
 
         public override string Texture => "CalamityMod/Projectiles/LaserProj";
 
@@ -53,7 +53,7 @@ namespace CalamityMod.Projectiles.Magic
 
             float waveSign = WaveFrameState < 0f ? -1f : 1f;
 
-            // Initialize waving. Setting localAI[1] to a number between -1 and 1 tells it which way to wave.
+            // Initialize waving. Setting ai[0] to a number between -1 and 1 tells it which way to wave.
             // Exactly 0 is a coinflip.
             if (Math.Abs(WaveFrameState) < 1f)
             {

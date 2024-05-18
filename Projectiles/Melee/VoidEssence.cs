@@ -88,19 +88,15 @@ namespace CalamityMod.Projectiles.Melee
             int targetIdx = -1;
             float maxHomingRange = 400f;
             bool hasHomingTarget = false;
-            for (int i = 0; i < Main.npc.Length; ++i)
+            foreach (NPC npc in Main.ActiveNPCs)
             {
-                NPC npc = Main.npc[i];
-                if (npc == null || !npc.active)
-                    continue;
-
                 // Won't home in through walls and won't chase invulnerable targets.
                 if (npc.CanBeChasedBy(Projectile, false) && Collision.CanHit(Projectile.Center, 1, 1, npc.Center, 1, 1))
                 {
                     float dist = (Projectile.Center - npc.Center).Length();
                     if (dist < maxHomingRange)
                     {
-                        targetIdx = i;
+                        targetIdx = npc.whoAmI;
                         maxHomingRange = dist;
                         hasHomingTarget = true;
                     }

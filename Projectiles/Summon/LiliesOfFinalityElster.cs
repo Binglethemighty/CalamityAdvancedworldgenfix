@@ -7,8 +7,6 @@ using Microsoft.Xna.Framework.Graphics;
 using ReLogic.Content;
 using Terraria;
 using Terraria.Audio;
-using Terraria.GameContent;
-using Terraria.ID;
 using Terraria.ModLoader;
 using static System.MathF;
 using static CalamityMod.Items.Weapons.Summon.LiliesOfFinality;
@@ -54,8 +52,6 @@ namespace CalamityMod.Projectiles.Summon
 
                 // Because some states mess with the rotation, we reset it so it doesn't cause visual issues on the states that don't deal with rotation.
                 Projectile.rotation = 0f;
-
-                NetUpdate();
             }
         }
 
@@ -179,6 +175,9 @@ namespace CalamityMod.Projectiles.Summon
             }
 
             Timer++;
+
+            Projectile.netSpam = 0;
+            Projectile.netUpdate = true;
         }
 
         private void IdleState()
@@ -316,7 +315,6 @@ namespace CalamityMod.Projectiles.Summon
                 Projectile.owner);
 
             HasShotOnce = true;
-            NetUpdate();
 
             // If on a dedicated server, don't bother running the visuals and sounds to save resources.
             if (Main.dedServ)
@@ -366,13 +364,6 @@ namespace CalamityMod.Projectiles.Summon
                     Scale: Main.rand.NextFloat(1f, 1.2f));
                 elevationDust.noGravity = true;
             }
-        }
-
-        private void NetUpdate()
-        {
-            Projectile.netUpdate = true;
-            if (Projectile.netSpam >= 10)
-                Projectile.netSpam = 9;
         }
 
         #endregion

@@ -40,7 +40,8 @@ namespace CalamityMod.Items.Weapons.Ranged
         public override bool CanConsumeAmmo(Item ammo, Player player) => Main.rand.NextFloat() > 0.95f && player.ownedProjectileCounts[Item.shoot] > 0;
         public override bool Shoot(Player player, EntitySource_ItemUse_WithAmmo source, Vector2 position, Vector2 velocity, int type, int damage, float knockback)
         {
-            Projectile.NewProjectile(source, position, velocity, ModContent.ProjectileType<KingsbaneHoldout>(), damage, knockback, player.whoAmI, 0f, 0f);
+            Projectile holdout = Projectile.NewProjectileDirect(source, position, velocity, ModContent.ProjectileType<KingsbaneHoldout>(), damage, knockback, player.whoAmI, 0f, 0f);
+            holdout.velocity = (player.Calamity().mouseWorld - player.MountedCenter).SafeNormalize(Vector2.Zero);
             return false;
         }
         public override void AddRecipes()

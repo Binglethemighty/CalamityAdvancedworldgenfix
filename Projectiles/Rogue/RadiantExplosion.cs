@@ -60,30 +60,30 @@ namespace CalamityMod.Projectiles.Rogue
             {
                 float projX = Projectile.Center.X;
                 float projY = Projectile.Center.Y;
-                for (int j = 0; j < Main.maxNPCs; j++)
+                foreach (NPC n in Main.ActiveNPCs)
                 {
-                    if (Main.npc[j].CanBeChasedBy(Projectile, false) && Collision.CanHit(Projectile.Center, 1, 1, Main.npc[j].Center, 1, 1) && !CalamityPlayer.areThereAnyDamnBosses)
+                    if (n.CanBeChasedBy(Projectile, false) && Collision.CanHit(Projectile.Center, 1, 1, n.Center, 1, 1) && !CalamityPlayer.areThereAnyDamnBosses)
                     {
-                        float npcCenterX = Main.npc[j].position.X + (float)(Main.npc[j].width / 2);
-                        float npcCenterY = Main.npc[j].position.Y + (float)(Main.npc[j].height / 2);
+                        float npcCenterX = n.position.X + (float)(n.width / 2);
+                        float npcCenterY = n.position.Y + (float)(n.height / 2);
                         float targetDist = Math.Abs(Projectile.position.X + (float)(Projectile.width / 2) - npcCenterX) + Math.Abs(Projectile.position.Y + (float)(Projectile.height / 2) - npcCenterY);
                         if (targetDist < 600f)
                         {
-                            if (Main.npc[j].position.X < projX)
+                            if (n.position.X < projX)
                             {
-                                Main.npc[j].velocity.X += 0.25f;
+                                n.velocity.X += 0.25f;
                             }
                             else
                             {
-                                Main.npc[j].velocity.X -= 0.25f;
+                                n.velocity.X -= 0.25f;
                             }
-                            if (Main.npc[j].position.Y < projY)
+                            if (n.position.Y < projY)
                             {
-                                Main.npc[j].velocity.Y += 0.25f;
+                                n.velocity.Y += 0.25f;
                             }
                             else
                             {
-                                Main.npc[j].velocity.Y -= 0.25f;
+                                n.velocity.Y -= 0.25f;
                             }
                         }
                     }

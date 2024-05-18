@@ -1,4 +1,5 @@
-﻿using Microsoft.Xna.Framework;
+﻿using System.Collections.Generic;
+using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Terraria;
 using Terraria.ID;
@@ -6,13 +7,13 @@ using Terraria.ModLoader;
 
 namespace CalamityMod.Tiles
 {
-    public class CryonicBrick : ModTile
+    public class CryonicBrick : ModTile, IMergeableTile
     {
         int subsheetHeight = 90;
         int subsheetWidth = 234;
 
-        public byte[,] tileAdjacency;
-        public byte[,] secondTileAdjacency;
+        List<TileFraming.MergeFrameData> IMergeableTile.TileAdjacencies { get; } = [];
+        
         public override void SetStaticDefaults()
         {
             Main.tileSolid[Type] = true;
@@ -24,8 +25,8 @@ namespace CalamityMod.Tiles
             HitSound = SoundID.Tink;
             AddMapEntry(new Color(99, 131, 199));
 
-            TileFraming.SetUpUniversalMerge(Type, TileID.Dirt, out tileAdjacency);
-            TileFraming.SetUpUniversalMerge(Type, TileID.SnowBlock, out secondTileAdjacency);
+            this.RegisterUniversalMerge(TileID.Dirt, "CalamityMod/Tiles/Merges/DirtMerge");
+            this.RegisterUniversalMerge(TileID.SnowBlock, "CalamityMod/Tiles/Merges/SnowMerge");
         }
 
         public override bool CreateDust(int i, int j, ref int type)
@@ -34,25 +35,12 @@ namespace CalamityMod.Tiles
             return false;
         }
 
-        public override bool TileFrame(int i, int j, ref bool resetFrame, ref bool noBreak)
-        {
-            TileFraming.GetAdjacencyData(i, j, TileID.Dirt, out tileAdjacency[i, j]);
-            TileFraming.GetAdjacencyData(i, j, TileID.SnowBlock, out secondTileAdjacency[i, j]);
-            return true;
-        }
-
         public override void AnimateIndividualTile(int type, int i, int j, ref int frameXOffset, ref int frameYOffset)
         {
             int xPos = i % 2;
             int yPos = j % 4;
             frameXOffset = xPos * subsheetWidth;
             frameYOffset = yPos * subsheetHeight;
-        }
-
-        public override void PostDraw(int i, int j, SpriteBatch spriteBatch)
-        {
-            TileFraming.DrawUniversalMergeFrames(i, j, secondTileAdjacency, "CalamityMod/Tiles/Merges/SnowMerge");
-            TileFraming.DrawUniversalMergeFrames(i, j, tileAdjacency, "CalamityMod/Tiles/Merges/DirtMerge");
         }
     }
 }

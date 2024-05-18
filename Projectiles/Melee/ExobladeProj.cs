@@ -363,6 +363,10 @@ namespace CalamityMod.Projectiles.Melee
 
                 Projectile.velocity = Owner.MountedCenter.DirectionTo(Owner.Calamity().mouseWorld);
                 Projectile.oldPos = new Vector2[Projectile.oldPos.Length];
+
+                // Prevent zeroed out garbage from messing up the trail rendering.
+                for (int i = 0; i < Projectile.oldPos.Length; ++i)
+                    Projectile.oldPos[i] = Projectile.position;
             }
 
             // Do the dash.
@@ -417,8 +421,6 @@ namespace CalamityMod.Projectiles.Melee
 
             Projectile.rotation = Projectile.velocity.ToRotation() + MathHelper.PiOver4 * Direction;
         }
-
-
 
         public float SlashWidthFunction(float completionRatio) => SquishAtProgress(RealProgressionAtTrailCompletion(completionRatio)) * Projectile.scale * 60.5f;
 
@@ -487,7 +489,6 @@ namespace CalamityMod.Projectiles.Melee
 
             Main.spriteBatch.EnterShaderRegion();
 
-
             Color mainColor = MulticolorLerp((Main.GlobalTimeWrappedHourly * 2f) % 1, Color.Cyan, Color.Lime, Color.GreenYellow, Color.Goldenrod, Color.Orange);
             Color secondaryColor = MulticolorLerp((Main.GlobalTimeWrappedHourly * 2f + 0.2f) % 1, Color.Cyan, Color.Lime, Color.GreenYellow, Color.Goldenrod, Color.Orange);
 
@@ -500,7 +501,13 @@ namespace CalamityMod.Projectiles.Melee
             GameShaders.Misc["CalamityMod:ExobladePierce"].UseColor(mainColor);
             GameShaders.Misc["CalamityMod:ExobladePierce"].UseSecondaryColor(secondaryColor);
             GameShaders.Misc["CalamityMod:ExobladePierce"].Apply();
-            PrimitiveRenderer.RenderTrail(Projectile.oldPos.Take(51).ToArray(), new(PierceWidthFunction, PierceColorFunction, (_) => trailOffset, shader: GameShaders.Misc["CalamityMod:ExobladePierce"]), 53);
+
+            // Exoblade tracks 120 positions in oldPos.
+            // Provide 60 points for smoothing, but only render 30
+            int numPointsRendered = 30;
+            int numPointsProvided = 60;
+            var positionsToUse = Projectile.oldPos.Take(numPointsProvided).ToArray();
+            PrimitiveRenderer.RenderTrail(positionsToUse, new(PierceWidthFunction, PierceColorFunction, (_) => trailOffset, shader: GameShaders.Misc["CalamityMod:ExobladePierce"]), numPointsRendered);
 
             Main.spriteBatch.ExitShaderRegion();
         }

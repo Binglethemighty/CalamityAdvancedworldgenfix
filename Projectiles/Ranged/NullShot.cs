@@ -1,4 +1,6 @@
-﻿using CalamityMod.NPCs.NormalNPCs;
+﻿using CalamityMod.CalPlayer;
+using CalamityMod.NPCs;
+using CalamityMod.NPCs.NormalNPCs;
 using Microsoft.Xna.Framework;
 using Terraria;
 using Terraria.ID;
@@ -47,40 +49,40 @@ namespace CalamityMod.Projectiles.Ranged
             {
                 return;
             }
-            int nullBuff = Main.rand.Next(7);
+
+            int randAmt = (CalamityPlayer.areThereAnyDamnBosses || CalamityLists.AquaticScourgeIDs.Contains(target.type)) ? 6 : 8;
+            int nullBuff = Main.rand.Next(randAmt);
             if (!target.boss)
             {
-                if (nullBuff == 0)
+                switch (nullBuff)
                 {
-                    target.scale *= 2f;
-                }
-                else if (nullBuff == 1)
-                {
-                    target.scale *= 0.5f;
-                }
-                else if (nullBuff == 2 && target.type != ModContent.NPCType<SuperDummyNPC>())
-                {
-                    target.damage += 10;
-                }
-                else if (nullBuff == 3)
-                {
-                    target.damage -= 10;
-                }
-                else if (nullBuff == 4)
-                {
-                    target.knockBackResist = 0f;
-                }
-                else if (nullBuff == 5)
-                {
-                    target.knockBackResist = 1f;
-                }
-                else if (nullBuff == 6)
-                {
-                    target.defense += 5;
-                }
-                else
-                {
-                    target.defense -= 5;
+                    case 0:
+                        if (target.type != ModContent.NPCType<SuperDummyNPC>())
+                            target.damage += 10;
+                        break;
+                    case 1:
+                        target.damage -= 10;
+                        break;
+                    case 2:
+                        target.knockBackResist = 0f;
+                        break;
+                    case 3:
+                        target.knockBackResist = 1f;
+                        break;
+                    case 4:
+                        target.defense += 5;
+                        break;
+                    case 5:
+                        target.defense -= 5;
+                        break;
+                    case 6:
+                        target.scale *= 2f;
+                        break;
+                    case 7:
+                        target.scale *= 0.5f;
+                        break;
+                    default:
+                        break;
                 }
             }
         }

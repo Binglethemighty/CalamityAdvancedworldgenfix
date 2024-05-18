@@ -154,9 +154,8 @@ namespace CalamityMod.Projectiles.Summon
 
                 bool foundTarget = false;
                 float maxDist = 300f;
-                for (int i = 0; i < Main.maxNPCs; i++)
+                foreach (NPC npc in Main.ActiveNPCs)
                 {
-                    NPC npc = Main.npc[i];
                     if (npc.CanBeChasedBy(Projectile, false))
                     {
                         if (Vector2.Distance(Projectile.Center, npc.Center) < maxDist && Collision.CanHit(Projectile.position, Projectile.width, Projectile.height, npc.position, npc.width, npc.height))

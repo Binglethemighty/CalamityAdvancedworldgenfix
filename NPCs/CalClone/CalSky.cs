@@ -52,11 +52,11 @@ namespace CalamityMod.NPCs.CalClone
                 return true;
             }
             CalIndex = -1;
-            for (int i = 0; i < Main.npc.Length; i++)
+            foreach (NPC n in Main.ActiveNPCs)
             {
-                if (Main.npc[i].active && Main.npc[i].type == CalType)
+                if (n.type == CalType)
                 {
-                    CalIndex = i;
+                    CalIndex = n.whoAmI;
                     break;
                 }
             }

@@ -47,21 +47,20 @@ namespace CalamityMod.Projectiles.Rogue
         {
             float minDist = 999f;
             int index = 0;
-            for (int i = 0; i < Main.npc.Length; i++)
+            foreach (NPC npc in Main.ActiveNPCs)
             {
                 bool hasHitNPC = false;
                 for (int j = 0; j < previousNPCs.Count; j++)
                 {
-                    if (previousNPCs[j] == i)
+                    if (previousNPCs[j] == npc.whoAmI)
                     {
                         hasHitNPC = true;
                     }
                 }
 
-                NPC npc = Main.npc[i];
                 if (npc == target)
                 {
-                    previousNPCs.Add(i);
+                    previousNPCs.Add(npc.whoAmI);
                 }
                 if (npc.CanBeChasedBy(Projectile, false) && npc != target && !hasHitNPC)
                 {
@@ -69,7 +68,7 @@ namespace CalamityMod.Projectiles.Rogue
                     if (dist < minDist)
                     {
                         minDist = dist;
-                        index = i;
+                        index = npc.whoAmI;
                     }
                 }
             }

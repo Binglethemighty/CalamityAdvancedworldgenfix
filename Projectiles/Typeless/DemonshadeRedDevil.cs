@@ -132,9 +132,8 @@ namespace CalamityMod.Projectiles.Typeless
             }
             else
             {
-                for (int j = 0; j < Main.maxNPCs; j++)
+                foreach (NPC nPC2 in Main.ActiveNPCs)
                 {
-                    NPC nPC2 = Main.npc[j];
                     if (nPC2.CanBeChasedBy(Projectile, false))
                     {
                         float npcDist = Vector2.Distance(nPC2.Center, Projectile.Center);

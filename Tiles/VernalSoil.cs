@@ -1,4 +1,5 @@
-﻿using Microsoft.Xna.Framework;
+﻿using System.Collections.Generic;
+using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Terraria;
 using Terraria.Audio;
@@ -10,11 +11,10 @@ using Terraria.ModLoader;
 
 namespace CalamityMod.Tiles
 {
-    public class VernalSoil : ModTile
+    public class VernalSoil : ModTile, IMergeableTile
     {
-        public byte[,] tileAdjacency;
-        public byte[,] secondTileAdjacency;
-        public byte[,] thirdTileAdjacency;
+        List<TileFraming.MergeFrameData> IMergeableTile.TileAdjacencies { get; } = [];
+        
         public override void SetStaticDefaults()
         {
             Main.tileSolid[Type] = true;
@@ -29,9 +29,9 @@ namespace CalamityMod.Tiles
             AddMapEntry(new Color(80, 120, 0));
             HitSound = SoundID.Dig;
 
-            TileFraming.SetUpUniversalMerge(Type, TileID.Dirt, out tileAdjacency);
-            TileFraming.SetUpUniversalMerge(Type, TileID.Stone, out secondTileAdjacency);
-            TileFraming.SetUpUniversalMerge(Type, TileID.Mud, out thirdTileAdjacency);
+            this.RegisterUniversalMerge(TileID.Dirt, "CalamityMod/Tiles/Merges/DirtMerge");
+            this.RegisterUniversalMerge(TileID.Stone, "CalamityMod/Tiles/Merges/StoneMerge");
+            this.RegisterUniversalMerge(TileID.Mud, "CalamityMod/Tiles/Merges/MudMerge");
         }
 
         public override void RandomUpdate(int i, int j)
@@ -148,21 +148,6 @@ namespace CalamityMod.Tiles
                     }
                 }
             }
-        }
-
-        public override void PostDraw(int i, int j, SpriteBatch spriteBatch)
-        {
-            TileFraming.DrawUniversalMergeFrames(i, j, thirdTileAdjacency, "CalamityMod/Tiles/Merges/MudMerge");
-            TileFraming.DrawUniversalMergeFrames(i, j, secondTileAdjacency, "CalamityMod/Tiles/Merges/StoneMerge");
-            TileFraming.DrawUniversalMergeFrames(i, j, tileAdjacency, "CalamityMod/Tiles/Merges/DirtMerge");
-        }
-
-        public override bool TileFrame(int i, int j, ref bool resetFrame, ref bool noBreak)
-        {
-            TileFraming.GetAdjacencyData(i, j, TileID.Dirt, out tileAdjacency[i, j]);
-            TileFraming.GetAdjacencyData(i, j, TileID.Stone, out secondTileAdjacency[i, j]);
-            TileFraming.GetAdjacencyData(i, j, TileID.Mud, out thirdTileAdjacency[i, j]);
-            return true;
         }
 
         public override void NumDust(int i, int j, bool fail, ref int num)

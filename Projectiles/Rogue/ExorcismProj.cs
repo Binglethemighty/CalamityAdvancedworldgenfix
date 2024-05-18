@@ -73,6 +73,20 @@ namespace CalamityMod.Projectiles.Rogue
             }
         }
 
+        public override void OnHitNPC(NPC target, NPC.HitInfo hit, int damageDone)
+        {
+            // Stars
+            if (Projectile.Calamity().stealthStrike)
+            {
+                for (int i = 0; i < 6; i++)
+                {
+                    Vector2 pos = new Vector2(Projectile.Center.X + (float)Projectile.width * 0.5f + (float)Main.rand.Next(-201, 201), Main.screenPosition.Y - 600f - Main.rand.Next(50));
+                    Vector2 starVelocity = CalamityUtils.CalculatePredictiveAimToTargetMaxUpdates(pos, target, 30f, 2);
+                    Projectile.NewProjectile(Projectile.GetSource_FromThis(), pos, starVelocity, ModContent.ProjectileType<ExorcismStar>(), (int)(Projectile.damage * 0.75f), Projectile.knockBack * 0.5f, Projectile.owner, Main.rand.NextFloat(-3f, 3f), 0f);
+                }
+            }
+        }
+
         public override bool PreDraw(ref Color lightColor)
         {
             Texture2D tex = Terraria.GameContent.TextureAssets.Projectile[Projectile.type].Value;
@@ -97,17 +111,6 @@ namespace CalamityMod.Projectiles.Rogue
             Main.projectile[p].rotation = Projectile.rotation;
             if (Projectile.Calamity().stealthStrike)
                 Main.projectile[p].Calamity().stealthStrike = true;
-            // Stars
-            if (Projectile.Calamity().stealthStrike)
-            {
-                for (int i = 0; i < 6; i++)
-                {
-                    Vector2 pos = new Vector2(Projectile.Center.X + (float)Projectile.width * 0.5f + (float)Main.rand.Next(-201, 201), Main.screenPosition.Y - 600f - Main.rand.Next(50));
-                    float speedX = (Projectile.Center.X - pos.X) / 20f;
-                    float speedY = (Projectile.Center.Y - pos.Y) / 20f;
-                    Projectile.NewProjectile(Projectile.GetSource_FromThis(), pos.X, pos.Y, speedX, speedY, ModContent.ProjectileType<ExorcismStar>(), (int)(Projectile.damage * 0.75f), Projectile.knockBack * 0.5f, Projectile.owner, Main.rand.NextFloat(-3f, 3f), 0f);
-                }
-            }
         }
     }
 }

@@ -452,10 +452,9 @@ namespace CalamityMod.CalPlayer
                 float enemyDistance = maxProxRageDistance + 1f;
                 float bossDistance = maxProxRageDistance + 1f;
 
-                for (int i = 0; i < Main.maxNPCs; ++i)
+                foreach (NPC npc in Main.ActiveNPCs)
                 {
-                    NPC npc = Main.npc[i];
-                    if (npc is null || npc.type == NPCID.None || !npc.IsAnEnemy() || !npc.Calamity().ProvidesProximityRage)
+                    if (npc.type == NPCID.None || !npc.IsAnEnemy() || !npc.Calamity().ProvidesProximityRage)
                         continue;
 
                     // Take the longer of the two directions for the NPC's hitbox to be generous.
@@ -719,10 +718,9 @@ namespace CalamityMod.CalPlayer
             sigilDamage = Player.ApplyArmorAccDamageBonusesTo(sigilDamage);
 
             bool brightenedSigil = false;
-            for (int i = 0; i < Main.maxNPCs; i++)
+            foreach (NPC target in Main.ActiveNPCs)
             {
-                NPC target = Main.npc[i];
-                if (!target.active || !target.Hitbox.Intersects(sigilHitbox) || target.immortal || target.dontTakeDamage || target.townNPC || NPCID.Sets.ActsLikeTownNPC[target.type] || NPCID.Sets.CountsAsCritter[target.type])
+                if (!target.Hitbox.Intersects(sigilHitbox) || target.immortal || target.dontTakeDamage || target.townNPC || NPCID.Sets.ActsLikeTownNPC[target.type] || NPCID.Sets.CountsAsCritter[target.type])
                     continue;
 
                 // Brighten the sigil because it is dealing damage. This can only happen once per hit event.
@@ -734,7 +732,7 @@ namespace CalamityMod.CalPlayer
 
                 // Create a direct strike to hit this specific NPC.
                 var source = Player.GetSource_Accessory(FindAccessory(ModContent.ItemType<Calamity>()));
-                Projectile sigilStrike = Projectile.NewProjectileDirect(source, target.Center, Vector2.Zero, ModContent.ProjectileType<DirectStrike>(), sigilDamage, 0f, Player.whoAmI, i);
+                Projectile sigilStrike = Projectile.NewProjectileDirect(source, target.Center, Vector2.Zero, ModContent.ProjectileType<DirectStrike>(), sigilDamage, 0f, Player.whoAmI, target.whoAmI);
 
                 // Enable crits by setting the sigil's damage class to be whatever the player's strongest damage class is.
                 sigilStrike.DamageType = Player.GetBestClass();
@@ -863,24 +861,23 @@ namespace CalamityMod.CalPlayer
             {
                 int bullseyeType = ModContent.ProjectileType<SpiritOriginBullseye>();
                 List<int> alreadyTargetedNPCs = new List<int>();
-                for (int i = 0; i < Main.maxProjectiles; i++)
+                foreach (Projectile p in Main.ActiveProjectiles)
                 {
-                    if (Main.projectile[i].type != bullseyeType || !Main.projectile[i].active || Main.projectile[i].owner != Player.whoAmI)
+                    if (p.type != bullseyeType || p.owner != Player.whoAmI)
                         continue;
 
-                    alreadyTargetedNPCs.Add((int)Main.projectile[i].ai[0]);
+                    alreadyTargetedNPCs.Add((int)p.ai[0]);
                 }
 
-                for (int i = 0; i < Main.maxNPCs; i++)
+                foreach (NPC target in Main.ActiveNPCs)
                 {
-                    NPC target = Main.npc[i];
-                    if (!target.active || target.friendly || target.lifeMax < 5 || alreadyTargetedNPCs.Contains(i) || target.realLife >= 0 ||
+                    if (target.friendly || target.lifeMax < 5 || alreadyTargetedNPCs.Contains(target.whoAmI) || target.realLife >= 0 ||
                         target.dontTakeDamage || target.immortal || target.townNPC || NPCID.Sets.ActsLikeTownNPC[target.type] || NPCID.Sets.CountsAsCritter[target.type])
                         continue;
 
                     var source = Player.GetSource_Accessory(FindAccessory(ModContent.ItemType<DaawnlightSpiritOrigin>()));
-                    if (Main.myPlayer == Player.whoAmI && Main.npc[i].WithinRange(Player.Center, 2000f))
-                        Projectile.NewProjectile(source, Main.npc[i].Center, Vector2.Zero, bullseyeType, 0, 0f, Player.whoAmI, i);
+                    if (Main.myPlayer == Player.whoAmI && target.WithinRange(Player.Center, 2000f))
+                        Projectile.NewProjectile(source, target.Center, Vector2.Zero, bullseyeType, 0, 0f, Player.whoAmI, target.whoAmI);
                     if (spiritOriginBullseyeShootCountdown <= 0)
                         spiritOriginBullseyeShootCountdown = 45;
                 }
@@ -1142,10 +1139,9 @@ namespace CalamityMod.CalPlayer
                 if (Player.ownedProjectileCounts[ModContent.ProjectileType<OmegaBlueTentacle>()] < 6 && Main.myPlayer == Player.whoAmI)
                 {
                     bool[] tentaclesPresent = new bool[6];
-                    for (int i = 0; i < Main.maxProjectiles; i++)
+                    foreach (Projectile projectile in Main.ActiveProjectiles)
                     {
-                        Projectile projectile = Main.projectile[i];
-                        if (projectile.active && projectile.type == ModContent.ProjectileType<OmegaBlueTentacle>() && projectile.owner == Main.myPlayer && projectile.ai[1] >= 0f && projectile.ai[1] < 6f)
+                        if (projectile.type == ModContent.ProjectileType<OmegaBlueTentacle>() && projectile.owner == Main.myPlayer && projectile.ai[1] >= 0f && projectile.ai[1] < 6f)
                             tentaclesPresent[(int)projectile.ai[1]] = true;
                     }
 
@@ -1250,14 +1246,13 @@ namespace CalamityMod.CalPlayer
                     {
                         float maxDistance = 300f;
                         int target = -1;
-                        for (int npcIndex = 0; npcIndex < Main.maxNPCs; npcIndex++)
+                        foreach (NPC npc in Main.ActiveNPCs)
                         {
-                            NPC npc = Main.npc[npcIndex];
                             float targetDist = Vector2.Distance(npc.Center, Player.Center);
                             if (targetDist < maxDistance && npc.Calamity().arcZapCooldown == 0 && npc.CanBeChasedBy())
                             {
                                 maxDistance = targetDist;
-                                target = npcIndex;
+                                target = npc.whoAmI;
                             }
                         }
 
@@ -1853,10 +1848,9 @@ namespace CalamityMod.CalPlayer
                 {
                     if (Main.rand.NextBool(5))
                     {
-                        for (int l = 0; l < Main.maxNPCs; l++)
+                        foreach (NPC npc in Main.ActiveNPCs)
                         {
-                            NPC npc = Main.npc[l];
-                            if (!npc.active || npc.friendly || npc.damage <= 0 || npc.dontTakeDamage)
+                            if (npc.friendly || npc.damage <= 0 || npc.dontTakeDamage)
                                 continue;
 
                             if (!npc.buffImmune[buffType] && Vector2.Distance(Player.Center, npc.Center) <= freezeDist)
@@ -1902,10 +1896,9 @@ namespace CalamityMod.CalPlayer
             // Ceaseless Hunger Potion buff
             if (ceaselessHunger)
             {
-                for (int j = 0; j < Main.maxItems; j++)
+                foreach (Item item in Main.ActiveItems)
                 {
-                    Item item = Main.item[j];
-                    if (item.active && item.noGrabDelay == 0 && item.playerIndexTheItemIsReservedFor == Player.whoAmI)
+                    if (item.noGrabDelay == 0 && item.playerIndexTheItemIsReservedFor == Player.whoAmI)
                     {
                         item.beingGrabbed = true;
                         if (Player.Center.X > item.Center.X)
@@ -2783,10 +2776,9 @@ namespace CalamityMod.CalPlayer
             {
                 if (Main.netMode != NetmodeID.MultiplayerClient && !areThereAnyDamnBosses)
                 {
-                    for (int m = 0; m < Main.maxNPCs; m++)
+                    foreach (NPC npc in Main.ActiveNPCs)
                     {
-                        NPC npc = Main.npc[m];
-                        if (!npc.active || npc.friendly || npc.dontTakeDamage)
+                        if (npc.friendly || npc.dontTakeDamage)
                             continue;
                         float distance = (npc.Center - Player.Center).Length();
                         if (distance < 120f)
@@ -3140,14 +3132,13 @@ namespace CalamityMod.CalPlayer
                     var source = Player.GetSource_FromThis(TarragonHeadSummon.LifeAuraEntitySourceContext);
                     float range = 300f;
 
-                    for (int i = 0; i < Main.maxNPCs; ++i)
+                    foreach (NPC npc in Main.ActiveNPCs)
                     {
-                        NPC npc = Main.npc[i];
-                        if (!npc.active || npc.friendly || npc.dontTakeDamage)
+                        if (npc.friendly || npc.dontTakeDamage)
                             continue;
 
                         if (Vector2.Distance(Player.Center, npc.Center) <= range)
-                            Projectile.NewProjectileDirect(source, npc.Center, Vector2.Zero, ModContent.ProjectileType<TarragonAura>(), damage, 0f, Player.whoAmI, i);
+                            Projectile.NewProjectileDirect(source, npc.Center, Vector2.Zero, ModContent.ProjectileType<TarragonAura>(), damage, 0f, Player.whoAmI, npc.whoAmI);
                     }
                 }
             }
@@ -3168,14 +3159,13 @@ namespace CalamityMod.CalPlayer
                     var source = Player.GetSource_ItemUse(Player.ActiveItem());
                     float range = 200f;
 
-                    for (int i = 0; i < Main.maxNPCs; ++i)
+                    foreach (NPC npc in Main.ActiveNPCs)
                     {
-                        NPC npc = Main.npc[i];
-                        if (!npc.active || npc.friendly || npc.damage <= 0 || npc.dontTakeDamage)
+                        if (npc.friendly || npc.damage <= 0 || npc.dontTakeDamage)
                             continue;
 
                         if (Vector2.Distance(Player.Center, npc.Center) <= range)
-                            Projectile.NewProjectileDirect(source, npc.Center, Vector2.Zero, ModContent.ProjectileType<DirectStrike>(), damage, 0f, Player.whoAmI, i);
+                            Projectile.NewProjectileDirect(source, npc.Center, Vector2.Zero, ModContent.ProjectileType<DirectStrike>(), damage, 0f, Player.whoAmI, npc.whoAmI);
 
                         // Occasionally spawn cute sparks so it looks like an electrical aura
                         if (Main.rand.NextBool(10))
@@ -3211,17 +3201,16 @@ namespace CalamityMod.CalPlayer
                     var source = Player.GetSource_FromThis(HydrothermicArmor.InfernoPotionEntitySourceContext);
                     float range = 300f;
 
-                    for (int i = 0; i < Main.maxNPCs; ++i)
+                    foreach (NPC npc in Main.ActiveNPCs)
                     {
-                        NPC npc = Main.npc[i];
-                        if (!npc.active || npc.friendly || npc.damage <= 0 || npc.dontTakeDamage)
+                        if (npc.friendly || npc.damage <= 0 || npc.dontTakeDamage)
                             continue;
 
                         if (Vector2.Distance(Player.Center, npc.Center) <= range)
                         {
                             npc.AddBuff(ModContent.BuffType<BrimstoneFlames>(), 120);
                             if (brimLoreInfernoTimer == 0)
-                                Projectile.NewProjectileDirect(source, npc.Center, Vector2.Zero, ModContent.ProjectileType<DirectStrike>(), damage, 0f, Player.whoAmI, i);
+                                Projectile.NewProjectileDirect(source, npc.Center, Vector2.Zero, ModContent.ProjectileType<DirectStrike>(), damage, 0f, Player.whoAmI, npc.whoAmI);
                         }
                     }
                 }
@@ -3381,11 +3370,11 @@ namespace CalamityMod.CalPlayer
             {
                 if (Player.whoAmI == Main.myPlayer)
                 {
-                    for (int i = 0; i < Main.maxProjectiles; i++)
+                    foreach (Projectile p in Main.ActiveProjectiles)
                     {
-                        if (Main.projectile[i].active && Main.projectile[i].type == ModContent.ProjectileType<BlunderBoosterAura>() && Main.projectile[i].owner == Player.whoAmI)
+                        if (p.type == ModContent.ProjectileType<BlunderBoosterAura>() && p.owner == Player.whoAmI)
                         {
-                            Main.projectile[i].Kill();
+                            p.Kill();
                             break;
                         }
                     }
@@ -3438,12 +3427,12 @@ namespace CalamityMod.CalPlayer
                 if (Player.whoAmI == Main.myPlayer)
                 {
                     int auraType = ModContent.ProjectileType<TeslaAura>();
-                    for (int i = 0; i < Main.maxProjectiles; i++)
+                    foreach (Projectile p in Main.ActiveProjectiles)
                     {
-                        if (Main.projectile[i].type != auraType || !Main.projectile[i].active || Main.projectile[i].owner != Player.whoAmI)
+                        if (p.type != auraType || p.owner != Player.whoAmI)
                             continue;
 
-                        Main.projectile[i].Kill();
+                        p.Kill();
                         break;
                     }
                 }
@@ -3461,12 +3450,12 @@ namespace CalamityMod.CalPlayer
             else if (Player.whoAmI == Main.myPlayer)
             {
                 int shieldType = ModContent.ProjectileType<CryonicShield>();
-                for (int i = 0; i < Main.maxProjectiles; i++)
+                foreach (Projectile p in Main.ActiveProjectiles)
                 {
-                    if (Main.projectile[i].type != shieldType || !Main.projectile[i].active || Main.projectile[i].owner != Player.whoAmI)
+                    if (p.type != shieldType || p.owner != Player.whoAmI)
                         continue;
 
-                    Main.projectile[i].Kill();
+                    p.Kill();
                     break;
                 }
             }
@@ -3952,62 +3941,51 @@ namespace CalamityMod.CalPlayer
             // Defense damage does not heal during iframes, and has a delay after they end before it starts recovering.
             if (totalDefenseDamage > 0)
             {
-                // If a Full Cleanse is in effect, then cleanse all defense damage and don't do anything else.
-                if (CleansingEffect == 1)
-                {
-                    totalDefenseDamage = 0;
-                    defenseDamageRecoveryFrames = 0;
-                    totalDefenseDamageRecoveryFrames = DefenseDamageBaseRecoveryTime;
-                    defenseDamageDelayFrames = 0;
-                    CleansingEffect = 0;
-                }
-                else
-                {
-                    // Defense damage is capped at your maximum defense, except in GFB.
-                    if (!Main.getGoodWorld && totalDefenseDamage > Player.statDefense)
-                        totalDefenseDamage = Player.statDefense;
+                // Defense damage is capped at your maximum defense, except in GFB.
+                if (!Main.getGoodWorld && totalDefenseDamage > Player.statDefense)
+                    totalDefenseDamage = Player.statDefense;
 
-                    // You cannot begin recovering from defense damage until your iframes wear off.
-                    if (!Player.HasIFrames())
+                // You cannot begin recovering from defense damage until your iframes wear off.
+                if (!Player.HasIFrames())
+                {
+                    // Delay before defense damage recovery can start. While this delay is ticking down, defense damage doesn't recover at all.
+                    if (defenseDamageDelayFrames > 0)
+                        --defenseDamageDelayFrames;
+
+                    // Once the delay is up, defense damage recovery actually occurs.
+                    else if (defenseDamageDelayFrames <= 0)
                     {
-                        // Delay before defense damage recovery can start. While this delay is ticking down, defense damage doesn't recover at all.
-                        if (defenseDamageDelayFrames > 0)
-                            --defenseDamageDelayFrames;
+                        // Make one frame's worth of progress towards recovery.
+                        --defenseDamageRecoveryFrames;
 
-                        // Once the delay is up, defense damage recovery actually occurs.
-                        else if (defenseDamageDelayFrames <= 0)
+                        // If completely recovered, reset defense damage to nothing.
+                        if (defenseDamageRecoveryFrames <= 0)
                         {
-                            // Make one frame's worth of progress towards recovery.
-                            --defenseDamageRecoveryFrames;
-
-                            // If completely recovered, reset defense damage to nothing.
-                            if (defenseDamageRecoveryFrames <= 0)
-                            {
-                                totalDefenseDamage = 0;
-                                defenseDamageRecoveryFrames = 0;
-                                totalDefenseDamageRecoveryFrames = DefenseDamageBaseRecoveryTime;
-                                defenseDamageDelayFrames = 0;
-                            }
+                            totalDefenseDamage = 0;
+                            defenseDamageRecoveryFrames = 0;
+                            totalDefenseDamageRecoveryFrames = DefenseDamageBaseRecoveryTime;
+                            defenseDamageDelayFrames = 0;
                         }
                     }
-
-                    // Get current amount of defense damage to apply this frame.
-                    int currentDefenseDamage = CurrentDefenseDamage;
-
-                    // Apply DR Damage.
-                    //
-                    // DR Damage is applied at exactly the same ratio as defense damage;
-                    // if you lose half your defense to defense damage, you also lose half your DR.
-                    // This is applied first because the math would be wrong if the player's defense was already reduced by defense damage.
-                    if (Player.statDefense > 0 && Player.endurance > 0f)
-                    {
-                        float drDamageRatio = currentDefenseDamage / (float)Player.statDefense;
-                        Player.endurance *= 1f - drDamageRatio;
-                    }
-
-                    // Apply defense damage
-                    Player.statDefense -= currentDefenseDamage;
                 }
+
+                // Get current amount of defense damage to apply this frame.
+                int currentDefenseDamage = CurrentDefenseDamage;
+
+                // Apply DR Damage.
+                //
+                // DR Damage is applied at exactly the same ratio as defense damage;
+                // if you lose half your defense to defense damage, you also lose half your DR.
+                // This is applied first because the math would be wrong if the player's defense was already reduced by defense damage.
+                if (Player.statDefense > 0 && Player.endurance > 0f)
+                {
+                    float drDamageRatio = currentDefenseDamage / (float)Player.statDefense;
+                    Player.endurance *= 1f - drDamageRatio;
+                }
+
+                // Apply defense damage
+                Player.statDefense -= currentDefenseDamage;
+                
             }
 
             // Defense can never be reduced below zero, no matter what
@@ -4228,10 +4206,9 @@ namespace CalamityMod.CalPlayer
             if (Main.myPlayer != Player.whoAmI)
                 return;
 
-            for (int i = 0; i < Main.maxNPCs; i++)
+            foreach (NPC npc in Main.ActiveNPCs)
             {
-                NPC npc = Main.npc[i];
-                if (npc is null || !npc.active || npc.type != ModContent.NPCType<AndroombaFriendly>())
+                if (npc.type != ModContent.NPCType<AndroombaFriendly>())
                     continue;
 
                 bool holdingsol = ((Player.HeldItem.type >= ItemID.GreenSolution && Player.HeldItem.type <= ItemID.RedSolution) || (Player.HeldItem.type >= ItemID.SandSolution && Player.HeldItem.type <= ItemID.DirtSolution) || Player.HeldItem.type == ModContent.ItemType<AstralSolution>());
@@ -4327,7 +4304,7 @@ namespace CalamityMod.CalPlayer
                                 }
                             }
                             if (Main.netMode == NetmodeID.Server)
-                                NetMessage.SendData(MessageID.SyncNPC, -1, -1, null, i);
+                                NetMessage.SendData(MessageID.SyncNPC, -1, -1, null, npc.whoAmI);
                         }
                     }
                 }

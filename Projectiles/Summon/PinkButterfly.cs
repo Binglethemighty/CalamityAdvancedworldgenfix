@@ -106,10 +106,9 @@ namespace CalamityMod.Projectiles.Summon
             }
             if (!canAttack)
             {
-                for (int j = 0; j < Main.maxNPCs; j++)
+                foreach (NPC nPC2 in Main.ActiveNPCs)
                 {
-                    NPC nPC2 = Main.npc[j];
-                    if ((nPC2.CanBeChasedBy(Projectile, false) || nPC2.type == NPCID.DukeFishron) && nPC2.active)
+                    if (nPC2.CanBeChasedBy(Projectile, false) || nPC2.type == NPCID.DukeFishron)
                     {
                         float targetDist = Vector2.Distance(nPC2.Center, Projectile.Center);
                         if (!canAttack && targetDist < attackRange)
@@ -117,7 +116,7 @@ namespace CalamityMod.Projectiles.Summon
                             attackRange = targetDist;
                             projPos = nPC2.Center;
                             canAttack = true;
-                            targetIndex = j;
+                            targetIndex = nPC2.whoAmI;
                         }
                     }
                 }

@@ -90,15 +90,7 @@ namespace CalamityMod.NPCs.DevourerofGods
                 NPC.realLife = (int)NPC.ai[2];
 
             // Check if other segments are still alive, if not, die
-            bool shouldDespawn = true;
-            for (int i = 0; i < Main.maxNPCs; i++)
-            {
-                if (Main.npc[i].active && Main.npc[i].type == ModContent.NPCType<CosmicGuardianHead>())
-                {
-                    shouldDespawn = false;
-                    break;
-                }
-            }
+            bool shouldDespawn = !NPC.AnyNPCs(ModContent.NPCType<CosmicGuardianHead>());
             if (!shouldDespawn)
             {
                 if (NPC.ai[1] <= 0f)

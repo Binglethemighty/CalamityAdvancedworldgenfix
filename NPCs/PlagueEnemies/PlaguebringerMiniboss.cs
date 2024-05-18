@@ -94,13 +94,7 @@ namespace CalamityMod.NPCs.PlagueEnemies
                     NPC.timeLeft = 750;
             }
 
-            int playerAmt = 0;
-            for (int i = 0; i < Main.maxPlayers; i++)
-            {
-                if (Main.player[i].active && !Main.player[i].dead && (NPC.Center - Main.player[i].Center).Length() < 1000f)
-                    playerAmt++;
-            }
-
+            int playerAmt = Main.CurrentFrameFlags.ActivePlayersCount;
             if (NPC.target < 0 || NPC.target == Main.maxPlayers || Main.player[NPC.target].dead || !Main.player[NPC.target].active)
                 NPC.TargetClosest();
 

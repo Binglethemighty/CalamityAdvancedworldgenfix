@@ -80,24 +80,21 @@ namespace CalamityMod.Projectiles.Boss
                 return;
 
             float acceleration = 0.5f;
-            for (int j = 0; j < Main.maxProjectiles; j++)
+            foreach (Projectile p in Main.ActiveProjectiles)
             {
-                if (Main.projectile[j].active)
+                if (p.whoAmI != Projectile.whoAmI && p.type == Projectile.type)
                 {
-                    if (j != Projectile.whoAmI && Main.projectile[j].type == Projectile.type)
+                    if (Vector2.Distance(Projectile.Center, p.Center) < 24f)
                     {
-                        if (Vector2.Distance(Projectile.Center, Main.projectile[j].Center) < 24f)
-                        {
-                            if (Projectile.position.X < Main.projectile[j].position.X)
-                                Projectile.velocity.X -= acceleration;
-                            else
-                                Projectile.velocity.X += acceleration;
-
-                            if (Projectile.position.Y < Main.projectile[j].position.Y)
-                                Projectile.velocity.Y -= acceleration;
-                            else
-                                Projectile.velocity.Y += acceleration;
-                        }
+                        if (Projectile.position.X < p.position.X)
+                            Projectile.velocity.X -= acceleration;
+                        else
+                            Projectile.velocity.X += acceleration;
+                        
+                        if (Projectile.position.Y < p.position.Y)
+                            Projectile.velocity.Y -= acceleration;
+                        else
+                            Projectile.velocity.Y += acceleration;
                     }
                 }
             }

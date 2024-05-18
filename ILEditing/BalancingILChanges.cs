@@ -27,7 +27,7 @@ namespace CalamityMod.ILEditing
 
         #endregion
 
-        #region Soaring Insignia Changes
+        #region Remove Soaring Insignia Infinite Flight
         private static void RemoveSoaringInsigniaInfiniteWingTime(ILContext il)
         {
             // Prevent the infinite flight effect.
@@ -39,34 +39,6 @@ namespace CalamityMod.ILEditing
             }
 
             // AND with 0 (false) so that the Soaring Insignia is never considered equipped and thus infinite flight never triggers.
-            cursor.Emit(OpCodes.Ldc_I4_0);
-            cursor.Emit(OpCodes.And);
-        }
-
-        private static void NerfSoaringInsigniaRunAcceleration(ILContext il)
-        {
-            // Nerf the run acceleration boost from 1.75x to 1.1x.
-            var cursor = new ILCursor(il);
-            if (!cursor.TryGotoNext(MoveType.After, i => i.MatchLdfld<Player>("empressBrooch")))
-            {
-                LogFailure("Soaring Insignia Mobility Nerf", "Could not locate the Soaring Insignia bool.");
-                return;
-            }
-            if (!cursor.TryGotoNext(MoveType.Before, i => i.MatchLdcR4(1.75f)))
-            {
-                LogFailure("Soaring Insignia Mobility Nerf", "Could not locate the Soaring Insignia run acceleration multiplier.");
-                return;
-            }
-            cursor.Next.Operand = 1.1f;
-
-            // Prevent the rocket boots infinite flight effect.
-            if (!cursor.TryGotoNext(MoveType.After, i => i.MatchLdfld<Player>("empressBrooch")))
-            {
-                LogFailure("Soaring Insignia Mobility Nerf", "Could not locate the Soaring Insignia bool.");
-                return;
-            }
-
-            // AND with 0 (false) so that the Soaring Insignia is never considered equipped and thus infinite rocket boots never triggers.
             cursor.Emit(OpCodes.Ldc_I4_0);
             cursor.Emit(OpCodes.And);
         }
@@ -257,6 +229,78 @@ namespace CalamityMod.ILEditing
                 cursor.Remove();
                 cursor.Emit(OpCodes.Ldc_R4, iceSkateTopSpeed);
             }
+        }
+
+        private static void NerfOverpoweredRunAccelerationSources(ILContext il)
+        {
+            // First: Soaring Insignia. Find the check for whether it's equipped for run speeds.
+            var cursor = new ILCursor(il);
+            if (!cursor.TryGotoNext(MoveType.After, i => i.MatchLdfld<Player>("empressBrooch")))
+            {
+                LogFailure("Run Acceleration Nerfs", "Could not locate the Soaring Insignia bool.");
+                return;
+            }
+
+            if (!cursor.TryGotoNext(MoveType.Before, i => i.MatchLdcR4(1.75f)))
+            {
+                LogFailure("Run Acceleration Nerfs", "Could not locate the Soaring Insignia run acceleration multiplier.");
+                return;
+            }
+            cursor.Next.Operand = BalancingConstants.SoaringInsigniaRunAccelerationMultiplier;
+
+            // Second: Magiluminescence. Find the check for whether it's equipped for run speeds.
+            if (!cursor.TryGotoNext(MoveType.After, i => i.MatchLdfld<Player>("hasMagiluminescence")))
+            {
+                LogFailure("Run Acceleration Nerfs", "Could not locate the Magiluminescence bool.");
+                return;
+            }
+
+            //
+            // Don't actually do anything. Magiluminescence is not intended to be nerfed by Calamity.
+            //
+
+            // Third: Shadow Armor. Find the check for whether it's equipped for run speeds.
+            if (!cursor.TryGotoNext(MoveType.After, i => i.MatchLdfld<Player>("shadowArmor")))
+            {
+                LogFailure("Run Acceleration Nerfs", "Could not locate the Shadow Armor bool.");
+                return;
+            }
+
+            // Load the player onto the stack as an argument to the following delegate.
+            // Emit a delegate which consumes the Shadow Armor bool, performs Calamity effects, then always returns false.
+            // Returning false ensures vanilla Shadow Armor code never runs.
+            cursor.Emit(OpCodes.Ldarg_0);
+
+            cursor.EmitDelegate((bool shadowArmor, Player p) => {
+                // If you don't even have Shadow Armor equipped, do nothing.
+                if (!shadowArmor)
+                    return 0;
+
+                // Shadow Armor does not stack with Magiluminescence if you are on the ground.
+                if (p.hasMagiluminescence && p.velocity.Y == 0)
+                    return 0;
+
+                // Shadow Armor grants reduced movement bonuses if in the air, or on the ground WITHOUT Magiluminescence.
+                p.runAcceleration *= BalancingConstants.ShadowArmorRunAccelerationMultiplier;
+                p.maxRunSpeed *= BalancingConstants.ShadowArmorMaxRunSpeedMultiplier;
+                p.accRunSpeed *= BalancingConstants.ShadowArmorAccRunSpeedMultiplier;
+                p.runSlowdown *= BalancingConstants.ShadowArmorRunSlowdownMultiplier;
+
+                // Vanilla Shadow Armor behavior should still always be skipped.
+                return 0;
+            });
+
+
+            // Finally: Back to Soaring Insignia. Prevent the rocket boots infinite flight effect, since it's in the same function.
+            if (!cursor.TryGotoNext(MoveType.After, i => i.MatchLdfld<Player>("empressBrooch")))
+            {
+                LogFailure("Run Acceleration Nerfs", "Could not locate the Soaring Insignia bool.");
+                return;
+            }
+
+            // AND with 0 (false) so that the Soaring Insignia is never considered equipped and thus infinite rocket boots never triggers.
+            cursor.Emit(OpCodes.Ldc_I4_0);
+            cursor.Emit(OpCodes.And);
         }
         #endregion
 

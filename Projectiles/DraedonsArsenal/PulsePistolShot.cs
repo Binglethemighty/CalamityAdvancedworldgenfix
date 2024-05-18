@@ -90,15 +90,15 @@ namespace CalamityMod.Projectiles.DraedonsArsenal
 
             float minDistance = 600f;
             List<NPC> potentialTargets = new List<NPC>();
-            for (int i = 0; i < Main.npc.Length; i++)
+            foreach (NPC n in Main.ActiveNPCs)
             {
-                bool legalTarget = Main.npc[i] != target && Main.npc[i].active && Main.npc[i].CanBeChasedBy(null);
-                float distanceToTarget = Projectile.Distance(Main.npc[i].Center);
-                if (legalTarget && distanceToTarget < minDistance && !NPCsAlreadyHit.Contains(Main.npc[i]))
+                bool legalTarget = n != target && n.CanBeChasedBy(null);
+                float distanceToTarget = Projectile.Distance(n.Center);
+                if (legalTarget && distanceToTarget < minDistance && !NPCsAlreadyHit.Contains(n))
                 {
                     minDistance = distanceToTarget;
                     // The NPCs at the bottom will always be at the bottom of the list because it works via a minimum distance.
-                    potentialTargets.Add(Main.npc[i]);
+                    potentialTargets.Add(n);
                 }
             }
 

@@ -35,9 +35,9 @@ namespace CalamityMod.Projectiles.Enemy
                 Projectile.velocity.Y += 0.15f;
             Projectile.rotation = Projectile.velocity.ToRotation() + MathHelper.PiOver2;
 
-            for (int i = 0; i < Main.player.Length; i++)
+            foreach (Player player in Main.ActivePlayers)
             {
-                if (Main.player[i].Distance(Projectile.Center) < 60f)
+                if (player.Distance(Projectile.Center) < 60f)
                 {
                     Projectile.Kill();
                 }

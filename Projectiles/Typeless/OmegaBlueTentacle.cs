@@ -96,16 +96,15 @@ namespace CalamityMod.Projectiles.Typeless
                     Projectile.ai[0] = 10 + Main.rand.Next(10);
                     float maxDistance = hentai ? 900f : 600f;
                     int target = -1;
-                    for (int i = 0; i < Main.maxNPCs; i++)
+                    foreach (NPC npc in Main.ActiveNPCs)
                     {
-                        NPC npc = Main.npc[i];
                         if (npc.CanBeChasedBy(Projectile))
                         {
                             float npcDistance = Projectile.Distance(npc.Center);
                             if (npcDistance < maxDistance)
                             {
                                 maxDistance = npcDistance;
-                                target = i;
+                                target = npc.whoAmI;
                             }
                         }
                     }

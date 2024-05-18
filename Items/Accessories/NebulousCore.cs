@@ -39,9 +39,9 @@ namespace CalamityMod.Items.Accessories
             if (Main.rand.NextBool(15))
             {
                 int numProj = 0;
-                for (int i = 0; i < Main.maxProjectiles; i++)
+                foreach (Projectile p in Main.ActiveProjectiles)
                 {
-                    if (Main.projectile[i].active && Main.projectile[i].owner == player.whoAmI && Main.projectile[i].type == ModContent.ProjectileType<NebulaStar>())
+                    if (p.owner == player.whoAmI && p.type == ModContent.ProjectileType<NebulaStar>())
                     {
                         numProj++;
                     }

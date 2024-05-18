@@ -98,6 +98,7 @@ namespace CalamityMod.NPCs.SupremeCalamitas
         public bool gettingTired5 = false; //1%
         public bool willCharge = false;
         public bool canFireSplitingFireball = true;
+        public bool fireFireblastFirst = true;
         public bool spawnArena = false;
         public bool enteredBrothersPhase = false;
         public bool hasSummonedBrothers = false;
@@ -125,7 +126,9 @@ namespace CalamityMod.NPCs.SupremeCalamitas
         public int alicornFrame = 0;
         public int alicornFrameCounter = 0;
         public int dashVisualCounter = 0;
-        public int brothersPause = 15; // Helps prevent telefragging
+        public int preventionPause = 15; // Helps prevent telefragging
+        public int attackPause = 0;
+        public bool respawnBro = true; // Master Mode change
 
         public float shieldOpacity = 1f;
         public float shieldRotation = 0f;
@@ -1623,6 +1626,7 @@ namespace CalamityMod.NPCs.SupremeCalamitas
 
                         if (!hasDoneDeathAnim && !bossRush) // Scrapped death animation for Scal
                         {
+                            attackPause = 5;
                             Dust.QuickDustLine(NPC.Center, safeBox.Center() + new Vector2(0, -30), 500f, cirrus ? Color.Pink : Color.Red);
                             NPC.Center = safeBox.Center() + new Vector2(0, -30);
                             NPC.velocity = new Vector2(10 * NPC.spriteDirection, -7);
@@ -2027,9 +2031,13 @@ namespace CalamityMod.NPCs.SupremeCalamitas
             }
             if (NPC.life > 0)
             {
+                if (attackPause > 0)
+                    attackPause--;
+
                 if (lifeRatio < 0.45f && !enteredBrothersPhase)
                 {
-                    if (brothersPause == 0)
+                    attackPause = 5;
+                    if (preventionPause == 0)
                     {
                         enteredBrothersPhase = true;
                         attackCastDelay = brothersSpawnCastTime;
@@ -2067,7 +2075,7 @@ namespace CalamityMod.NPCs.SupremeCalamitas
                     }
                     else
                     {
-                        brothersPause--;
+                        preventionPause--;
                         NPC.dontTakeDamage = true;
                         NPC.velocity *= 0.85f;
                         return;
@@ -2234,6 +2242,7 @@ namespace CalamityMod.NPCs.SupremeCalamitas
                         if (NPC.ai[2] >= 300f)
                         {
                             NPC.ai[1] = -1f;
+                            fireFireblastFirst = true;
                             NPC.TargetClosest();
                             NPC.netUpdate = true;
                         }
@@ -2248,7 +2257,8 @@ namespace CalamityMod.NPCs.SupremeCalamitas
                             NPC.localAI[1] = 0f;
 
                             int randomShot = Main.rand.Next(6);
-                            if (randomShot == 0 && canFireSplitingFireball)
+
+                            if (randomShot == 0 && canFireSplitingFireball && !fireFireblastFirst)
                             {
                                 canFireSplitingFireball = false;
                                 randomShot = gigablast;
@@ -2267,7 +2277,7 @@ namespace CalamityMod.NPCs.SupremeCalamitas
                                     NPC.netUpdate = true;
                                 }
                             }
-                            else if (randomShot == 1 && canFireSplitingFireball) // Firing gigablast while hovering above pre laugh
+                            else if ((randomShot == 1 && canFireSplitingFireball) ||  fireFireblastFirst) // Firing gigablast while hovering above pre laugh
                             {
                                 canFireSplitingFireball = false;
                                 randomShot = fireblast;
@@ -2286,7 +2296,7 @@ namespace CalamityMod.NPCs.SupremeCalamitas
                                     NPC.netUpdate = true;
                                 }
                             }
-                            else
+                            else if (!fireFireblastFirst)
                             {
                                 canFireSplitingFireball = true;
                                 randomShot = barrage;
@@ -2311,6 +2321,7 @@ namespace CalamityMod.NPCs.SupremeCalamitas
                                     }
                                 }
                             }
+                            fireFireblastFirst = false;
                         }
 
                         FrameType = FrameAnimationType.FasterUpwardDraft;
@@ -2479,7 +2490,8 @@ namespace CalamityMod.NPCs.SupremeCalamitas
                                     Vector2 projectileSpawn = NPC.Center + projectileVelocity * 4f;
                                     projectileVelocity *= 10f * uDieLul;
                                     int projectileType = hellblast;
-                                    Projectile.NewProjectile(NPC.GetSource_FromAI(), projectileSpawn, projectileVelocity, projectileType, hellblastDamage, 0f, Main.myPlayer, 0f, 2f);
+                                    if (attackPause == 0)
+                                        Projectile.NewProjectile(NPC.GetSource_FromAI(), projectileSpawn, projectileVelocity, projectileType, hellblastDamage, 0f, Main.myPlayer, 0f, 2f);
                                 }
                             }
                         }
@@ -2795,6 +2807,7 @@ namespace CalamityMod.NPCs.SupremeCalamitas
                         if (NPC.ai[2] >= 240f)
                         {
                             NPC.ai[1] = -1f;
+                            fireFireblastFirst = true;
                             NPC.TargetClosest();
                             NPC.netUpdate = true;
                         }
@@ -2809,7 +2822,8 @@ namespace CalamityMod.NPCs.SupremeCalamitas
                             NPC.localAI[1] = 0f;
 
                             int randomShot = Main.rand.Next(6);
-                            if (randomShot == 0 && canFireSplitingFireball) // fireblast while floating post laugh
+
+                            if (randomShot == 0 && canFireSplitingFireball && !fireFireblastFirst) // fireblast while floating post laugh
                             {
                                 SoundEngine.PlaySound(BrimstoneBigShotSound, NPC.Center);
                                 canFireSplitingFireball = false;
@@ -2826,10 +2840,11 @@ namespace CalamityMod.NPCs.SupremeCalamitas
                                     NPC.netUpdate = true;
                                 }
                             }
-                            else if (randomShot == 1 && canFireSplitingFireball) // Gigablast while floating post laugh
+                            else if ((randomShot == 1 && canFireSplitingFireball) ||  fireFireblastFirst) // Gigablast while floating post laugh
                             {
                                 SoundEngine.PlaySound(BrimstoneShotSound, NPC.Center);
-                                canFireSplitingFireball = false;
+                                if (NPC.ai[2] > 1)
+                                    canFireSplitingFireball = false;
                                 randomShot = fireblast;
 
                                 Particle pulse = new DirectionalPulseRing(NPC.Center, projectileVelocity * 1.2f, cirrus ? Color.Pink : Color.Red, new Vector2(0.5f, 1f), projectileVelocity.ToRotation(), 0.95f, 0f, 55);
@@ -2843,7 +2858,7 @@ namespace CalamityMod.NPCs.SupremeCalamitas
                                     NPC.netUpdate = true;
                                 }
                             }
-                            else
+                            else if (!fireFireblastFirst)
                             {
                                 SoundEngine.PlaySound(BrimstoneBigShotSound, NPC.Center);
                                 canFireSplitingFireball = true;
@@ -2868,6 +2883,7 @@ namespace CalamityMod.NPCs.SupremeCalamitas
                                     }
                                 }
                             }
+                            fireFireblastFirst = false;
                         }
                     }
                     else if (NPC.ai[1] == 1f)
@@ -3007,7 +3023,8 @@ namespace CalamityMod.NPCs.SupremeCalamitas
                                     Vector2 projectileSpawn = NPC.Center + projectileVelocity * 4f;
                                     projectileVelocity *= 10f * uDieLul;
                                     int projectileType = hellblast;
-                                    Projectile.NewProjectile(NPC.GetSource_FromAI(), projectileSpawn, projectileVelocity, projectileType, hellblastDamage, 0f, Main.myPlayer, 0f, 2f);
+                                    if (attackPause == 0)
+                                        Projectile.NewProjectile(NPC.GetSource_FromAI(), projectileSpawn, projectileVelocity, projectileType, hellblastDamage, 0f, Main.myPlayer, 0f, 2f);
                                 }
                             }
                         }

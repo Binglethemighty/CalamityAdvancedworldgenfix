@@ -29,7 +29,7 @@ namespace CalamityMod.Projectiles.Ranged
         // It'll carry over to the projectiles that it shoots.
         public static int DustEffectsID { get; set; }
         public static Color EffectsColor { get; set; }
-        public static Color StaticEffectsColor = Color.Turquoise;
+        public static Color StaticEffectsColor { get; set; } = Color.Turquoise;
 
         public override void HoldoutAI()
         {
@@ -58,7 +58,6 @@ namespace CalamityMod.Projectiles.Ranged
                 {
                     ShootingTimer = 0f;
                     TimerBetweenBursts = 0f;
-                    NetUpdate();
                 }
             }
 
@@ -155,8 +154,6 @@ namespace CalamityMod.Projectiles.Ranged
                 rocketType,
                 projSpeed);
 
-            NetUpdate();
-
             // Inside here go all the things that dedicated servers shouldn't spend resources on.
             // Like visuals and sounds.
             if (Main.dedServ)
@@ -193,13 +190,6 @@ namespace CalamityMod.Projectiles.Ranged
                 0.4f,
                 20);
             GeneralParticleHandler.SpawnParticle(shootPulse);
-        }
-
-        public void NetUpdate()
-        {
-            Projectile.netUpdate = true;
-            if (Projectile.netSpam >= 10)
-                Projectile.netSpam = 9;
         }
 
         public override bool PreDraw(ref Color lightColor)

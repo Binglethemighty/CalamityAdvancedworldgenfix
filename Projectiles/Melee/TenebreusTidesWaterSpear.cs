@@ -123,9 +123,8 @@ namespace CalamityMod.Projectiles.Melee
                     int whoAmI = -1;
                     Vector2 targetSpot = Projectile.Center;
                     float detectRange = 700f;
-                    for (int i = 0; i < Main.maxNPCs; i++)
+                    foreach (NPC npc in Main.ActiveNPCs)
                     {
-                        NPC npc = Main.npc[i];
                         if (npc.CanBeChasedBy(Projectile, false))
                         {
                             float targetDist = Vector2.Distance(npc.Center, Projectile.Center);
@@ -133,7 +132,7 @@ namespace CalamityMod.Projectiles.Melee
                             {
                                 detectRange = targetDist;
                                 targetSpot = npc.Center;
-                                whoAmI = i;
+                                whoAmI = npc.whoAmI;
                             }
                         }
                     }

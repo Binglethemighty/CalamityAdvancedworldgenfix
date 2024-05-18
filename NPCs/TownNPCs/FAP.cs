@@ -669,11 +669,10 @@ namespace CalamityMod.NPCs.TownNPCs
             if (CalamityWorld.spawnedCirrus)
                 return true;
 
-            for (int k = 0; k < Main.maxPlayers; k++)
+            foreach (Player player in Main.ActivePlayers)
             {
-                Player player = Main.player[k];
                 bool hasVodka = player.InventoryHas(ModContent.ItemType<FabsolsVodka>()) || player.PortableStorageHas(ModContent.ItemType<FabsolsVodka>());
-                if (player.active && hasVodka)
+                if (hasVodka)
                     return Main.hardMode;
             }
             return false;
@@ -883,8 +882,8 @@ namespace CalamityMod.NPCs.TownNPCs
 
         public override void AddShops()
         {
-            Condition potionSells = new(CalamityUtils.GetText("Condition.PotionConfig"), () => CalamityConfig.Instance.PotionSelling);
-            Condition downedAureus = new(CalamityUtils.GetText("Condition.PostAureus"), () => DownedBossSystem.downedAstrumAureus);
+            Condition potionSells = CalamityConditions.PotionSellingConfig;
+            Condition downedAureus = CalamityConditions.DownedAstrumAureus;
 
             NPCShop shop = new(Type);
             shop.AddWithCustomValue(ItemID.LovePotion, Item.buyPrice(silver: 25), potionSells, Condition.HappyEnough)

@@ -67,15 +67,14 @@ namespace CalamityMod.Projectiles.Magic
                 int index = 0;
                 float findOldest = 0f;
                 int projType = Projectile.type;
-                for (int i = 0; i < Main.maxProjectiles; i++)
+                foreach (Projectile proj in Main.ActiveProjectiles)
                 {
-                    Projectile proj = Main.projectile[i];
-                    if (proj.active && proj.owner == Projectile.owner && proj.type == projType && proj.ai[1] < 3600f)
+                    if (proj.owner == Projectile.owner && proj.type == projType && proj.ai[1] < 3600f)
                     {
                         projCount++;
                         if (proj.ai[1] > findOldest)
                         {
-                            index = i;
+                            index = proj.whoAmI;
                             findOldest = proj.ai[1];
                         }
                     }

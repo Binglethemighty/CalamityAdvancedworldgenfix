@@ -18,8 +18,7 @@ namespace CalamityMod.Tiles.Pylons
 
         public override NPCShop.Entry GetNPCShopEntry()
         {
-            Condition biomeCondition = new Condition(CalamityUtils.GetText("Condition.InSulph"), () => Main.LocalPlayer.Calamity().ZoneSulphur);
-            return new NPCShop.Entry(AssociatedItem, Condition.AnotherTownNPCNearby, biomeCondition);
+            return new NPCShop.Entry(AssociatedItem, Condition.AnotherTownNPCNearby, CalamityConditions.InSulph);
         }
 
         public override bool ValidTeleportCheck_BiomeRequirements(TeleportPylonInfo pylonInfo, SceneMetrics sceneData) => BiomeTileCounterSystem.SulphurTiles >= 100;

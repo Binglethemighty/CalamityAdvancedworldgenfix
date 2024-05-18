@@ -1,4 +1,5 @@
-﻿using Microsoft.Xna.Framework;
+﻿using System.Collections.Generic;
+using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Terraria;
 using Terraria.ID;
@@ -7,13 +8,13 @@ using Terraria.ModLoader;
 
 namespace CalamityMod.Tiles.SunkenSea
 {
-    public class SeaPrism : ModTile
+    public class SeaPrism : ModTile, IMergeableTile
     {
-        public byte[,] tileAdjacency;
-
         private const short subsheetWidth = 450;
-        private const short subsheetHeight = 198;
-
+        private const short subsheetHeight = 198; 
+        
+        List<TileFraming.MergeFrameData> IMergeableTile.TileAdjacencies { get; } = [];
+        
         public override void SetStaticDefaults()
         {
             Main.tileSolid[Type] = true;
@@ -32,7 +33,7 @@ namespace CalamityMod.Tiles.SunkenSea
             Main.tileSpelunker[Type] = true;
             MinPick = 55;
 
-            TileFraming.SetUpUniversalMerge(Type, ModContent.TileType<Navystone>(), out tileAdjacency);
+            this.RegisterUniversalMerge(ModContent.TileType<Navystone>(), "CalamityMod/Tiles/Merges/NavystoneMerge");
         }
 
         public override void NumDust(int i, int j, bool fail, ref int num)
@@ -45,15 +46,9 @@ namespace CalamityMod.Tiles.SunkenSea
             frameXOffset = i % 2 * subsheetWidth;
             frameYOffset = j % 2 * subsheetHeight;
         }
-
-        public override void PostDraw(int i, int j, SpriteBatch spriteBatch)
-        {
-            TileFraming.DrawUniversalMergeFrames(i, j, tileAdjacency, "CalamityMod/Tiles/Merges/NavystoneMerge");
-        }
-
+        
         public override bool TileFrame(int i, int j, ref bool resetFrame, ref bool noBreak)
         {
-            TileFraming.GetAdjacencyData(i, j, ModContent.TileType<Navystone>(), out tileAdjacency[i, j]);
             return TileFraming.BrimstoneFraming(i, j, resetFrame);
         }
     }

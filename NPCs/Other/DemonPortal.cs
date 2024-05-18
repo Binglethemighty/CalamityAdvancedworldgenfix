@@ -47,14 +47,14 @@ namespace CalamityMod.NPCs.Other
                 NPC.dontTakeDamage = true;
                 NPC.netUpdate = true;
                 int demonType = ModContent.ProjectileType<SuicideBomberDemon>();
-                for (int i = 0; i < Main.maxProjectiles; i++)
+                foreach (Projectile p in Main.ActiveProjectiles)
                 {
-                    if (Main.projectile[i].type != demonType || !Main.projectile[i].active || Main.projectile[i].hostile)
+                    if (p.type != demonType || p.hostile)
                         continue;
 
-                    Main.projectile[i].hostile = true;
-                    Main.projectile[i].friendly = false;
-                    Main.projectile[i].netUpdate = true;
+                    p.hostile = true;
+                    p.friendly = false;
+                    p.netUpdate = true;
                 }
             }
 

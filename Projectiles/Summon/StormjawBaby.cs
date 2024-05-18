@@ -111,15 +111,14 @@ namespace CalamityMod.Projectiles.Summon
                 }
                 if (targetIndex < 0)
                 {
-                    for (int i = 0; i < Main.maxNPCs; ++i)
+                    foreach (NPC npc in Main.ActiveNPCs)
                     {
-                        NPC npc = Main.npc[i];
                         if (npc.CanBeChasedBy(Projectile, false))
                         {
                             float num1 = (npc.Center - Projectile.Center).Length();
                             if (num1 < maxDistance)
                             {
-                                targetIndex = i;
+                                targetIndex = npc.whoAmI;
                                 maxDistance = num1;
                             }
                         }
@@ -299,9 +298,8 @@ namespace CalamityMod.Projectiles.Summon
             else
             {
                 Rectangle rectangle = new Rectangle((int)(Projectile.position.X + Projectile.velocity.X * 0.5f - 4f), (int)(Projectile.position.Y + Projectile.velocity.Y * 0.5f - 4f), Projectile.width + 8, Projectile.height + 8);
-                for (int i = 0; i < Main.maxNPCs; i++)
+                foreach (NPC npc in Main.ActiveNPCs)
                 {
-                    NPC npc = Main.npc[i];
                     if (npc.CanBeChasedBy(Projectile, false) && npc.immune[Projectile.owner] <= 0)
                     {
                         Rectangle rect = npc.getRect();

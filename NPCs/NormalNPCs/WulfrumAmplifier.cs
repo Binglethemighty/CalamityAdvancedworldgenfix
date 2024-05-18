@@ -165,12 +165,8 @@ namespace CalamityMod.NPCs.NormalNPCs
                     }
                 }
 
-                for (int i = 0; i < Main.maxNPCs; i++)
+                foreach (var npcAtIndex in Main.ActiveNPCs)
                 {
-                    NPC npcAtIndex = Main.npc[i];
-                    if (!npcAtIndex.active)
-                        continue;
-
                     // For some strange reason, the Wulfrum enemies are not counted when SuperchargableEnemies is a static list declared up front.
                     // What I assume is going on is that it hasn't been loaded yet since it's later alphabetically (Amplifier is before the other enemies).
                     if (!SuperchargableEnemies.Contains(npcAtIndex.type) && npcAtIndex.type != ModContent.NPCType<WulfrumRover>())

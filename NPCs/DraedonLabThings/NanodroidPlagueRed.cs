@@ -42,12 +42,8 @@ namespace CalamityMod.NPCs.DraedonLabThings
             {
                 Lighting.AddLight(NPC.Center, 0.3f, 0.03f, 0f);
             }
-            for (int i = 0; i < Main.maxPlayers; i++)
+            foreach (Player player in Main.ActivePlayers)
             {
-                Player player = Main.player[i];
-                if (player is null || !player.active)
-                    continue;
-
                 if (NPC.Hitbox.Intersects(player.HitboxForBestiaryNearbyCheck))
                 {
                     NPC nPC = new NPC();

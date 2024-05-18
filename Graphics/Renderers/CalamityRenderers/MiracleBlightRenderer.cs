@@ -89,13 +89,11 @@ namespace CalamityMod.Graphics.Renderers.CalamityRenderers
             ActuallyDoPreDraw = true;
 
             // Draw every npc to a single target that should have the miracle blight visual.
-            for (int i = 0; i < Main.maxNPCs; i++)
+            foreach (NPC npc in Main.ActiveNPCs)
             {
                 // Extra check to ensure that index errors will not occur. If not in range, something has gone wrong and the loop should terminate.
-                if (!Main.npc.IndexInRange(i))
+                if (!Main.npc.IndexInRange(npc.whoAmI))
                     break;
-
-                NPC npc = Main.npc[i];
 
                 if (ValidToDraw(npc))
                     Main.instance.DrawNPC(npc.whoAmI, npc.behindTiles);

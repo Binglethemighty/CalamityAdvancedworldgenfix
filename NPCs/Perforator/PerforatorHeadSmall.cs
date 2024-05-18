@@ -238,19 +238,15 @@ namespace CalamityMod.NPCs.Perforator
                 bool outsideFlyRadius = true;
                 if (NPC.position.Y > player.position.Y)
                 {
-                    for (int m = 0; m < Main.maxPlayers; m++)
+                    foreach (Player plr in Main.ActivePlayers)
                     {
-                        if (Main.player[m].active)
+                        Rectangle rectangle2 = new Rectangle((int)plr.position.X - stopFlyingRadius, (int)plr.position.Y - stopFlyingRadius, stopFlyingRadius * 2, stopFlyingRadius * 2);
+                        if (rectangle.Intersects(rectangle2))
                         {
-                            Rectangle rectangle2 = new Rectangle((int)Main.player[m].position.X - stopFlyingRadius, (int)Main.player[m].position.Y - stopFlyingRadius, stopFlyingRadius * 2, stopFlyingRadius * 2);
-                            if (rectangle.Intersects(rectangle2))
-                            {
-                                outsideFlyRadius = false;
-                                break;
-                            }
+                            outsideFlyRadius = false;
+                            break;
                         }
                     }
-
                     if (outsideFlyRadius)
                         shouldFly = true;
                 }

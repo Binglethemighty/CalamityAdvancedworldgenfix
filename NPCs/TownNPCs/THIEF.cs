@@ -91,11 +91,10 @@ namespace CalamityMod.NPCs.TownNPCs
             if (CalamityWorld.spawnedBandit)
                 return true;
 
-            for (int k = 0; k < Main.maxPlayers; k++)
+            foreach (Player player in Main.ActivePlayers)
             {
-                Player player = Main.player[k];
                 bool rich = player.InventoryHas(ItemID.PlatinumCoin) || player.PortableStorageHas(ItemID.PlatinumCoin);
-                if (player.active && rich)
+                if (rich)
                     return NPC.downedBoss3;
             }
             return false;
@@ -269,10 +268,10 @@ namespace CalamityMod.NPCs.TownNPCs
         }
         public override void AddShops()
         {
-            Condition potionSells = new(CalamityUtils.GetText("Condition.PotionConfig"), () => CalamityConfig.Instance.PotionSelling);
-            Condition downedCalclone = new(CalamityUtils.GetText("Condition.PostCal"), () => DownedBossSystem.downedCalamitasClone);
-            Condition downedDoG = new(CalamityUtils.GetText("Condition.PostDoG"), () => DownedBossSystem.downedDoG);
-            Condition downedYharon = new(CalamityUtils.GetText("Condition.PostYharon"), () => DownedBossSystem.downedYharon);
+            Condition potionSells = CalamityConditions.PotionSellingConfig;
+            Condition downedCalclone = CalamityConditions.DownedCalamitasClone;
+            Condition downedDoG = CalamityConditions.DownedDevourerOfGods;
+            Condition downedYharon = CalamityConditions.DownedYharon;
 
             NPCShop shop = new(Type);
             shop.AddWithCustomValue(ModContent.ItemType<Cinquedea>(), Item.buyPrice(gold: 9))
@@ -282,7 +281,7 @@ namespace CalamityMod.NPCs.TownNPCs
                 .Add(ItemID.TigerClimbingGear)
                 .AddWithCustomValue(ItemID.InvisibilityPotion, Item.buyPrice(silver: 25), potionSells, Condition.HappyEnough)
                 .AddWithCustomValue(ItemID.NightOwlPotion, Item.buyPrice(silver: 25), potionSells, Condition.HappyEnough)
-                .AddWithCustomValue(ModContent.ItemType<SlickCane>(), Item.buyPrice(gold: 25), Condition.Hardmode)
+                .AddWithCustomValue(ModContent.ItemType<SlickCane>(), Item.buyPrice(gold: 25))
                 .Add(ModContent.ItemType<ThiefsDime>(), Condition.DownedPirates)
                 .AddWithCustomValue(ModContent.ItemType<MomentumCapacitor>(), Item.buyPrice(gold: 60), Condition.DownedMechBossAll)
                 .Add(ModContent.ItemType<DeepWounder>(), downedCalclone)

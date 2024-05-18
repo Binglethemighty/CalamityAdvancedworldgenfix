@@ -2,7 +2,6 @@
 using CalamityMod.Particles;
 using Microsoft.Xna.Framework;
 using Terraria;
-using Terraria.DataStructures;
 using Terraria.ModLoader;
 using static CalamityMod.Items.Weapons.Summon.LiliesOfFinality;
 
@@ -38,6 +37,8 @@ namespace CalamityMod.Projectiles.Summon
 
         public override void AI()
         {
+            Ariane ??= Main.projectile[(int)ArianeID];
+
             if (Ariane != null && Ariane.active && Ariane.owner == Projectile.owner && Ariane.type == ModContent.ProjectileType<LiliesOfFinalityAriane>() && Ariane.ModProjectile<LiliesOfFinalityAriane>().State == LiliesOfFinalityAriane.AIState.Attack)
                 Projectile.timeLeft = 2;
 
@@ -99,8 +100,6 @@ namespace CalamityMod.Projectiles.Summon
 
             Timer++;
         }
-
-        public override void OnSpawn(IEntitySource source) => Ariane = Main.projectile[(int)ArianeID];
 
         public override void ModifyHitNPC(NPC target, ref NPC.HitModifiers modifiers) => modifiers.SourceDamage *= Ariane_AoEDMGMultiplier;
     }

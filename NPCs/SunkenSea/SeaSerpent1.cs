@@ -84,15 +84,14 @@ namespace CalamityMod.NPCs.SunkenSea
                 }
             }
 
-            Lighting.AddLight(NPC.Center, (255 - NPC.alpha) * 0f / 255f, (255 - NPC.alpha) * 0.30f / 255f, (255 - NPC.alpha) * 0.30f / 255f);
+            Lighting.AddLight(NPC.Center, 0f, (255 - NPC.alpha) * 0.3f / 255f, (255 - NPC.alpha) * 0.3f / 255f);
+
             if (NPC.ai[2] > 0f)
-            {
                 NPC.realLife = (int)NPC.ai[2];
-            }
+
             if (NPC.target < 0 || NPC.target == Main.maxPlayers || Main.player[NPC.target].dead)
-            {
                 NPC.TargetClosest(true);
-            }
+
             if (Main.netMode != NetmodeID.MultiplayerClient)
             {
                 if (!TailSpawned && NPC.ai[0] == 0f)
@@ -102,21 +101,14 @@ namespace CalamityMod.NPCs.SunkenSea
                     {
                         int lol = 0;
                         if (segment == 0 || segment == 1 || segment == 4 || segment == 5)
-                        {
                             lol = NPC.NewNPC(NPC.GetSource_FromAI(), (int)NPC.position.X + (NPC.width / 2), (int)NPC.position.Y + (NPC.height / 2), ModContent.NPCType<SeaSerpent2>(), NPC.whoAmI);
-                        }
                         else if (segment == 2 || segment == 3 || segment == 6)
-                        {
                             lol = NPC.NewNPC(NPC.GetSource_FromAI(), (int)NPC.position.X + (NPC.width / 2), (int)NPC.position.Y + (NPC.height / 2), ModContent.NPCType<SeaSerpent3>(), NPC.whoAmI);
-                        }
                         else if (segment == 7)
-                        {
                             lol = NPC.NewNPC(NPC.GetSource_FromAI(), (int)NPC.position.X + (NPC.width / 2), (int)NPC.position.Y + (NPC.height / 2), ModContent.NPCType<SeaSerpent4>(), NPC.whoAmI);
-                        }
                         else if (segment == 8)
-                        {
                             lol = NPC.NewNPC(NPC.GetSource_FromAI(), (int)NPC.position.X + (NPC.width / 2), (int)NPC.position.Y + (NPC.height / 2), ModContent.NPCType<SeaSerpent5>(), NPC.whoAmI);
-                        }
+
                         Main.npc[lol].realLife = NPC.whoAmI;
                         Main.npc[lol].ai[2] = (float)NPC.whoAmI;
                         Main.npc[lol].ai[1] = (float)Previous;
@@ -124,30 +116,30 @@ namespace CalamityMod.NPCs.SunkenSea
                         NetMessage.SendData(MessageID.SyncNPC, -1, -1, null, lol, 0f, 0f, 0f, 0);
                         Previous = lol;
                     }
+
                     TailSpawned = true;
                 }
             }
+
             if (NPC.velocity.X < 0f)
-            {
                 NPC.spriteDirection = -1;
-            }
             else if (NPC.velocity.X > 0f)
-            {
                 NPC.spriteDirection = 1;
-            }
+
             if (Main.player[NPC.target].dead)
-            {
                 NPC.TargetClosest(false);
-            }
+
             NPC.alpha -= 42;
             if (NPC.alpha < 0)
-            {
                 NPC.alpha = 0;
-            }
+
             if (Vector2.Distance(Main.player[NPC.target].Center, NPC.Center) > 5600f)
             {
-                NPC.active = false;
+                NPC.TargetClosest(false);
+                if (Vector2.Distance(Main.player[NPC.target].Center, NPC.Center) > 5600f)
+                    NPC.active = false;
             }
+
             float currentSpeed = speed;
             float currentTurnSpeed = turnSpeed;
             Vector2 segmentPosition = new Vector2(NPC.position.X + (float)NPC.width * 0.5f, NPC.position.Y + (float)NPC.height * 0.5f);

@@ -39,13 +39,21 @@ namespace CalamityMod.Items.Weapons.Ranged
         }
 
         public override Vector2? HoldoutOffset() => new Vector2(-10, 0);
+
         public override bool CanUseItem(Player player) => player.ownedProjectileCounts[Item.shoot] <= 0;
+
+        public override void HoldItem(Player player) => player.Calamity().mouseWorldListener = true;
 
         // Spawning the holdout cannot consume ammo
         public override bool CanConsumeAmmo(Item ammo, Player player) => player.ownedProjectileCounts[Item.shoot] > 0;
+
         public override bool Shoot(Player player, EntitySource_ItemUse_WithAmmo source, Vector2 position, Vector2 velocity, int type, int damage, float knockback)
         {
-            Projectile.NewProjectile(source, position, Vector2.Zero, type, 0, 0f, player.whoAmI);
+            Projectile holdout = Projectile.NewProjectileDirect(source, position, Vector2.Zero, ModContent.ProjectileType<WildfireBloomHoldout>(), 0, 0f, player.whoAmI);
+
+            // We set the rotation to the direction to the mouse so the first frame doesn't appear bugged out.
+            holdout.velocity = (player.Calamity().mouseWorld - player.MountedCenter).SafeNormalize(Vector2.Zero);
+
             return false;
         }
 

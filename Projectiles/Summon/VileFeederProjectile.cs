@@ -90,9 +90,8 @@ namespace CalamityMod.Projectiles.Summon
                 }
                 if (!canAttack)
                 {
-                    for (int j = 0; j < Main.maxNPCs; j++)
+                    foreach (NPC npc in Main.ActiveNPCs)
                     {
-                        NPC npc = Main.npc[j];
                         if (npc.CanBeChasedBy(Projectile, false))
                         {
                             float npcX = npc.position.X + (float)(npc.width / 2);

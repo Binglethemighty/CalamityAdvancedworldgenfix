@@ -25,7 +25,7 @@ namespace CalamityMod.Projectiles.Typeless
             Projectile.friendly = true;
             Projectile.ignoreWater = true;
             Projectile.tileCollide = false;
-            Projectile.penetrate = -1;
+            Projectile.penetrate = 3;
             Projectile.timeLeft = 300;
             Projectile.localNPCHitCooldown = -1;
             Projectile.usesLocalNPCImmunity = true;

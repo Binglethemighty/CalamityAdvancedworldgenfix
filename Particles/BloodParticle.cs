@@ -2,6 +2,7 @@
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Terraria;
+using Terraria.GameContent;
 using Terraria.ModLoader;
 
 namespace CalamityMod.Particles
@@ -31,6 +32,11 @@ namespace CalamityMod.Particles
             Velocity.Y = MathHelper.Clamp(Velocity.Y + 0.9f, -22f, 22f);
             Color = Color.Lerp(InitialColor, Color.Transparent, (float)Math.Pow(LifetimeCompletion, 3D));
             Rotation = Velocity.ToRotation() + MathHelper.PiOver2;
+            // Cycle through disco colors if blood and gore is off
+            if (!ChildSafety.Disabled)
+            {
+                Color = Main.DiscoColor;
+            }
         }
 
         public override void CustomDraw(SpriteBatch spriteBatch)

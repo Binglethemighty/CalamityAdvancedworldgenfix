@@ -7,12 +7,14 @@ using CalamityMod.Items.Materials;
 using CalamityMod.Items.TreasureBags.MiscGrabBags;
 using CalamityMod.NPCs.AcidRain;
 using CalamityMod.NPCs.NormalNPCs;
+using CalamityMod.Walls;
 using Microsoft.Xna.Framework;
 using Mono.Cecil.Cil;
 using MonoMod.Cil;
 using Terraria;
 using Terraria.DataStructures;
 using Terraria.ID;
+using Terraria.Map;
 using Terraria.ModLoader;
 
 namespace CalamityMod.ILEditing
@@ -269,7 +271,7 @@ namespace CalamityMod.ILEditing
 
             // Sync the color changes.
             if (colorWasChanged)
-                NetMessage.SendData(MessageID.ItemTweaker, -1, -1, null, itemID, 1f);
+                NetMessage.SendData(MessageID.ItemTweaker, -1, -1, null, itemIndex, 1f);
         }
         #endregion Color Blighted Gel
 
@@ -896,6 +898,63 @@ namespace CalamityMod.ILEditing
                         NetMessage.SendData(MessageID.SyncItem, -1, -1, null, number, 1f);
                 }
             }
+        }
+        #endregion
+
+        #region Render Special Map Colors
+        private static void UseVisibleThroughWaterMapTile(ILContext il)
+        {
+            var c = new ILCursor(il);
+
+            if (!c.TryGotoNext(x => x.MatchCall<Tilemap>("get_Item")))
+            {
+                LogFailure("Use VisibleThroughWater Map Tile", "Could not locate call to Terraria.Map.TileMap::get_Item.");
+                return;
+            }
+            
+            int tileIndex = -1;
+            if (!c.TryGotoNext(x => x.MatchStloc(out tileIndex)) || tileIndex == -1)
+            {
+                LogFailure("Use VisibleThroughWater Map Tile", "Could not determine the local variable index tile is pushed to.");
+                return;
+            }
+
+            if (!c.TryGotoNext(x => x.MatchCall<Tile>("liquidType")))
+            {
+                LogFailure("Use VisibleThroughWater Map Tile", "Could not locate call to Terraria.Tile::liquidType.");
+                return;
+            }
+
+            int liquidTypeIndex = -1;
+            if (!c.TryGotoNext(x => x.MatchStloc(out liquidTypeIndex)) || liquidTypeIndex == -1)
+            {
+                LogFailure("Use VisibleThroughWater Map Tile", "Could not determine the local variable index liquidType is pushed to.");
+                return;
+            }
+
+            int relativeMapTypeIndex = -1;
+            if (!c.TryGotoNext(MoveType.After, x => x.MatchStloc(out relativeMapTypeIndex)) || relativeMapTypeIndex == -1)
+            {
+                LogFailure("Use VisibleThroughWater Map Tile", "Could not determine the local variable index of the relative map type.");
+                return;
+            }
+
+            c.Emit(OpCodes.Ldloc_0);
+            c.Emit(OpCodes.Ldloc, relativeMapTypeIndex);
+            c.Emit(OpCodes.Ldloc, liquidTypeIndex);
+            c.EmitDelegate(
+                (Tile tile, int relativeMapType, int liquidType) =>
+                {
+                    if (liquidType != LiquidID.Water)
+                        return relativeMapType;
+
+                    if (WallLoader.GetWall(tile.WallType) is IVisibleThroughWater visibleThroughWater)
+                        return visibleThroughWater.WaterMapEntry;
+
+                    return relativeMapType;
+                }
+            );
+            c.Emit(OpCodes.Stloc, relativeMapTypeIndex);
         }
         #endregion
     }

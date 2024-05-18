@@ -50,9 +50,9 @@ namespace CalamityMod.Projectiles.Summon
             if (Main.rand.NextBool(15))
             {
                 int mineAmt = 0;
-                for (int i = 0; i < Main.maxProjectiles; i++)
+                foreach (Projectile p in Main.ActiveProjectiles)
                 {
-                    if (Main.projectile[i].active && Main.projectile[i].owner == Main.myPlayer && Main.projectile[i].type == ModContent.ProjectileType<Dreadmine>())
+                    if (p.owner == Main.myPlayer && p.type == ModContent.ProjectileType<Dreadmine>())
                     {
                         mineAmt++;
                     }

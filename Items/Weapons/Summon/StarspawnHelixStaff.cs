@@ -42,13 +42,13 @@ namespace CalamityMod.Items.Weapons.Summon
                 }
 
                 int bladeIndex = 0;
-                for (int i = 0; i < Main.maxProjectiles; i++)
+                foreach (Projectile pro in Main.ActiveProjectiles)
                 {
-                    if (Main.projectile[i].type == type && Main.projectile[i].active && Main.projectile[i].owner == player.whoAmI)
+                    if (pro.type == type && pro.owner == player.whoAmI)
                     {
-                        Main.projectile[i].ModProjectile<AstralProbeSummon>().ProbeIndex = bladeIndex++;
-                        Main.projectile[i].ModProjectile<AstralProbeSummon>().AITimer = 0f;
-                        Main.projectile[i].netUpdate = true;
+                        pro.ModProjectile<AstralProbeSummon>().ProbeIndex = bladeIndex++;
+                        pro.ModProjectile<AstralProbeSummon>().AITimer = 0f;
+                        pro.netUpdate = true;
                     }
                 }
             }

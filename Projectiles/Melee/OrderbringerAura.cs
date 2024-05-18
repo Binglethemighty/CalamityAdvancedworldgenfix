@@ -52,15 +52,15 @@ namespace CalamityMod.Projectiles.Melee
                 int incTracker = 0;
                 float aiTracker = 0f;
                 int theProjectile = Projectile.type;
-                for (int i = 0; i < 1000; i++)
+                foreach (Projectile p in Main.ActiveProjectiles)
                 {
-                    if (Main.projectile[i].active && Main.projectile[i].owner == Projectile.owner && Main.projectile[i].type == theProjectile && Main.projectile[i].ai[1] < 3600f)
+                    if (p.owner == Projectile.owner && p.type == theProjectile && p.ai[1] < 3600f)
                     {
                         projTimer++;
-                        if (Main.projectile[i].ai[1] > aiTracker)
+                        if (p.ai[1] > aiTracker)
                         {
-                            incTracker = i;
-                            aiTracker = Main.projectile[i].ai[1];
+                            incTracker = p.whoAmI;
+                            aiTracker = p.ai[1];
                         }
                     }
                 }

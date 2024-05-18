@@ -9,13 +9,13 @@ using Terraria.Audio;
 using Terraria.ID;
 using Terraria.ModLoader;
 
-namespace CalamityMod.Projectiles.Melee
+namespace CalamityMod.Projectiles.Magic
 {
     public class ChronomancersScytheHoldout : ModProjectile, ILocalizedModType
     {
-        public new string LocalizationCategory => "Projectiles.Melee";
+        public new string LocalizationCategory => "Projectiles.Magic";
         public Player Owner => Main.player[Projectile.owner];
-        public override string Texture => "CalamityMod/Items/Weapons/Melee/ChronomancersScythe";
+        public override string Texture => "CalamityMod/Items/Weapons/Magic/ChronomancersScythe";
         public static int ClockChance = 30;
 
         public override void SetDefaults()
@@ -23,7 +23,7 @@ namespace CalamityMod.Projectiles.Melee
             Projectile.width = 60;
             Projectile.height = 60;
             Projectile.friendly = true;
-            Projectile.DamageType = DamageClass.MeleeNoSpeed;
+            Projectile.DamageType = DamageClass.Magic;
             Projectile.ignoreWater = true;
             Projectile.tileCollide = false;
             Projectile.penetrate = -1;

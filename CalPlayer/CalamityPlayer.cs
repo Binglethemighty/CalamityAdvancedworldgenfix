@@ -190,6 +190,7 @@ namespace CalamityMod.CalPlayer
         public int PHAThammer = 0;
         public int StellarHammer = 0;
         public int GalaxyHammer = 0;
+        public int NorfleetCounter = 0;
         public int hideOfDeusMeleeBoostTimer = 0;
         public int alcoholPoisonLevel = 0;
         public int modStealthTimer;
@@ -574,10 +575,13 @@ namespace CalamityMod.CalPlayer
         public bool bloodPactBoost = false;
         public bool bloodflareCore = false;
         public int bloodflareCoreRemainingHealOverTime = 0;
+
         public bool chaliceOfTheBloodGod = false;
         public double chaliceBleedoutBuffer = 0D;
         public double chaliceDamagePointPartialProgress = 0D;
+        public int chaliceBleedoutToApplyOnHurt = 0;
         public int chaliceHitOriginalDamage = 0;
+
         public bool elementalHeart = false;
         public bool crownJewel = false;
         public bool infectedJewel = false;
@@ -593,6 +597,8 @@ namespace CalamityMod.CalPlayer
         public bool anechoicPlating = false;
         public bool jellyfishNecklace = false;
         public bool fairyBoots = false;
+        public bool flameWakerBoots = false;
+        public int bootLevel = 0; //Used to prevent Flame Waker and Hellfire Treads stacking
         public bool hellfireTreads = false;
         public bool abyssalAmulet = false;
         public bool lumenousAmulet = false;
@@ -1086,10 +1092,7 @@ namespace CalamityMod.CalPlayer
 
         #region Biome
         public bool ZoneCalamity => Player.InModBiome(ModContent.GetInstance<BrimstoneCragsBiome>());
-        public bool ZoneAstral => (Player.InModBiome(ModContent.GetInstance<AbovegroundAstralBiome>()) ||
-            Player.InModBiome(ModContent.GetInstance<AbovegroundAstralSnowBiome>()) ||
-            Player.InModBiome(ModContent.GetInstance<AbovegroundAstralDesertBiome>()) ||
-            Player.InModBiome(ModContent.GetInstance<UndergroundAstralBiome>())) && !ZoneAbyss;
+        public bool ZoneAstral => Player.InModBiome(ModContent.GetInstance<BiomeManagers.AstralInfectionBiome>()) && !ZoneAbyss;
         public bool ZoneSunkenSea => Player.InModBiome(ModContent.GetInstance<SunkenSeaBiome>());
         public bool ZoneSulphur => Player.InModBiome(ModContent.GetInstance<SulphurousSeaBiome>());
         public bool ZoneAbyss => ZoneAbyssLayer1 || ZoneAbyssLayer2 || ZoneAbyssLayer3 || ZoneAbyssLayer4;
@@ -1721,6 +1724,7 @@ namespace CalamityMod.CalPlayer
             bloodPact = false;
             bloodflareCore = false;
             chaliceOfTheBloodGod = false;
+            chaliceBleedoutToApplyOnHurt = 0; // Resets every frame so it doesn't improperly carry over between hits
             elementalHeart = false;
             crownJewel = false;
             infectedJewel = false;
@@ -1815,6 +1819,7 @@ namespace CalamityMod.CalPlayer
             anechoicPlating = false;
             jellyfishNecklace = false;
             fairyBoots = false;
+            flameWakerBoots = false;
             hellfireTreads = false;
             abyssalAmulet = false;
             lumenousAmulet = false;
@@ -2146,11 +2151,13 @@ namespace CalamityMod.CalPlayer
             StellarTorus = false;
             LiliesOfFinalityBool = false;
 
+            /*
             disableVoodooSpawns = false;
             disablePerfCystSpawns = false;
             disableHiveCystSpawns = false;
             disableNaturalScourgeSpawns = false;
             disableAnahitaSpawns = false;
+            */
 
             abyssalDivingSuitPrevious = abyssalDivingSuit;
             abyssalDivingSuit = abyssalDivingSuitHide = abyssalDivingSuitForce = abyssalDivingSuitPower = false;
@@ -2972,10 +2979,9 @@ namespace CalamityMod.CalPlayer
                     }
                     if (Main.netMode != NetmodeID.MultiplayerClient)
                     {
-                        for (int l = 0; l < Main.maxNPCs; l++)
+                        foreach (NPC npc in Main.ActiveNPCs)
                         {
-                            NPC npc = Main.npc[l];
-                            if (npc.active && !npc.friendly && !npc.dontTakeDamage && Vector2.Distance(Player.Center, npc.Center) <= 3000f)
+                            if (!npc.friendly && !npc.dontTakeDamage && Vector2.Distance(Player.Center, npc.Center) <= 3000f)
                                 npc.AddBuff(ModContent.BuffType<Enraged>(), 600, false);
                         }
                     }
@@ -4762,22 +4768,22 @@ namespace CalamityMod.CalPlayer
             {
                 int spearsFired = 0;
 
-                for (int i = 0; i < Main.projectile.Length; i++)
+                foreach (Projectile p in Main.ActiveProjectiles)
                 {
                     if (spearsFired == 2)
                         break;
-                    if (Main.projectile[i].owner == Player.whoAmI && Main.projectile[i].friendly)
+                    if (p.owner == Player.whoAmI && p.friendly)
                     {
-                        bool attack = Main.projectile[i].owner == Player.whoAmI && Main.projectile[i].type == ModContent.ProjectileType<MiniGuardianAttack>();
+                        bool attack = p.type == ModContent.ProjectileType<MiniGuardianAttack>();
                         if (attack)
                         {
                             int numSpears = profanedCrystalBuffs ? 12 : 6;
-                            int dam = (int)(Main.projectile[i].originalDamage * (profanedCrystalBuffs ? 1f : 0.25f));
+                            int dam = (int)(p.originalDamage * (profanedCrystalBuffs ? 1f : 0.25f));
 
                             for (int x = 0; x < numSpears; x++)
                             {
                                 float angle = MathHelper.TwoPi / numSpears * x;
-                                int proj = Projectile.NewProjectile(source, Main.projectile[i].Center, angle.ToRotationVector2().RotatedBy(Math.Atan(-45f)) * 8f, ModContent.ProjectileType<MiniGuardianSpear>(), dam, 0f, Player.whoAmI, pscState, 0f);
+                                int proj = Projectile.NewProjectile(source, p.Center, angle.ToRotationVector2().RotatedBy(Math.Atan(-45f)) * 8f, ModContent.ProjectileType<MiniGuardianSpear>(), dam, 0f, Player.whoAmI, pscState, 0f);
                                 Main.projectile[proj].originalDamage = dam;
                             }
                             spearsFired++;

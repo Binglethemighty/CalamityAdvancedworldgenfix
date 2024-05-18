@@ -53,11 +53,10 @@ namespace CalamityMod.Projectiles.Summon
             Player player = Main.player[Projectile.owner];
             CalamityPlayer modPlayer = player.Calamity();
 
-            for (int j = 0; j < Main.maxProjectiles; j++)
+            foreach (Projectile proj in Main.ActiveProjectiles)
             {
-                Projectile proj = Main.projectile[j];
                 // Short circuits to make the loop as fast as possible
-                if (!proj.active || proj.owner != Projectile.owner || !proj.minion || proj.Calamity().lineColor != 1)
+                if (proj.owner != Projectile.owner || !proj.minion || proj.Calamity().lineColor != 1)
                     continue;
                 if (proj.type == Projectile.type)
                 {

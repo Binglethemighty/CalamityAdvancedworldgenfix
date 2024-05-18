@@ -101,11 +101,9 @@ namespace CalamityMod.Projectiles.Summon
             Projectile.Center = Vector2.Lerp(Projectile.Center, MainMinion.Center + DesiredLocation, interpolant);
             Projectile.rotation = (Projectile.Center - MainMinion.Center).ToRotation();
 
-            for (int i = 0; i < Main.maxProjectiles; i++)
+            foreach (Projectile proj in Main.ActiveProjectiles)
             {
-                Projectile proj = Main.projectile[i];
-
-                if (proj is null || !proj.active || proj.owner != Owner.whoAmI || proj.type != ModContent.ProjectileType<PlantationStaffSummon>() || proj.ModProjectile<PlantationStaffSummon>().State == PlantationStaffSummon.AIState.Ramming)
+                if (proj.owner != Owner.whoAmI || proj.type != ModContent.ProjectileType<PlantationStaffSummon>() || proj.ModProjectile<PlantationStaffSummon>().State == PlantationStaffSummon.AIState.Ramming)
                     continue;
 
                 State = AIState.Seeking;

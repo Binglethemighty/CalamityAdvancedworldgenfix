@@ -232,15 +232,7 @@ namespace CalamityMod.Skies
             if (SCalIndex >= 0 && Main.npc[SCalIndex].active && Main.npc[SCalIndex].type == SCalType)
                 return true;
 
-            SCalIndex = -1;
-            for (int i = 0; i < Main.npc.Length; i++)
-            {
-                if (Main.npc[i].active && Main.npc[i].type == SCalType)
-                {
-                    SCalIndex = i;
-                    break;
-                }
-            }
+            SCalIndex = NPC.FindFirstNPC(SCalType);
 
             return SCalIndex != -1;
         }

@@ -100,7 +100,7 @@ namespace CalamityMod.Projectiles.Ranged
             if (player.moonLeech)
                 return;
 
-            if (Main.player[Main.myPlayer].lifeSteal <= 0f || target.lifeMax <= 5)
+            if (target.lifeMax <= 5)
                 return;
 
             float lifeRatio = (float)player.statLife / player.statLifeMax2;

@@ -609,16 +609,16 @@ namespace CalamityMod.NPCs.PrimordialWyrm
                                 int numProjectiles = 0;
                                 float maxDistance = 2400f;
 
-                                for (int i = 0; i < Main.maxPlayers; i++)
+                                foreach (Player plr in Main.ActivePlayers)
                                 {
-                                    if (!Main.player[i].active || Main.player[i].dead)
+                                    if (plr.dead)
                                         continue;
 
-                                    Vector2 playerCenter = Main.player[i].Center;
+                                    Vector2 playerCenter = plr.Center;
                                     float distance = Vector2.Distance(playerCenter, NPC.Center);
                                     if (distance < maxDistance)
                                     {
-                                        whoAmIArray[numProjectiles] = i;
+                                        whoAmIArray[numProjectiles] = plr.whoAmI;
                                         targetCenterArray[numProjectiles] = playerCenter;
                                         int projectileLimit = numProjectiles + 1;
                                         numProjectiles = projectileLimit;
@@ -904,16 +904,16 @@ namespace CalamityMod.NPCs.PrimordialWyrm
                             int numProjectiles = 0;
                             float maxDistance = 2400f;
 
-                            for (int i = 0; i < Main.maxPlayers; i++)
+                            foreach (Player plr in Main.ActivePlayers)
                             {
-                                if (!Main.player[i].active || Main.player[i].dead)
+                                if (plr.dead)
                                     continue;
 
-                                Vector2 playerCenter = Main.player[i].Center;
+                                Vector2 playerCenter = plr.Center;
                                 float distance = Vector2.Distance(playerCenter, NPC.Center);
                                 if (distance < maxDistance)
                                 {
-                                    whoAmIArray[numProjectiles] = i;
+                                    whoAmIArray[numProjectiles] = plr.whoAmI;
                                     targetCenterArray[numProjectiles] = playerCenter;
                                     int projectileLimit = numProjectiles + 1;
                                     numProjectiles = projectileLimit;

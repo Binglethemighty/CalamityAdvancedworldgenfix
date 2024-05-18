@@ -58,13 +58,12 @@ namespace CalamityMod.Items.Accessories
                     if (auraCounter == 9)
                     {
                         auraCounter = 0;
-                        for (int i = 0; i < Main.maxNPCs; i++)
+                        foreach (NPC npc in Main.ActiveNPCs)
                         {
-                            NPC npc = Main.npc[i];
                             if (npc.IsAnEnemy() && !npc.dontTakeDamage && Vector2.Distance(player.Center, npc.Center) <= range)
                             {
                                 int campingFireDamage = (int)player.GetBestClassDamage().ApplyTo(Main.rand.Next(20, 41));
-                                Projectile.NewProjectileDirect(source, npc.Center, Vector2.Zero, ModContent.ProjectileType<DirectStrike>(), campingFireDamage, 0f, player.whoAmI, i);
+                                Projectile.NewProjectileDirect(source, npc.Center, Vector2.Zero, ModContent.ProjectileType<DirectStrike>(), campingFireDamage, 0f, player.whoAmI, npc.whoAmI);
                             }
                         }
                     }

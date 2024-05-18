@@ -1169,11 +1169,11 @@ PrepareToShoot:
                     int nailCount = Main.rand.Next(3, 6);
                     int[] players = new int[nailCount];
                     int i = 0;
-                    for (int j = 0; j < Main.player.Length; j++)
+                    foreach (Player plr in Main.ActivePlayers)
                     {
-                        if (Main.player[j].active && !Main.player[j].dead && Collision.CanHitLine(npc.position, npc.width, npc.height, Main.player[j].position, Main.player[j].width, Main.player[j].height))
+                        if (!plr.dead && Collision.CanHitLine(npc.position, npc.width, npc.height, plr.position, plr.width, plr.height))
                         {
-                            players[i] = j;
+                            players[i] = plr.whoAmI;
                             i++;
                             if (i == nailCount)
                             {
@@ -1975,9 +1975,9 @@ PrepareToShoot:
             {
                 npc.hide = false;
                 // I'd assume the Drakomire is drawn by the rider if it's present
-                for (int i = 0; i < Main.npc.Length; i++)
+                foreach (NPC n in Main.ActiveNPCs)
                 {
-                    if (Main.npc[i].active && Main.npc[i].type == NPCID.SolarDrakomireRider && Main.npc[i].ai[0] == (float)npc.whoAmI)
+                    if (n.type == NPCID.SolarDrakomireRider && n.ai[0] == (float)npc.whoAmI)
                     {
                         npc.hide = true;
                         break;
@@ -2077,11 +2077,11 @@ PrepareToShoot:
                         dust.customData = npc;
                     }
                     // Adjust velocity based on the other storm drivers who want to pump your face full of bullets
-                    for (int i = 0; i < Main.npc.Length; i++)
+                    foreach (NPC n in Main.ActiveNPCs)
                     {
-                        if (i != npc.whoAmI && Main.npc[i].active && Main.npc[i].type == npcType && Math.Abs(npc.position.X - Main.npc[i].position.X) + Math.Abs(npc.position.Y - Main.npc[i].position.Y) < (float)npc.width)
+                        if (n.whoAmI != npc.whoAmI && n.type == npcType && Math.Abs(npc.position.X - n.position.X) + Math.Abs(npc.position.Y - n.position.Y) < (float)npc.width)
                         {
-                            if (npc.position.X < Main.npc[i].position.X)
+                            if (npc.position.X < n.position.X)
                             {
                                 npc.velocity.X -= 0.05f;
                             }
@@ -2089,7 +2089,7 @@ PrepareToShoot:
                             {
                                 npc.velocity.X += 0.05f;
                             }
-                            if (npc.position.Y < Main.npc[i].position.Y)
+                            if (npc.position.Y < n.position.Y)
                             {
                                 npc.velocity.Y -= 0.05f;
                             }
@@ -2184,11 +2184,11 @@ PrepareToShoot:
                             npc.velocity.Y += 0.25f;
                         }
                     }
-                    for (int i = 0; i < Main.npc.Length; i++)
+                    foreach (NPC n in Main.ActiveNPCs)
                     {
-                        if (i != npc.whoAmI && Main.npc[i].active && Main.npc[i].type == npcType && Math.Abs(npc.position.X - Main.npc[i].position.X) + Math.Abs(npc.position.Y - Main.npc[i].position.Y) < (float)npc.width)
+                        if (n.whoAmI != npc.whoAmI && n.type == npcType && Math.Abs(npc.position.X - n.position.X) + Math.Abs(npc.position.Y - n.position.Y) < (float)npc.width)
                         {
-                            if (npc.position.X < Main.npc[i].position.X)
+                            if (npc.position.X < n.position.X)
                             {
                                 npc.velocity.X -= 0.05f;
                             }
@@ -2196,7 +2196,7 @@ PrepareToShoot:
                             {
                                 npc.velocity.X += 0.05f;
                             }
-                            if (npc.position.Y < Main.npc[i].position.Y)
+                            if (npc.position.Y < n.position.Y)
                             {
                                 npc.velocity.Y -= 0.05f;
                             }
@@ -2260,11 +2260,11 @@ PrepareToShoot:
                 {
                     npc.velocity.Y = -8f;
                 }
-                for (int i = 0; i < Main.npc.Length; i++)
+                foreach (NPC n in Main.ActiveNPCs)
                 {
-                    if (i != npc.whoAmI && Main.npc[i].active && Main.npc[i].type == npcType && Math.Abs(npc.position.X - Main.npc[i].position.X) + Math.Abs(npc.position.Y - Main.npc[i].position.Y) < (float)npc.width)
+                    if (n.whoAmI != npc.whoAmI && n.type == npcType && Math.Abs(npc.position.X - n.position.X) + Math.Abs(npc.position.Y - n.position.Y) < (float)npc.width)
                     {
-                        if (npc.position.X < Main.npc[i].position.X)
+                        if (npc.position.X < n.position.X)
                         {
                             npc.velocity.X -= 0.1f;
                         }
@@ -2272,7 +2272,7 @@ PrepareToShoot:
                         {
                             npc.velocity.X += 0.1f;
                         }
-                        if (npc.position.Y < Main.npc[i].position.Y)
+                        if (npc.position.Y < n.position.Y)
                         {
                             npc.velocity.Y -= 0.1f;
                         }
@@ -7592,11 +7592,11 @@ PrepareToShoot:
             {
                 turnAroundDelayMult = 3;
                 bool noYVelocity = npc.velocity.Y == 0f;
-                for (int i = 0; i < Main.maxNPCs; i++)
+                foreach (NPC n in Main.ActiveNPCs)
                 {
-                    if (i != npc.whoAmI && Main.npc[i].active && Main.npc[i].type == npc.type && Math.Abs(npc.position.X - Main.npc[i].position.X) + Math.Abs(npc.position.Y - Main.npc[i].position.Y) < (float)npc.width)
+                    if (n.whoAmI != npc.whoAmI && n.type == npc.type && Math.Abs(npc.position.X - n.position.X) + Math.Abs(npc.position.Y - n.position.Y) < (float)npc.width)
                     {
-                        if (npc.position.X < Main.npc[i].position.X)
+                        if (npc.position.X < n.position.X)
                         {
                             npc.velocity.X -= 0.05f;
                         }
@@ -7604,7 +7604,7 @@ PrepareToShoot:
                         {
                             npc.velocity.X += 0.05f;
                         }
-                        if (npc.position.Y < Main.npc[i].position.Y)
+                        if (npc.position.Y < n.position.Y)
                         {
                             npc.velocity.Y -= 0.05f;
                         }
@@ -7661,9 +7661,9 @@ PrepareToShoot:
                 bool spawnTwinkle = npc.ai[1] >= (CalamityWorld.death ? 60f : 120f);
                 if (!spawnTwinkle && npc.velocity.Y == 0f)
                 {
-                    for (int j = 0; j < Main.maxPlayers; j++)
+                    foreach (Player plr in Main.ActivePlayers)
                     {
-                        if (Main.player[j].active && !Main.player[j].dead && Main.player[j].Distance(npc.Center) < 800f && Main.player[j].Center.Y < npc.Center.Y && Math.Abs(Main.player[j].Center.X - npc.Center.X) < 20f)
+                        if (!plr.dead && plr.Distance(npc.Center) < 800f && plr.Center.Y < npc.Center.Y && Math.Abs(plr.Center.X - npc.Center.X) < 20f)
                         {
                             spawnTwinkle = true;
                             break;
@@ -10704,19 +10704,19 @@ PrepareToShoot:
             npc.noTileCollide = true;
             npc.knockBackResist = 0f;
 
-            for (int i = 0; i < Main.maxNPCs; i++)
+            foreach (NPC n in Main.ActiveNPCs)
             {
-                if (i == npc.whoAmI || !Main.npc[i].active || Main.npc[i].type != npc.type)
+                if (n.whoAmI == npc.whoAmI || n.type != npc.type)
                     continue;
 
-                Vector2 targetDirection = Main.npc[i].Center - npc.Center;
+                Vector2 targetDirection = n.Center - npc.Center;
                 if (!(targetDirection.Length() < 50f))
                     continue;
 
                 targetDirection.Normalize();
                 if (targetDirection.X == 0f && targetDirection.Y == 0f)
                 {
-                    if (i > npc.whoAmI)
+                    if (n.whoAmI > npc.whoAmI)
                         targetDirection.X = 1f;
                     else
                         targetDirection.X = -1f;
@@ -10724,8 +10724,7 @@ PrepareToShoot:
 
                 targetDirection *= 0.4f;
                 npc.velocity -= targetDirection;
-                NPC nPC = Main.npc[i];
-                nPC.velocity += targetDirection;
+                n.velocity += targetDirection;
             }
 
             if (npc.type == NPCID.ShadowFlameApparition)

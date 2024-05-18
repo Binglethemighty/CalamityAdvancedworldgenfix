@@ -121,7 +121,7 @@ namespace CalamityMod.NPCs.DesertScourge
 
         public override void BossHeadSlot(ref int index)
         {
-            if (NPC.AnyNPCs(ModContent.NPCType<DesertNuisanceHead>()) || NPC.AnyNPCs(ModContent.NPCType<DesertNuisanceHeadYoung>()))
+            if ((NPC.AnyNPCs(ModContent.NPCType<DesertNuisanceHead>()) || NPC.AnyNPCs(ModContent.NPCType<DesertNuisanceHeadYoung>())) && !Main.masterMode)
                 index = -1;
         }
 
@@ -238,8 +238,8 @@ namespace CalamityMod.NPCs.DesertScourge
 
             float burrowDistance = hide ? BurrowDistance_Hide : bossRush ? BurrowDistance_BossRush : BurrowDistance;
 
-            float speed = death ? 0.18f : 0.15f;
-            float turnSpeed = death ? 0.36f : 0.3f;
+            float speed = death ? 0.15f : 0.12f;
+            float turnSpeed = death ? 0.3f : 0.24f;
 
             if (expertMode)
             {
@@ -249,12 +249,12 @@ namespace CalamityMod.NPCs.DesertScourge
 
             if (revenge)
             {
-                speed += (death ? 0.06f : 0.05f) * (1f - lifeRatio);
-                turnSpeed += (death ? 0.12f : 0.1f) * (1f - lifeRatio);
+                speed += (death ? 0.05f : 0.04f) * (1f - lifeRatio);
+                turnSpeed += (death ? 0.1f : 0.08f) * (1f - lifeRatio);
             }
 
-            speed += 0.15f * enrageScale;
-            turnSpeed += 0.3f * enrageScale;
+            speed += 0.12f * enrageScale;
+            turnSpeed += 0.24f * enrageScale;
 
             if (Main.getGoodWorld)
             {
@@ -528,21 +528,17 @@ namespace CalamityMod.NPCs.DesertScourge
                 {
                     int rectWidth = directChaseDistance * 2;
                     int rectHeight = directChaseDistance * 2;
-                    for (int m = 0; m < Main.maxPlayers; m++)
+                    foreach (Player plr in Main.ActivePlayers)
                     {
-                        if (Main.player[m].active)
+                        int rectX = (int)plr.position.X - directChaseDistance;
+                        int rectY = (int)plr.position.Y - directChaseDistance;
+                        Rectangle directChaseRect = new Rectangle(rectX, rectY, rectWidth, rectHeight);
+                        if (rectangle.Intersects(directChaseRect))
                         {
-                            int rectX = (int)Main.player[m].position.X - directChaseDistance;
-                            int rectY = (int)Main.player[m].position.Y - directChaseDistance;
-                            Rectangle directChaseRect = new Rectangle(rectX, rectY, rectWidth, rectHeight);
-                            if (rectangle.Intersects(directChaseRect))
-                            {
-                                shouldDirectlyChase = false;
-                                break;
-                            }
+                            shouldDirectlyChase = false;
+                            break;
                         }
                     }
-
                     if (shouldDirectlyChase)
                         shouldFly = true;
                 }

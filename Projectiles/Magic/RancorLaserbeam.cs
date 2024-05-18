@@ -21,12 +21,12 @@ namespace CalamityMod.Projectiles.Magic
         {
             get
             {
-                for (int i = 0; i < Main.maxProjectiles; i++)
+                foreach (Projectile p in Main.ActiveProjectiles)
                 {
-                    if (Main.projectile[i].identity != Projectile.ai[0] || !Main.projectile[i].active || Main.projectile[i].owner != Projectile.owner)
+                    if (p.identity != Projectile.ai[0] || p.owner != Projectile.owner)
                         continue;
 
-                    return Main.projectile[i];
+                    return p;
                 }
                 return null;
             }

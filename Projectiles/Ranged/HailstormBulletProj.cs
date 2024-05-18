@@ -88,7 +88,7 @@ namespace CalamityMod.Projectiles.Ranged
                     WaterFlavoredParticle subTrail = new WaterFlavoredParticle(Projectile.Center + velocity * 4.5f + addedPlacement, velocity * 7, false, 6, 0.65f, Color.SkyBlue);
                     GeneralParticleHandler.SpawnParticle(subTrail);
                 }
-                int onHitDamage = Owner.CalcIntDamage<RangedDamageClass>(0.48f * Projectile.damage);
+                int onHitDamage = Owner.CalcIntDamage<RangedDamageClass>(0.36f * Projectile.damage);
                 Owner.ApplyDamageToNPC(target, onHitDamage, 0f, 0, false);
             }
         }

@@ -1,4 +1,5 @@
-﻿using CalamityMod.CalPlayer;
+﻿using System.Collections.Generic;
+using CalamityMod.CalPlayer;
 using CalamityMod.Projectiles.Enemy;
 using CalamityMod.World;
 using Microsoft.Xna.Framework;
@@ -15,12 +16,9 @@ namespace CalamityMod.Tiles.Abyss
     // It would create block swap issues with regular sulphurous sand and was rendered obsolete with the removal of this tile's water emission mechanic.
     // For compatibility reasons (including with schematics), however, that tile is converted into this one.
     [LegacyName("SulphurousSandNoWater")]
-    public class SulphurousSand : ModTile
+    public class SulphurousSand : ModTile, IMergeableTile
     {
-        public byte[,] tileAdjacency;
-        public byte[,] secondTileAdjacency;
-        public byte[,] thirdTileAdjacency;
-        public byte[,] fourthTileAdjacency;
+        List<TileFraming.MergeFrameData> IMergeableTile.TileAdjacencies { get; } = [];
 
         public override void SetStaticDefaults()
         {
@@ -37,10 +35,10 @@ namespace CalamityMod.Tiles.Abyss
             AddMapEntry(new Color(150, 100, 50));
             HitSound = SoundID.Dig;
 
-            TileFraming.SetUpUniversalMerge(Type, TileID.Dirt, out tileAdjacency);
-            TileFraming.SetUpUniversalMerge(Type, TileID.Stone, out secondTileAdjacency);
-            TileFraming.SetUpUniversalMerge(Type, ModContent.TileType<SulphurousSandstone>(), out thirdTileAdjacency);
-            TileFraming.SetUpUniversalMerge(Type, TileID.Sand, out fourthTileAdjacency);
+            this.RegisterUniversalMerge(TileID.Dirt, "CalamityMod/Tiles/Merges/DirtMerge");
+            this.RegisterUniversalMerge(TileID.Stone, "CalamityMod/Tiles/Merges/StoneMerge");
+            this.RegisterUniversalMerge(ModContent.TileType<SulphurousSandstone>(), "CalamityMod/Tiles/Merges/SulphurousSandstoneMerge");
+            this.RegisterUniversalMerge(TileID.Sand, "CalamityMod/Tiles/Merges/SandMerge");
         }
 
         public override void NumDust(int i, int j, bool fail, ref int num)
@@ -174,24 +172,6 @@ namespace CalamityMod.Tiles.Abyss
                     }
                 }
             }
-        }
-
-        public override void PostDraw(int i, int j, SpriteBatch spriteBatch)
-        {
-
-            TileFraming.DrawUniversalMergeFrames(i, j, fourthTileAdjacency, "CalamityMod/Tiles/Merges/SandMerge");
-            TileFraming.DrawUniversalMergeFrames(i, j, thirdTileAdjacency, "CalamityMod/Tiles/Merges/SulphurousSandstoneMerge");
-            TileFraming.DrawUniversalMergeFrames(i, j, secondTileAdjacency, "CalamityMod/Tiles/Merges/StoneMerge");
-            TileFraming.DrawUniversalMergeFrames(i, j, tileAdjacency, "CalamityMod/Tiles/Merges/DirtMerge");
-        }
-
-        public override bool TileFrame(int i, int j, ref bool resetFrame, ref bool noBreak)
-        {
-            TileFraming.GetAdjacencyData(i, j, TileID.Dirt, out tileAdjacency[i, j]);
-            TileFraming.GetAdjacencyData(i, j, TileID.Stone, out secondTileAdjacency[i, j]);
-            TileFraming.GetAdjacencyData(i, j, ModContent.TileType<SulphurousSandstone>(), out thirdTileAdjacency[i, j]);
-            TileFraming.GetAdjacencyData(i, j, TileID.Sand, out fourthTileAdjacency[i, j]);
-            return true;
         }
     }
 }

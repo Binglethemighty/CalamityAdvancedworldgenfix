@@ -15,15 +15,15 @@ namespace CalamityMod.Projectiles.Magic
             get
             {
                 int spiritType = ModContent.ProjectileType<SpiritCongregation>();
-                for (int i = 0; i < Main.maxProjectiles; i++)
+                foreach (Projectile p in Main.ActiveProjectiles)
                 {
-                    if (Main.projectile[i].type != spiritType || Main.projectile[i].identity != Projectile.ai[0] ||
-                        Main.projectile[i].owner != Projectile.owner)
+                    if (p.type != spiritType || p.identity != Projectile.ai[0] ||
+                        p.owner != Projectile.owner)
                     {
                         continue;
                     }
 
-                    return Main.projectile[i];
+                    return p;
                 }
                 return null;
             }

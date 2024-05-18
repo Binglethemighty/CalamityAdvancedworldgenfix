@@ -1353,10 +1353,10 @@ namespace CalamityMod.NPCs.Providence
                     if (NPC.ai[3] % 60f == 0f && expertMode)
                     {
                         List<int> targets = new List<int>();
-                        for (int p = 0; p < Main.maxPlayers; p++)
+                        foreach (Player plr in Main.ActivePlayers)
                         {
-                            if (Main.player[p].active && !Main.player[p].dead)
-                                targets.Add(p);
+                            if (!plr.dead)
+                                targets.Add(plr.whoAmI);
 
                             if (targets.Count > 4)
                                 break;
@@ -1834,11 +1834,11 @@ namespace CalamityMod.NPCs.Providence
                 DespawnSpecificProjectiles();
 
                 int laserType = ModContent.ProjectileType<ProvidenceHolyRay>();
-                for (int i = 0; i < Main.maxProjectiles; i++)
+                foreach (Projectile p in Main.ActiveProjectiles)
                 {
-                    if (!Main.projectile[i].active || Main.projectile[i].type != laserType)
+                    if (p.type != laserType)
                         continue;
-                    Main.projectile[i].Kill();
+                    p.Kill();
                 }
             }
 

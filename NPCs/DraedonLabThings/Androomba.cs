@@ -87,9 +87,8 @@ namespace CalamityMod.NPCs.DraedonLabThings
                             NPC.ai[2] *= -1;
                         }
                         // If she sees someone, start running
-                        for (int i = 0; i < Main.maxPlayers; i++)
+                        foreach (Player player in Main.ActivePlayers)
                         {
-                            Player player = Main.player[i];
                             if (Collision.CanHit(NPC.position, NPC.width, NPC.height, player.position, player.width, player.height))
                             {
                                 ChangeAI(1);
@@ -152,12 +151,8 @@ namespace CalamityMod.NPCs.DraedonLabThings
                     break;
             }
 
-            for (int i = 0; i < Main.maxPlayers; i++)
+            foreach (Player player in Main.ActivePlayers)
             {
-                Player player = Main.player[i];
-                if (player is null || !player.active)
-                    continue;
-
                 if (NPC.Hitbox.Intersects(player.HitboxForBestiaryNearbyCheck))
                 {
                     Main.BestiaryTracker.Kills.RegisterKill(NPC);

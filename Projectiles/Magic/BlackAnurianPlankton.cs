@@ -57,14 +57,14 @@ namespace CalamityMod.Projectiles.Magic
             if (Projectile.ai[0] > 30f)
             {
                 Projectile.ai[0] = 30f;
-                for (int i = 0; i < Main.maxNPCs; i++)
+                foreach (NPC n in Main.ActiveNPCs)
                 {
-                    if (Main.npc[i].CanBeChasedBy(Projectile, false) && !Main.npc[i].wet)
+                    if (n.CanBeChasedBy(Projectile, false) && !n.wet)
                     {
-                        float npcX = Main.npc[i].position.X + (float)(Main.npc[i].width / 2);
-                        float npcY = Main.npc[i].position.Y + (float)(Main.npc[i].height / 2);
+                        float npcX = n.position.X + (float)(n.width / 2);
+                        float npcY = n.position.Y + (float)(n.height / 2);
                         float npcDist = Math.Abs(Projectile.position.X + (float)(Projectile.width / 2) - npcX) + Math.Abs(Projectile.position.Y + (float)(Projectile.height / 2) - npcY);
-                        if (npcDist < 800f && npcDist < homingRange && Collision.CanHit(Projectile.position, Projectile.width, Projectile.height, Main.npc[i].position, Main.npc[i].width, Main.npc[i].height))
+                        if (npcDist < 800f && npcDist < homingRange && Collision.CanHit(Projectile.position, Projectile.width, Projectile.height, n.position, n.width, n.height))
                         {
                             homingRange = npcDist;
                             projX = npcX;

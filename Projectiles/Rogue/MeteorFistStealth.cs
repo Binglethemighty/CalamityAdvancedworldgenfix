@@ -157,16 +157,15 @@ namespace CalamityMod.Projectiles.Rogue
             // Get the closest enemy to the fist
             if (Projectile.penetrate != -1)
             {
-                for (int i = 0; i < Main.npc.Length; i++)
+                foreach (var npc in Main.ActiveNPCs)
                 {
-                    NPC npc = Main.npc[i];
                     if (npc.CanBeChasedBy(Projectile, false) && npc != target)
                     {
                         float dist = (Projectile.Center - npc.Center).Length();
                         if (dist < minDist)
                         {
                             minDist = dist;
-                            index = i;
+                            index = npc.whoAmI;
                         }
                     }
                 }

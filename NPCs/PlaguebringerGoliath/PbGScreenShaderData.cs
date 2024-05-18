@@ -22,15 +22,7 @@ namespace CalamityMod.NPCs.PlaguebringerGoliath
             {
                 return;
             }
-            PbGIndex = -1;
-            for (int i = 0; i < Main.npc.Length; i++)
-            {
-                if (Main.npc[i].active && Main.npc[i].type == PbGType)
-                {
-                    PbGIndex = i;
-                    break;
-                }
-            }
+            PbGIndex = NPC.FindFirstNPC(PbGType);
         }
 
         public override void Update(GameTime gameTime)

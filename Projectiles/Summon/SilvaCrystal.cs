@@ -114,20 +114,17 @@ namespace CalamityMod.Projectiles.Summon
                 }
                 if (targetID < 0)
                 {
-                    int targetIDCopy;
-                    for (int i = 0; i < Main.maxNPCs; i = targetIDCopy + 1)
+                    foreach (NPC target in Main.ActiveNPCs)
                     {
-                        NPC target = Main.npc[i];
                         if (target.CanBeChasedBy(Projectile, false))
                         {
                             float targetDistance = Projectile.Distance(target.Center);
                             if (targetDistance < attackRange && Collision.CanHitLine(Projectile.Center, 0, 0, target.Center, 0, 0))
                             {
                                 attackRange = targetDistance;
-                                targetID = i;
+                                targetID = target.whoAmI;
                             }
                         }
-                        targetIDCopy = i;
                     }
                 }
                 if (targetID != -1)

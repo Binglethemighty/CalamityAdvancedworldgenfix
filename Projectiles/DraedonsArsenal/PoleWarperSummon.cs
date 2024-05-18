@@ -116,13 +116,12 @@ namespace CalamityMod.Projectiles.DraedonsArsenal
 
         public void NPCMovement(NPC npc)
         {
-            for (int i = 0; i < Main.projectile.Length; i++)
+            foreach (Projectile p in Main.ActiveProjectiles)
             {
-                if (Main.projectile[i].type == Projectile.type &&
-                    Main.projectile[i].active &&
+                if (p.type == Projectile.type &&
                     Projectile.owner == Projectile.owner)
                 {
-                    PoleWarperSummon otherPole = (PoleWarperSummon)Main.projectile[i].ModProjectile;
+                    PoleWarperSummon otherPole = (PoleWarperSummon)p.ModProjectile;
                     if (otherPole.Time != Time && otherPole.Time != Time + 1)
                     {
                         otherPole.Time = Time;
@@ -152,22 +151,21 @@ namespace CalamityMod.Projectiles.DraedonsArsenal
         public void RepelMovement()
         {
             // This does not incorporate attraction on purpose. Doing so causes the minions to very easily become distracted.
-            for (int i = 0; i < Main.projectile.Length; i++)
+            foreach (Projectile p in Main.ActiveProjectiles)
             {
-                if (Main.projectile[i].type == Projectile.type &&
-                    Main.projectile[i].active &&
-                    Projectile.Distance(Main.projectile[i].Center) < 40f)
+                if (p.type == Projectile.type &&
+                    Projectile.Distance(p.Center) < 40f)
                 {
-                    PoleWarperSummon otherPole = (PoleWarperSummon)Main.projectile[i].ModProjectile;
+                    PoleWarperSummon otherPole = (PoleWarperSummon)p.ModProjectile;
                     if (otherPole.North != North)
                     {
-                        float distanceFromOtherPole = Projectile.Distance(Main.projectile[i].Center) + 1f;
+                        float distanceFromOtherPole = Projectile.Distance(p.Center) + 1f;
                         if (float.IsNaN(distanceFromOtherPole) || distanceFromOtherPole < 1f)
                         {
                             distanceFromOtherPole = 1f;
                         }
                         float repulsionSpeed = MaximumRepulsionSpeed * (float)Math.Pow(3f, -distanceFromOtherPole / 27f);
-                        Projectile.velocity -= (Main.projectile[i].Center - Projectile.Center).SafeNormalize(Vector2.UnitY) * repulsionSpeed;
+                        Projectile.velocity -= (p.Center - Projectile.Center).SafeNormalize(Vector2.UnitY) * repulsionSpeed;
                     }
                 }
             }

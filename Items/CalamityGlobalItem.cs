@@ -160,6 +160,10 @@ namespace CalamityMod.Items
             if (item.type == ItemID.PearlwoodBow || item.type == ItemID.PearlwoodHammer || item.type == ItemID.PearlwoodSword)
                 item.rare = ItemRarityID.LightRed;
 
+            //Flame Waker Boots are no longer just vanity and therefore lose the vanity tooltip.
+            if (item.type == ItemID.FlameWakerBoots)
+                item.vanity = false;
+
             // Volatile Gelatin is pre-mech post-WoF so it should use the pink rarity.
             if (item.type == ItemID.VolatileGelatin)
                 item.rare = ItemRarityID.Pink;
@@ -433,8 +437,8 @@ namespace CalamityMod.Items
                     modPlayer.canFireAtaxiaRogueProjectile = false;
                     int flareID = ModContent.ProjectileType<HydrothermicFlareRogue>();
 
-                    // Ataxia Rogue Flares: 6 x 50%, soft cap starts at 90 base damage
-                    int flareDamage = CalamityUtils.DamageSoftCap(damage * 0.5, 90);
+                    // Hydrothermic Rogue Flares: 6 x (50 + 15%), soft cap starts at 90 base damage
+                    int flareDamage = CalamityUtils.DamageSoftCap(50 + damage * 0.15, 90);
                     flareDamage = player.ApplyArmorAccDamageBonusesTo(flareDamage);
 
                     if (player.whoAmI == Main.myPlayer)
@@ -509,11 +513,11 @@ namespace CalamityMod.Items
             }
             if (item.type == ItemID.PearlwoodBow)
             {
-                for (int i = 0; i < Main.maxProjectiles; i++)
+                foreach (Projectile p in Main.ActiveProjectiles)
                 {
-                    if (Main.projectile[i].active && (Main.projectile[i].type == ModContent.ProjectileType<RainbowFront>() || Main.projectile[i].type == ModContent.ProjectileType<RainbowTrail>()) && Main.projectile[i].owner == player.whoAmI)
+                    if ((p.type == ModContent.ProjectileType<RainbowFront>() || p.type == ModContent.ProjectileType<RainbowTrail>()) && p.owner == player.whoAmI)
                     {
-                        Main.projectile[i].Kill();
+                        p.Kill();
                     }
                 }
                 for (int i = -8; i <= 8; i += 8)
@@ -674,9 +678,9 @@ namespace CalamityMod.Items
             if (player.ActiveItem().type == ModContent.ItemType<IgneousExaltation>())
             {
                 bool hasBlades = false;
-                for (int i = 0; i < Main.maxProjectiles; i++)
+                foreach (Projectile p in Main.ActiveProjectiles)
                 {
-                    if (Main.projectile[i].active && Main.projectile[i].type == ModContent.ProjectileType<IgneousBlade>() && Main.projectile[i].owner == player.whoAmI && Main.projectile[i].localAI[1] == 0f)
+                    if (p.type == ModContent.ProjectileType<IgneousBlade>() && p.owner == player.whoAmI && p.localAI[1] == 0f)
                     {
                         hasBlades = true;
                         break;
@@ -684,22 +688,22 @@ namespace CalamityMod.Items
                 }
                 if (hasBlades)
                 {
-                    for (int i = 0; i < Main.maxProjectiles; i++)
+                    foreach (Projectile p in Main.ActiveProjectiles)
                     {
-                        if (Main.projectile[i].ModProjectile is IgneousBlade)
+                        if (p.ModProjectile is IgneousBlade)
                         {
-                            if (Main.projectile[i].ModProjectile<IgneousBlade>().Firing)
+                            if (p.ModProjectile<IgneousBlade>().Firing)
                                 continue;
                         }
-                        if (Main.projectile[i].active && Main.projectile[i].type == ModContent.ProjectileType<IgneousBlade>() && Main.projectile[i].owner == player.whoAmI && Main.projectile[i].localAI[1] == 0f)
+                        if (p.type == ModContent.ProjectileType<IgneousBlade>() && p.owner == player.whoAmI && p.localAI[1] == 0f)
                         {
-                            Main.projectile[i].rotation = MathHelper.PiOver2 + MathHelper.PiOver4;
-                            Main.projectile[i].velocity = Main.projectile[i].SafeDirectionTo(Main.MouseWorld, Vector2.UnitY) * 22f;
-                            Main.projectile[i].rotation += Main.projectile[i].velocity.ToRotation();
-                            Main.projectile[i].ai[0] = 180f;
-                            Main.projectile[i].ModProjectile<IgneousBlade>().Firing = true;
-                            Main.projectile[i].tileCollide = true;
-                            Main.projectile[i].netUpdate = true;
+                            p.rotation = MathHelper.PiOver2 + MathHelper.PiOver4;
+                            p.velocity = p.SafeDirectionTo(Main.MouseWorld, Vector2.UnitY) * 22f;
+                            p.rotation += p.velocity.ToRotation();
+                            p.ai[0] = 180f;
+                            p.ModProjectile<IgneousBlade>().Firing = true;
+                            p.tileCollide = true;
+                            p.netUpdate = true;
                         }
                     }
                 }
@@ -707,13 +711,13 @@ namespace CalamityMod.Items
             }
             if (player.ActiveItem().type == ModContent.ItemType<VoidConcentrationStaff>() && player.ownedProjectileCounts[ModContent.ProjectileType<VoidConcentrationBlackhole>()] == 0)
             {
-                for (int i = 0; i < Main.maxProjectiles; i++)
+                foreach (Projectile p in Main.ActiveProjectiles)
                 {
-                    if (Main.projectile[i].ModProjectile is VoidConcentrationAura)
+                    if (p.ModProjectile is VoidConcentrationAura)
                     {
-                        if (Main.projectile[i].active && Main.projectile[i].owner == player.whoAmI)
+                        if (p.owner == player.whoAmI)
                         {
-                            Main.projectile[i].ModProjectile<VoidConcentrationAura>().HandleRightClick();
+                            p.ModProjectile<VoidConcentrationAura>().HandleRightClick();
                             break;
                         }
                     }
@@ -724,18 +728,18 @@ namespace CalamityMod.Items
             {
                 bool canContinue = true;
                 int count = 0;
-                for (int i = 0; i < Main.projectile.Length; i++)
+                foreach (Projectile p in Main.ActiveProjectiles)
                 {
-                    if (Main.projectile[i].active && Main.projectile[i].type == ModContent.ProjectileType<GlacialEmbracePointyThing>() && Main.projectile[i].owner == player.whoAmI)
+                    if (p.type == ModContent.ProjectileType<GlacialEmbracePointyThing>() && p.owner == player.whoAmI)
                     {
-                        if (Main.projectile[i].ai[1] > 1f)
+                        if (p.ai[1] > 1f)
                         {
                             canContinue = false;
                             break;
                         }
-                        else if (Main.projectile[i].ai[1] == 0f)
+                        else if (p.ai[1] == 0f)
                         {
-                            if (((GlacialEmbracePointyThing)Main.projectile[i].ModProjectile).circlingPlayer)
+                            if (((GlacialEmbracePointyThing)p.ModProjectile).circlingPlayer)
                                 count++;
                         }
                     }
@@ -1179,9 +1183,18 @@ namespace CalamityMod.Items
             if (item.type == ItemID.AnkhShield)
                 player.buffImmune[BuffID.WindPushed] = true;
 
+            if (item.type == ItemID.FlameWakerBoots)
+            {
+                modPlayer.flameWakerBoots = true;
+                if (modPlayer.bootLevel < 1)
+                    modPlayer.bootLevel = 1;
+            }
+
             if (item.type == ItemID.HellfireTreads)
             {
                 modPlayer.hellfireTreads = true;
+                if (modPlayer.bootLevel < 2)
+                    modPlayer.bootLevel = 2;
                 player.buffImmune[BuffID.OnFire] = true;
             }
 
@@ -1443,7 +1456,7 @@ namespace CalamityMod.Items
                     player.AddBuff(BuffID.DryadsWard, 5, true); // Dryad's Blessing
                 }
             }
-            else if (item.type == ItemID.FestiveWings) // Drop powerful homing christmas tree bulbs while in flight
+            else if (item.type == ItemID.FestiveWings) // Drop homing christmas tree bulbs while in flight
             {
                 player.noFallDmg = true;
                 player.statLifeMax2 += 40;
@@ -1452,13 +1465,13 @@ namespace CalamityMod.Items
                     var source = player.GetSource_Accessory(item);
                     if (player.controlJump && player.jump == 0 && player.velocity.Y != 0f && !player.mount.Active && !player.mount.Cart)
                     {
-                        int ornamentDamage = (int)player.GetBestClassDamage().ApplyTo(100);
+                        int ornamentDamage = (int)player.GetBestClassDamage().ApplyTo(50);
                         int p = Projectile.NewProjectile(source, player.Center, Vector2.UnitY * 2f, ProjectileID.OrnamentFriendly, ornamentDamage, 5f, player.whoAmI);
                         if (p.WithinBounds(Main.maxProjectiles))
                         {
                             Main.projectile[p].DamageType = DamageClass.Generic;
                             Main.projectile[p].Calamity().lineColor = 1;
-                            modPlayer.icicleCooldown = 10;
+                            modPlayer.icicleCooldown = 15;
                         }
                     }
                 }

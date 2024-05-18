@@ -31,5 +31,7 @@ namespace CalamityMod.Items.Weapons.Magic
         }
 
         public override bool CanUseItem(Player player) => player.ownedProjectileCounts[Item.shoot] <= 0;
+
+        public override void HoldItem(Player player) => player.Calamity().mouseWorldListener = true;
     }
 }

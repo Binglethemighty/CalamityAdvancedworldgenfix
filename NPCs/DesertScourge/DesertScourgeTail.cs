@@ -91,15 +91,7 @@ namespace CalamityMod.NPCs.DesertScourge
             if (NPC.target < 0 || NPC.target == Main.maxPlayers || Main.player[NPC.target].dead || !Main.player[NPC.target].active)
                 NPC.TargetClosest();
 
-            bool shouldDespawn = true;
-            for (int i = 0; i < Main.maxNPCs; i++)
-            {
-                if (Main.npc[i].active && Main.npc[i].type == ModContent.NPCType<DesertScourgeHead>())
-                {
-                    shouldDespawn = false;
-                    break;
-                }
-            }
+            bool shouldDespawn = !NPC.AnyNPCs(ModContent.NPCType<DesertScourgeHead>());
             if (!shouldDespawn)
             {
                 if (NPC.ai[1] <= 0f)

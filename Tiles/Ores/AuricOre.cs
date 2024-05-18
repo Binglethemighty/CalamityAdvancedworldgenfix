@@ -1,4 +1,5 @@
-﻿using CalamityMod.Buffs.DamageOverTime;
+﻿using System.Collections.Generic;
+using CalamityMod.Buffs.DamageOverTime;
 using CalamityMod.Tiles.Astral;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
@@ -13,14 +14,14 @@ using Terraria.ObjectData;
 
 namespace CalamityMod.Tiles.Ores
 {
-    public class AuricOre : ModTile
+    public class AuricOre : ModTile, IMergeableTile
     {
         public static readonly SoundStyle MineSound = new("CalamityMod/Sounds/Custom/AuricMine", 3);
         public static bool Animate;
         internal static Texture2D GlowTexture;
 
-        public byte[,] tileAdjacency;
-        public byte[,] secondTileAdjacency;
+        List<TileFraming.MergeFrameData> IMergeableTile.TileAdjacencies { get; } = [];
+        
         public override void SetStaticDefaults()
         {
             if (!Main.dedServ)
@@ -44,9 +45,9 @@ namespace CalamityMod.Tiles.Ores
             MineResist = 5f;
             MinPick = 250;
             HitSound = MineSound;
-
-            TileFraming.SetUpUniversalMerge(Type, TileID.Dirt, out tileAdjacency);
-            TileFraming.SetUpUniversalMerge(Type, TileID.Stone, out secondTileAdjacency);
+            
+            this.RegisterUniversalMerge(TileID.Dirt, "CalamityMod/Tiles/Merges/DirtMerge");
+            this.RegisterUniversalMerge(TileID.Stone, "CalamityMod/Tiles/Merges/StoneMerge");
         }
 
         public override bool CanExplode(int i, int j)
@@ -95,16 +96,8 @@ namespace CalamityMod.Tiles.Ores
             Tile trackTile = Main.tile[i, j];
             double num6 = Main.time * 0.08;
             TileFraming.SlopedGlowmask(i, j, 0, glowmask, drawOffset, null, GetDrawColour(i, j, drawColour), default);
+        }
 
-            TileFraming.DrawUniversalMergeFrames(i, j, secondTileAdjacency, "CalamityMod/Tiles/Merges/StoneMerge");
-            TileFraming.DrawUniversalMergeFrames(i, j, tileAdjacency, "CalamityMod/Tiles/Merges/DirtMerge");
-        }
-        public override bool TileFrame(int i, int j, ref bool resetFrame, ref bool noBreak)
-        {
-            TileFraming.GetAdjacencyData(i, j, TileID.Dirt, out tileAdjacency[i, j]);
-            TileFraming.GetAdjacencyData(i, j, TileID.Stone, out secondTileAdjacency[i, j]);
-            return true;
-        }
         private Color GetDrawColour(int i, int j, Color colour)
         {
             int colType = Main.tile[i, j].TileColor;

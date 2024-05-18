@@ -139,10 +139,9 @@ namespace CalamityMod.Projectiles.DraedonsArsenal
                     // so it looks like the minion deflected his own projectile.
                     if (HasShot)
                     {
-                        for (int i = 0; i < Main.maxProjectiles; i++)
+                        foreach (Projectile proj in Main.ActiveProjectiles)
                         {
-                            Projectile proj = Main.projectile[i];
-                            if (proj is not null && proj.active && proj.type == ModContent.ProjectileType<SnakeEyesProjectile>() && proj.owner == Owner.whoAmI && proj.ModProjectile<SnakeEyesProjectile>().MinionID == Projectile.whoAmI && proj.ModProjectile<SnakeEyesProjectile>().HasRedirected)
+                            if (proj.type == ModContent.ProjectileType<SnakeEyesProjectile>() && proj.owner == Owner.whoAmI && proj.ModProjectile<SnakeEyesProjectile>().MinionID == Projectile.whoAmI && proj.ModProjectile<SnakeEyesProjectile>().HasRedirected)
                             {
                                 Projectile.Center = proj.Center;
                                 SwitchAIState(AIState.Redirecting);

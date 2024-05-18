@@ -1,4 +1,5 @@
 ﻿
+using System.Collections.Generic;
 using CalamityMod.Dusts;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
@@ -9,12 +10,12 @@ using Terraria.ModLoader;
 
 namespace CalamityMod.Tiles.Astral
 {
-    public class AstralMonolith : ModTile
+    public class AstralMonolith : ModTile, IMergeableTile
     {
         private static int sheetWidth = 216;
         private static int sheetHeight = 72;
 
-        public byte[,] tileAdjacency;
+        List<TileFraming.MergeFrameData> IMergeableTile.TileAdjacencies { get; } = [];
 
         public override void SetStaticDefaults()
         {
@@ -31,7 +32,7 @@ namespace CalamityMod.Tiles.Astral
 
             AddMapEntry(new Color(45, 36, 63));
 
-            TileFraming.SetUpUniversalMerge(Type, ModContent.TileType<AstralDirt>(), out tileAdjacency);
+            this.RegisterUniversalMerge(ModContent.TileType<AstralDirt>(), "CalamityMod/Tiles/Merges/AstralDirtMerge");
         }
 
         public override bool CreateDust(int i, int j, ref int type)
@@ -86,14 +87,10 @@ namespace CalamityMod.Tiles.Astral
             {
                 Main.spriteBatch.Draw(glowmask, drawOffset + new Vector2(0f, 8f), new Rectangle?(new Rectangle(xPos, yPos, 18, 8)), drawColour, 0.0f, Vector2.Zero, 1f, SpriteEffects.None, 0.0f);
             }
-
-            TileFraming.DrawUniversalMergeFrames(i, j, tileAdjacency, "CalamityMod/Tiles/Merges/AstralDirtMerge");
         }
 
         public override bool TileFrame(int i, int j, ref bool resetFrame, ref bool noBreak)
         {
-
-            TileFraming.GetAdjacencyData(i, j, ModContent.TileType<AstralDirt>(), out tileAdjacency[i, j]);
             TileFraming.CompactFraming(i, j, resetFrame);
             return false;
         }

@@ -39,13 +39,13 @@ namespace CalamityMod.Items.Weapons.Summon
                     Main.projectile[p].originalDamage = Item.damage;
 
                 int minionCount = 0;
-                for (int i = 0; i < Main.maxProjectiles; i++)
+                foreach (Projectile pro in Main.ActiveProjectiles)
                 {
-                    if (Main.projectile[i].type != type || !Main.projectile[i].active || Main.projectile[i].owner != player.whoAmI)
+                    if (pro.type != type || pro.owner != player.whoAmI)
                         continue;
 
-                    Main.projectile[i].localAI[0] = minionCount;
-                    Main.projectile[i].netUpdate = true;
+                    pro.localAI[0] = minionCount;
+                    pro.netUpdate = true;
                     minionCount++;
                 }
             }

@@ -150,6 +150,8 @@ namespace CalamityMod.NPCs.SunkenSea
                     // Avoid cheap bullshit
                     NPC.damage = 0;
 
+                    NPC.defense = Main.hardMode ? 35 : 10;
+
                     NPC.ai[0] += 1f;
                     hide = false;
                 }

@@ -167,6 +167,13 @@ namespace CalamityMod.NPCs.SupremeCalamitas
                 return;
             }
 
+            NPC scal = Main.npc[CalamityGlobalNPC.SCal];
+            if (scal.ModNPC<SupremeCalamitas>().respawnBro == false && Main.masterMode && !broIsAlive)
+            {
+                if (NPC.life > (NPC.lifeMax * 0.65f))
+                    NPC.life = (int)(NPC.lifeMax * 0.65f);
+            }
+
             // Difficulty modes
             bool bossRush = BossRushEvent.BossRushActive;
             bool death = CalamityWorld.death || bossRush;
@@ -275,17 +282,42 @@ namespace CalamityMod.NPCs.SupremeCalamitas
                         dashes++;
                         if (dashes == 30 && broIsAlive == false)
                         {
-                            SoundStyle slash = new("CalamityMod/Sounds/Item/MurasamaBigSwing");
-                            SoundEngine.PlaySound(slash with { Volume = 0.55f, Pitch = -0.3f }, NPC.Center);
-                            Projectile.NewProjectile(NPC.GetSource_FromAI(), NPC.Center + NPC.DirectionTo(Target.Center).RotatedBy(0.34f) * 130, NPC.DirectionTo(Target.Center).RotatedBy(0.34f) * 90f, type, damage, 0f, Main.myPlayer, 0f, 0, 50);
-                            Projectile.NewProjectile(NPC.GetSource_FromAI(), NPC.Center + NPC.DirectionTo(Target.Center).RotatedBy(-0.34f) * 130, NPC.DirectionTo(Target.Center).RotatedBy(-0.34f) * 90f, type, damage, 0f, Main.myPlayer, 0f, 0, 50);
-                            for (int i = 0; i < 30; i++)
+                            if (Main.zenithWorld)
                             {
-                                Vector2 vel = new Vector2(7, 7).RotatedByRandom(100) * Main.rand.NextFloat(0.1f, 2.5f);
-                                Dust catastrophedust = Dust.NewDustPerfect(NPC.Center + vel * 2, 279, vel);
-                                catastrophedust.noGravity = true;
-                                catastrophedust.scale = Main.rand.NextFloat(1.2f, 1.8f);
-                                catastrophedust.color = Color.DeepSkyBlue;
+                                SoundStyle charge = new("CalamityMod/Sounds/Item/ExobladeBeamSlash");
+                                SoundEngine.PlaySound(charge with { Volume = 0.85f, Pitch = -0.5f }, NPC.Center);
+                                NPC.velocity = NPC.DirectionTo(Target.Center) * 150f;
+
+                                for (int i = 0; i < 30; i++)
+                                {
+                                    Vector2 vel = new Vector2(7, 7).RotatedByRandom(100) * Main.rand.NextFloat(0.1f, 2.5f);
+                                    Dust catastrophedust = Dust.NewDustPerfect(NPC.Center + vel * 2, 279, vel);
+                                    catastrophedust.noGravity = true;
+                                    catastrophedust.scale = Main.rand.NextFloat(1.2f, 1.8f);
+                                    catastrophedust.color = Color.DeepSkyBlue;
+                                }
+                                dashes = 0;
+                                dashAttackTimer = 30;
+                                BigAttackTimer = 500;
+                                AttackDelayTimer = 120;
+                                if (NPC.life > 10001)
+                                    NPC.life -= 10000;
+                                return;
+                            }
+                            else
+                            {
+                                SoundStyle slash = new("CalamityMod/Sounds/Item/MurasamaBigSwing");
+                                SoundEngine.PlaySound(slash with { Volume = 0.55f, Pitch = -0.3f }, NPC.Center);
+                                Projectile.NewProjectile(NPC.GetSource_FromAI(), NPC.Center + NPC.DirectionTo(Target.Center).RotatedBy(0.34f) * 130, NPC.DirectionTo(Target.Center).RotatedBy(0.34f) * 90f, type, damage, 0f, Main.myPlayer, 0f, 0, 50);
+                                Projectile.NewProjectile(NPC.GetSource_FromAI(), NPC.Center + NPC.DirectionTo(Target.Center).RotatedBy(-0.34f) * 130, NPC.DirectionTo(Target.Center).RotatedBy(-0.34f) * 90f, type, damage, 0f, Main.myPlayer, 0f, 0, 50);
+                                for (int i = 0; i < 30; i++)
+                                {
+                                    Vector2 vel = new Vector2(7, 7).RotatedByRandom(100) * Main.rand.NextFloat(0.1f, 2.5f);
+                                    Dust catastrophedust = Dust.NewDustPerfect(NPC.Center + vel * 2, 279, vel);
+                                    catastrophedust.noGravity = true;
+                                    catastrophedust.scale = Main.rand.NextFloat(1.2f, 1.8f);
+                                    catastrophedust.color = Color.DeepSkyBlue;
+                                }
                             }
                         }
                         NPC.velocity *= 0.975f;
@@ -349,6 +381,10 @@ namespace CalamityMod.NPCs.SupremeCalamitas
                     SoundEngine.PlaySound(SupremeCalamitas.CatastropheSwing with { Volume = 0.5f, Pitch = (SlashingFromRight ? 0.2f : -0.2f) }, NPC.Center);
 
                     int type = ModContent.ProjectileType<SupremeCatastropheSlash>();
+
+                    if (Main.zenithWorld)
+                        type = ModContent.ProjectileType<SupremeCataclysmFist>();
+
                     int damage = NPC.GetProjectileDamage(type);
                     if (bossRush)
                         damage /= 2;
@@ -368,7 +404,7 @@ namespace CalamityMod.NPCs.SupremeCalamitas
                                 SoundStyle slash = new("CalamityMod/Sounds/Item/MurasamaBigSwing");
                                 SoundEngine.PlaySound(slash with { Volume = 0.55f, Pitch = 0.4f }, NPC.Center);
 
-                                Projectile.NewProjectile(NPC.GetSource_FromAI(), slashSpawnPosition, firingVelocity * 0.2f, type, damage, 0f, Main.myPlayer, 0f, SlashingFromRight.ToInt(), 3);
+                                Projectile.NewProjectile(NPC.GetSource_FromAI(), slashSpawnPosition, firingVelocity * 0.2f, type, damage, 0f, Main.myPlayer, 0f, SlashingFromRight.ToInt(), Main.zenithWorld ? 0 : 3);
                                 accSlashCounter = 0;
                             }
                         }
@@ -412,6 +448,10 @@ namespace CalamityMod.NPCs.SupremeCalamitas
                     SlashCounter = 0f;
 
                     int type = ModContent.ProjectileType<SupremeCatastropheSlash>();
+
+                    if (Main.zenithWorld)
+                        type = ModContent.ProjectileType<SupremeCataclysmFist>();
+
                     int damage = NPC.GetProjectileDamage(type);
                     if (bossRush)
                         damage /= 2;
@@ -420,7 +460,7 @@ namespace CalamityMod.NPCs.SupremeCalamitas
 
                     if ((broIsAlive == false ? BigAttackLimit <= 3 && BigAttackLimit > 0 : BigAttackLimit == 1) && death)
                     {
-                        Projectile.NewProjectile(NPC.GetSource_FromAI(), slashSpawnPosition + firingVelocity * 130, (Phase2 ? NPC.DirectionTo(Target.Center) : firingVelocity) * 90f, type, damage, 0f, Main.myPlayer, 0f, 5, 50);
+                        Projectile.NewProjectile(NPC.GetSource_FromAI(), slashSpawnPosition + firingVelocity * 130, (Phase2 ? NPC.DirectionTo(Target.Center) : firingVelocity) * 90f, ModContent.ProjectileType<SupremeCatastropheSlash>(), damage, 0f, Main.myPlayer, 0f, 5, 50);
                         SoundStyle slash = new("CalamityMod/Sounds/Item/MurasamaBigSwing");
                         SoundEngine.PlaySound(slash with { Volume = 0.55f, Pitch = -0.3f - BigAttackLimit * 0.1f }, NPC.Center);
                     }
@@ -545,7 +585,35 @@ namespace CalamityMod.NPCs.SupremeCalamitas
 
                 // Turn into dust on death.
                 if (NPC.life <= 0)
+                {
+                    if (NPC.AnyNPCs(ModContent.NPCType<SupremeCalamitas>()))
+                    {
+                        NPC scal = Main.npc[CalamityGlobalNPC.SCal];
+                        if (scal.ModNPC<SupremeCalamitas>().respawnBro == true && Main.masterMode && !broIsAlive)
+                        {
+                            for (int i = 0; i < 45; i++)
+                            {
+                                Vector2 vel = new Vector2(14, 14).RotatedByRandom(100) * Main.rand.NextFloat(0.1f, 2.5f);
+                                Dust cataclysmdust = Dust.NewDustPerfect(NPC.Center + vel * 2, 279, vel);
+                                cataclysmdust.noGravity = true;
+                                cataclysmdust.scale = Main.rand.NextFloat(1.2f, 1.8f);
+                                cataclysmdust.color = Color.Red;
+                            }
+                            Particle pulse = new DirectionalPulseRing(NPC.Center, Vector2.Zero, Color.Red, new Vector2(1f, 1f), 0, 0.1f, 5f, 25);
+                            GeneralParticleHandler.SpawnParticle(pulse);
+                            Particle pulse2 = new DirectionalPulseRing(NPC.Center, Vector2.Zero, Color.Lerp(Color.Red, Color.Magenta, 0.3f), new Vector2(1f, 1f), 0, 0.05f, 4f, 28);
+                            GeneralParticleHandler.SpawnParticle(pulse2);
+
+                            SoundStyle respawn = new("CalamityMod/Sounds/NPCKilled/RavagerLimbLoss3");
+                            SoundEngine.PlaySound(respawn with { Volume = 0.9f, Pitch = 0.3f }, NPC.Center);
+
+                            CalamityUtils.SpawnBossBetter(NPC.Center, ModContent.NPCType<SupremeCataclysm>(), null, MovingUp ? -1 : 1);
+                            scal.ModNPC<SupremeCalamitas>().respawnBro = false;
+                        }
+
+                    }
                     DeathAshParticle.CreateAshesFromNPC(NPC);
+                }
             }
         }
     }

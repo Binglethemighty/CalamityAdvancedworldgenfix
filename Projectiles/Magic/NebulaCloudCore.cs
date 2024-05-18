@@ -169,17 +169,17 @@ namespace CalamityMod.Projectiles.Magic
                         int npcTrack = 0;
                         if (Projectile.ai[1] == 0f)
                         {
-                            for (int i = 0; i < Main.maxNPCs; i++)
+                            foreach (NPC n in Main.ActiveNPCs)
                             {
-                                if (Main.npc[i].CanBeChasedBy(this))
+                                if (n.CanBeChasedBy(this))
                                 {
-                                    Vector2 npcCenter = Main.npc[i].Center;
-                                    if (Projectile.Distance(npcCenter) < homingRange && Collision.CanHit(new Vector2(Projectile.position.X + Projectile.width / 2, Projectile.position.Y + Projectile.height / 2), 1, 1, Main.npc[i].position, Main.npc[i].width, Main.npc[i].height))
+                                    Vector2 npcCenter = n.Center;
+                                    if (Projectile.Distance(npcCenter) < homingRange && Collision.CanHit(new Vector2(Projectile.position.X + Projectile.width / 2, Projectile.position.Y + Projectile.height / 2), 1, 1, n.position, n.width, n.height))
                                     {
                                         homingRange = Projectile.Distance(npcCenter);
                                         projCenter = npcCenter;
                                         isHoming = true;
-                                        npcTrack = i;
+                                        npcTrack = n.whoAmI;
                                     }
                                 }
                             }

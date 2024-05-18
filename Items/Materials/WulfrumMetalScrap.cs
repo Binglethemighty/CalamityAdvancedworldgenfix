@@ -44,9 +44,9 @@ namespace CalamityMod.Items.Materials
 
                 bool closePlayer = false;
 
-                for (int i = 0; i < Main.maxPlayers; i++)
+                foreach (Player player in Main.ActivePlayers)
                 {
-                    if ((Main.player[i].Center - Item.Center).Length() < 1200 && Main.player[i].GetModPlayer<WulfrumBatteryPlayer>().battery)
+                    if ((player.Center - Item.Center).Length() < 1200 && player.GetModPlayer<WulfrumBatteryPlayer>().battery)
                     {
                         closePlayer = true;
                         break;

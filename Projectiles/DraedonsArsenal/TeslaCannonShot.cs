@@ -96,14 +96,14 @@ namespace CalamityMod.Projectiles.DraedonsArsenal
                     {
                         if (arcs < 10)
                         {
-                            for (int i = 0; i < Main.maxNPCs; i++)
+                            foreach (NPC n in Main.ActiveNPCs)
                             {
-                                if (!Main.npc[i].CanBeChasedBy(Projectile, false) || !Collision.CanHit(Projectile.Center, 1, 1, Main.npc[i].Center, 1, 1))
+                                if (!n.CanBeChasedBy(Projectile, false) || !Collision.CanHit(Projectile.Center, 1, 1, n.Center, 1, 1))
                                     continue;
 
-                                if (Projectile.Center.ManhattanDistance(Main.npc[i].Center) < 600f)
+                                if (Projectile.Center.ManhattanDistance(n.Center) < 600f)
                                 {
-                                    Projectile.NewProjectile(Projectile.GetSource_FromThis(), Projectile.Center, Projectile.SafeDirectionTo(Main.npc[i].Center) * 2f, Projectile.type, (int)(Projectile.damage * 0.6), Projectile.knockBack * 0.6f, Projectile.owner, 0f, -1f);
+                                    Projectile.NewProjectile(Projectile.GetSource_FromThis(), Projectile.Center, Projectile.SafeDirectionTo(n.Center) * 2f, Projectile.type, (int)(Projectile.damage * 0.6), Projectile.knockBack * 0.6f, Projectile.owner, 0f, -1f);
 
                                     Projectile.ai[1] = 60f;
 
