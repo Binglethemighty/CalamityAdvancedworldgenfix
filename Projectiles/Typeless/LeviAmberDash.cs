@@ -1,4 +1,5 @@
 ﻿using System;
+using CalamityMod.CalPlayer;
 using CalamityMod.Particles;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
@@ -34,11 +35,13 @@ namespace CalamityMod.Projectiles.Typeless
 
         public override void OnHitNPC(NPC target, NPC.HitInfo hit, int damageDone)
         {
-            if (!target.boss && target.IsAnEnemy(true, true))
+            bool isAPillar = target.type == NPCID.LunarTowerSolar || target.type == NPCID.LunarTowerVortex || target.type == NPCID.LunarTowerNebula || target.type == NPCID.LunarTowerStardust;
+            if (!isAPillar && !target.boss && target.IsAnEnemy(true, true) && !CalamityPlayer.areThereAnyDamnBosses && target.CanBeChasedBy(Projectile, false))
             {
                 target.velocity.Y += -1.8f;
                 target.velocity.X += 4.2f * Owner.direction;
             }
+
             target.AddBuff(BuffID.Wet, 300);
             target.AddBuff(ModContent.BuffType<Buffs.DamageOverTime.RiptideDebuff>(), 180);
             SoundEngine.PlaySound(SoundID.Item85 with { Volume = 0.4f, PitchVariance = 0.4f }, Projectile.Center);

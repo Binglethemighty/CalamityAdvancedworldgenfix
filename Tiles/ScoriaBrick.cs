@@ -10,13 +10,12 @@ using Terraria.ModLoader;
 namespace CalamityMod.Tiles
 {
     [LegacyName("ChaoticBrick")]
-    public class ScoriaBrick : ModTile, IMergeableTile
+    public class ScoriaBrick : ModTile
     {
         int subsheetHeight = 72;
         internal static Texture2D GlowTexture;
 
-        List<TileFraming.MergeFrameData> IMergeableTile.TileAdjacencies { get; } = [];
-        
+
         public override void SetStaticDefaults()
         {
             if (!Main.dedServ)

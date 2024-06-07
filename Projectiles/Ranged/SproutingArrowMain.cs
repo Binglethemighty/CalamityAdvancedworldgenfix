@@ -34,7 +34,7 @@ namespace CalamityMod.Projectiles.Ranged
         {
             if (Projectile.ai[0] == 0)
             {
-                Projectile.damage = (int)(Projectile.damage * 0.18f);
+                Projectile.damage = (int)(Projectile.damage * 0.3f);
                 Projectile.velocity *= 0.25f;
                 LineParticle spark = new LineParticle(Projectile.Center + Projectile.velocity * 4, Projectile.velocity * 4.95f, false, 9, 2.4f, Color.LimeGreen);
                 GeneralParticleHandler.SpawnParticle(spark);
@@ -51,8 +51,8 @@ namespace CalamityMod.Projectiles.Ranged
                 Vector2 vel1 = (Projectile.velocity * 0.4f).RotatedBy(Main.rand.NextFloat(0.015f, 0.04f));
                 Vector2 vel2 = (Projectile.velocity * 0.4f).RotatedBy(Main.rand.NextFloat(-0.015f, -0.04f));
 
-                int split1 = Projectile.NewProjectile(Projectile.GetSource_FromThis(), Projectile.Center, vel1 * Main.rand.NextFloat(0.95f, 1.05f), ModContent.ProjectileType<SproutingArrowSplit>(), (int)(Projectile.damage * 3), 0f, Projectile.owner, 0f, hitDirect ? 1f : 0f);
-                int split2 = Projectile.NewProjectile(Projectile.GetSource_FromThis(), Projectile.Center, vel2 * Main.rand.NextFloat(0.95f, 1.05f), ModContent.ProjectileType<SproutingArrowSplit>(), (int)(Projectile.damage * 3), 0f, Projectile.owner, 0f, hitDirect ? 1f : 0f);
+                int split1 = Projectile.NewProjectile(Projectile.GetSource_FromThis(), Projectile.Center, vel1 * Main.rand.NextFloat(0.95f, 1.05f), ModContent.ProjectileType<SproutingArrowSplit>(), (int)(Projectile.damage * 2), 0f, Projectile.owner, 0f, hitDirect ? 1f : 0f);
+                int split2 = Projectile.NewProjectile(Projectile.GetSource_FromThis(), Projectile.Center, vel2 * Main.rand.NextFloat(0.95f, 1.05f), ModContent.ProjectileType<SproutingArrowSplit>(), (int)(Projectile.damage * 2), 0f, Projectile.owner, 0f, hitDirect ? 1f : 0f);
                 if (Projectile.Calamity().allProjectilesHome) // Allows the split arrows to home when using Arterial Assault as well
                 {
                     Main.projectile[split1].Calamity().allProjectilesHome = true;

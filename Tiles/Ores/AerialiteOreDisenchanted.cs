@@ -7,12 +7,10 @@ using Terraria.ModLoader;
 
 namespace CalamityMod.Tiles.Ores
 {
-    public class AerialiteOreDisenchanted : ModTile, IMergeableTile
+    public class AerialiteOreDisenchanted : ModTile
     {
         private const int AnimationFrameWidth = 234;
-
-        List<TileFraming.MergeFrameData> IMergeableTile.TileAdjacencies { get; } = [];
-
+        
         public override void SetStaticDefaults()
         {
             Main.tileBlockLight[Type] = true;

@@ -11,7 +11,7 @@ using Terraria.ModLoader;
 
 namespace CalamityMod.NPCs.NormalNPCs
 {
-    public class KingSlimeJewel2 : ModNPC
+    public class KingSlimeJewelSapphire : ModNPC
     {
         public override string Texture => "CalamityMod/NPCs/NormalNPCs/KingSlimeJewel";
 
@@ -34,7 +34,7 @@ namespace CalamityMod.NPCs.NormalNPCs
             NPC.defense = 5;
             NPC.DR_NERD(0.05f);
 
-            NPC.lifeMax = 140;
+            NPC.lifeMax = 120;
             double HPBoost = CalamityConfig.Instance.BossHealthBoost * 0.01;
             NPC.lifeMax += (int)(NPC.lifeMax * HPBoost);
 
@@ -71,7 +71,20 @@ namespace CalamityMod.NPCs.NormalNPCs
             float velocity = 5f;
             float acceleration = 0.1f;
 
-            if (NPC.position.Y > Main.player[NPC.target].position.Y - 300f)
+            int distanceFromKingSlime = 1;
+            Vector2 kingSlimeCenter = NPC.Center;
+            for (int i = 0; i < Main.maxNPCs; i++)
+            {
+                if (Main.npc[i].active && Main.npc[i].type == NPCID.KingSlime)
+                {
+                    distanceFromKingSlime = (int)NPC.Distance(Main.npc[i].Center);
+                    kingSlimeCenter = Main.npc[i].Center;
+                    break;
+                }
+            }
+
+            Vector2 movementTarget = kingSlimeCenter == NPC.Center ? Main.player[NPC.target].Center : kingSlimeCenter;
+            if (NPC.position.Y > movementTarget.Y - 200f)
             {
                 if (NPC.velocity.Y > 0f)
                     NPC.velocity.Y *= 0.98f;
@@ -81,7 +94,7 @@ namespace CalamityMod.NPCs.NormalNPCs
                 if (NPC.velocity.Y > velocity)
                     NPC.velocity.Y = velocity;
             }
-            else if (NPC.position.Y < Main.player[NPC.target].position.Y - 400f)
+            else if (NPC.position.Y < movementTarget.Y - 250f)
             {
                 if (NPC.velocity.Y < 0f)
                     NPC.velocity.Y *= 0.98f;
@@ -92,7 +105,7 @@ namespace CalamityMod.NPCs.NormalNPCs
                     NPC.velocity.Y = -velocity;
             }
 
-            if (NPC.Center.X > Main.player[NPC.target].Center.X + 300f)
+            if (NPC.Center.X > movementTarget.X + 100f)
             {
                 if (NPC.velocity.X > 0f)
                     NPC.velocity.X *= 0.98f;
@@ -102,7 +115,7 @@ namespace CalamityMod.NPCs.NormalNPCs
                 if (NPC.velocity.X > 8f)
                     NPC.velocity.X = 8f;
             }
-            if (NPC.Center.X < Main.player[NPC.target].Center.X - 300f)
+            if (NPC.Center.X < movementTarget.X - 100f)
             {
                 if (NPC.velocity.X < 0f)
                     NPC.velocity.X *= 0.98f;
@@ -120,18 +133,6 @@ namespace CalamityMod.NPCs.NormalNPCs
                 NPC.ai[0] = 0f;
 
                 SoundEngine.PlaySound(SoundID.Item8, NPC.Center);
-
-                int distanceFromKingSlime = 1;
-                Vector2 kingSlimeCenter = NPC.Center;
-                for (int i = 0; i < Main.maxNPCs; i++)
-                {
-                    if (Main.npc[i].active && Main.npc[i].type == NPCID.KingSlime)
-                    {
-                        distanceFromKingSlime = (int)NPC.Distance(Main.npc[i].Center);
-                        kingSlimeCenter = Main.npc[i].Center;
-                        break;
-                    }
-                }
 
                 for (int dusty = 0; dusty < 10; dusty++)
                 {

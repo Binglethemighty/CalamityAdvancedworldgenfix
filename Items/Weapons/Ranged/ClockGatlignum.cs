@@ -33,7 +33,7 @@ namespace CalamityMod.Items.Weapons.Ranged
             Item.Calamity().canFirePointBlankShots = true;
         }
 
-        public override Vector2? HoldoutOffset() => new Vector2(-5, 0);
+        public override Vector2? HoldoutOffset() => new Vector2(-14, 0);
 
         public override bool Shoot(Player player, EntitySource_ItemUse_WithAmmo source, Vector2 position, Vector2 velocity, int type, int damage, float knockback)
         {

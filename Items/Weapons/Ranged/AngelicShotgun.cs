@@ -21,14 +21,14 @@ namespace CalamityMod.Items.Weapons.Ranged
         {
             Item.width = 86;
             Item.height = 38;
-            Item.damage = 96;
+            Item.damage = 92;
             Item.knockBack = 3f;
             Item.DamageType = DamageClass.Ranged;
             Item.noMelee = true;
             Item.autoReuse = true;
 
-            Item.useTime = 24;
-            Item.useAnimation = 24;
+            Item.useTime = 26;
+            Item.useAnimation = 26;
             Item.UseSound = SoundID.Item38;
             Item.useStyle = ItemUseStyleID.Shoot;
 
@@ -49,7 +49,7 @@ namespace CalamityMod.Items.Weapons.Ranged
 
         public override bool Shoot(Player player, EntitySource_ItemUse_WithAmmo source, Vector2 position, Vector2 velocity, int type, int damage, float knockback)
         {
-            int NumBullets = Main.rand.Next(5, 8);
+            int NumBullets = Main.rand.Next(5, 6+1);
             Vector2 baseVelocity = velocity.SafeNormalize(Vector2.Zero) * BulletSpeed;
 
             // If Musket Balls are used, damage is set to match Hallow-Point Rounds for both bullets and lasers
@@ -71,7 +71,7 @@ namespace CalamityMod.Items.Weapons.Ranged
 
             // Spawn a beam from the sky ala Deathhail Staff or Lunar Flare
             float laserSpeed = 8f;
-            int laserDamage = 3 * damage;
+            int laserDamage = (int)(damage * 2.5f);
             float laserKB = 5f;
 
             Vector2 rrp = player.RotatedRelativePoint(player.MountedCenter, true);

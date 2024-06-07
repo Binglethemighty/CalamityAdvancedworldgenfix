@@ -630,7 +630,7 @@ namespace CalamityMod.NPCs.Abyss
         public override void ModifyNPCLoot(NPCLoot npcLoot)
         {
             npcLoot.Add(ItemID.BlackInk, 1, 3, 5);
-            npcLoot.Add(ModContent.ItemType<InkBomb>(), 5);
+            npcLoot.Add(ModContent.ItemType<InkBomb>(), 3);
 
             var postLevi = npcLoot.DefineConditionalDropSet(DropHelper.PostLevi());
             postLevi.Add(DropHelper.NormalVsExpertQuantity(ModContent.ItemType<DepthCells>(), 2, 26, 38, 31, 45));

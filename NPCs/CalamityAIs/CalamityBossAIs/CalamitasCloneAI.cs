@@ -185,10 +185,6 @@ namespace CalamityMod.NPCs.CalamityAIs.CalamityBossAIs
             if (npc.target < 0 || npc.target == Main.maxPlayers || Main.player[npc.target].dead || !Main.player[npc.target].active)
                 npc.TargetClosest();
 
-            // Despawn safety, make sure to target another player if the current player target is too far away
-            if (Vector2.Distance(Main.player[npc.target].Center, npc.Center) > CalamityGlobalNPC.CatchUpDistance200Tiles)
-                npc.TargetClosest();
-
             // Target variable
             Player player = Main.player[npc.target];
 
@@ -556,7 +552,6 @@ namespace CalamityMod.NPCs.CalamityAIs.CalamityBossAIs
                     if (death)
                         npc.localAI[0] = 1f;
 
-                    npc.TargetClosest();
                     npc.netUpdate = true;
                 }
 
@@ -645,7 +640,6 @@ namespace CalamityMod.NPCs.CalamityAIs.CalamityBossAIs
                     if (death)
                         npc.localAI[0] = 1f;
 
-                    npc.TargetClosest();
                     npc.netUpdate = true;
                 }
             }
@@ -706,11 +700,11 @@ namespace CalamityMod.NPCs.CalamityAIs.CalamityBossAIs
                     npc.ai[2] = 0f;
 
                     npc.rotation = rotation;
-                    npc.TargetClosest();
                     npc.netUpdate = true;
 
                     if (npc.ai[3] >= 2f)
                     {
+                        npc.TargetClosest();
                         npc.ai[1] = 0f;
                         npc.ai[3] = 0f;
                         return;
@@ -727,8 +721,6 @@ namespace CalamityMod.NPCs.CalamityAIs.CalamityBossAIs
                 npc.ai[2] += 1f;
                 if (npc.ai[2] >= (phase4 ? 15f : 30f))
                 {
-                    npc.TargetClosest();
-
                     npc.ai[1] = 2f;
                     npc.ai[2] = 0f;
                     if (death)
@@ -766,10 +758,6 @@ namespace CalamityMod.NPCs.CalamityAIs.CalamityBossAIs
 
             // Get a target
             if (npc.target < 0 || npc.target == Main.maxPlayers || Main.player[npc.target].dead || !Main.player[npc.target].active)
-                npc.TargetClosest();
-
-            // Despawn safety, make sure to target another player if the current player target is too far away
-            if (Vector2.Distance(Main.player[npc.target].Center, npc.Center) > CalamityGlobalNPC.CatchUpDistance200Tiles)
                 npc.TargetClosest();
 
             Player player = Main.player[npc.target];
@@ -914,7 +902,6 @@ namespace CalamityMod.NPCs.CalamityAIs.CalamityBossAIs
                 npc.ai[2] += 1f;
                 if (npc.ai[2] >= (240f - (death ? 120f * (1f - lifeRatio) : 0f)))
                 {
-                    npc.TargetClosest();
                     npc.ai[1] = 1f;
                     npc.ai[2] = 0f;
                     npc.target = 255;
@@ -1047,7 +1034,6 @@ namespace CalamityMod.NPCs.CalamityAIs.CalamityBossAIs
                         npc.ai[2] = 0f;
                         npc.target = 255;
                         npc.rotation = calCloneBroRotation;
-                        npc.TargetClosest();
                         if (npc.ai[3] >= 3f)
                         {
                             npc.ai[1] = 0f;
@@ -1087,10 +1073,6 @@ namespace CalamityMod.NPCs.CalamityAIs.CalamityBossAIs
 
             // Get a target
             if (npc.target < 0 || npc.target == Main.maxPlayers || Main.player[npc.target].dead || !Main.player[npc.target].active)
-                npc.TargetClosest();
-
-            // Despawn safety, make sure to target another player if the current player target is too far away
-            if (Vector2.Distance(Main.player[npc.target].Center, npc.Center) > CalamityGlobalNPC.CatchUpDistance200Tiles)
                 npc.TargetClosest();
 
             Player player = Main.player[npc.target];
@@ -1235,7 +1217,6 @@ namespace CalamityMod.NPCs.CalamityAIs.CalamityBossAIs
                 npc.ai[2] += 1f;
                 if (npc.ai[2] >= (180f - (death ? 90f * (1f - lifeRatio) : 0f)))
                 {
-                    npc.TargetClosest();
                     npc.ai[1] = 1f;
                     npc.ai[2] = 0f;
                     npc.target = 255;
@@ -1366,7 +1347,6 @@ namespace CalamityMod.NPCs.CalamityAIs.CalamityBossAIs
                     {
                         npc.ai[3] += 1f;
                         npc.ai[2] = 0f;
-                        npc.TargetClosest();
                         npc.rotation = calCloneBroRotation;
                         if (npc.ai[3] >= 4f)
                         {

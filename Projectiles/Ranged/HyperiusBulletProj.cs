@@ -108,7 +108,7 @@ namespace CalamityMod.Projectiles.Ranged
             {
                 for (int b = 0; b < 3; b++)
                 {
-                    Projectile.NewProjectile(Projectile.GetSource_FromThis(), Projectile.Center, -oldVelocity.RotatedByRandom(0.5f) * 0.7f, ModContent.ProjectileType<HyperiusSplit>(), (int)(Projectile.damage * 0.35), 0f, Projectile.owner, 0f, 0f, Main.rand.Next(0, 4 + 1));
+                    Projectile.NewProjectile(Projectile.GetSource_FromThis(), Projectile.Center, -oldVelocity.RotatedByRandom(0.5f) * 0.7f, ModContent.ProjectileType<HyperiusSplit>(), (int)(Projectile.damage * 0.1), 0f, Projectile.owner, 0f, 0f, Main.rand.Next(0, 4 + 1));
                 }
             }
             return true;
@@ -130,7 +130,7 @@ namespace CalamityMod.Projectiles.Ranged
                 for (int b = 0; b < 3; b++)
                 {
                     Vector2 velocity = Projectile.velocity.RotatedByRandom(0.5f);
-                    Projectile.NewProjectile(Projectile.GetSource_FromThis(), Projectile.Center, velocity * 0.7f, ModContent.ProjectileType<HyperiusSplit>(), (int)(Projectile.damage * 0.15), Projectile.knockBack * 2f, Projectile.owner, 0f, 0f, Main.rand.Next(0, 4 + 1));
+                    Projectile.NewProjectile(Projectile.GetSource_FromThis(), Projectile.Center, velocity * 0.7f, ModContent.ProjectileType<HyperiusSplit>(), (int)(Projectile.damage * 0.1), Projectile.knockBack * 2f, Projectile.owner, 0f, 0f, Main.rand.Next(0, 4 + 1));
                 }
             }
         }

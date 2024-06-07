@@ -595,14 +595,17 @@ namespace CalamityMod.CalPlayer
             if (!proj.CountsAsClass<MeleeDamageClass>() && !proj.CountsAsClass<SummonMeleeSpeedDamageClass>() && Player.meleeEnchant == 7)
                 Projectile.NewProjectile(source, position, proj.velocity, ProjectileID.ConfettiMelee, 0, 0f, proj.owner);
 
-            if (alchFlask && Player.ownedProjectileCounts[ProjectileType<PlagueSeeker>()] < 3 && hasClass)
+            if (alchFlask && AlchFlaskCooldown == 0 && proj.type != ModContent.ProjectileType<BasicPlagueBee>())
             {
-                int seekerDamage = (int)Player.GetBestClassDamage().ApplyTo(30);
+                int seekerDamage = (int)Player.GetBestClassDamage().ApplyTo(10);
                 seekerDamage = Player.ApplyArmorAccDamageBonusesTo(seekerDamage);
+                Vector2 seekerVelocity = new Vector2(5, 5).RotatedByRandom(100) * Main.rand.NextFloat(0.5f, 1.2f);
 
-                Projectile projectile = CalamityUtils.SpawnOrb(proj, seekerDamage, ProjectileType<PlagueSeeker>(), 400f, 12f);
-                if (projectile.whoAmI.WithinBounds(Main.maxProjectiles))
-                    Main.projectile[projectile.whoAmI].DamageType = DamageClass.Generic;
+                Projectile bee = Projectile.NewProjectileDirect(source, position, seekerVelocity, ModContent.ProjectileType<BasicPlagueBee>(), seekerDamage, 0f, Player.whoAmI, -20, 30, 2);
+                bee.ArmorPenetration = 20;
+                bee.penetrate = 2;
+                bee.extraUpdates = 1;
+                AlchFlaskCooldown = 7;
             }
 
             bool lifeAndShieldCondition = Player.statLife >= Player.statLifeMax2 && (!HasAnyEnergyShield || TotalEnergyShielding >= TotalMaxShieldDurability);
@@ -1237,9 +1240,6 @@ namespace CalamityMod.CalPlayer
                 if (divineBless)
                     target.AddBuff(BuffType<BanishingFire>(), 60);
 
-                if (holyMinions)
-                    target.AddBuff(BuffType<HolyFlames>(), 180);
-
                 if (shadowMinions)
                     target.AddBuff(BuffID.ShadowFlame, 180);
 
@@ -1266,7 +1266,7 @@ namespace CalamityMod.CalPlayer
             if (omegaBlueChestplate)
                 target.AddBuff(BuffType<CrushDepth>(), 180);
             if (sulphurSet)
-                target.AddBuff(BuffID.Poisoned, 120);
+                target.AddBuff(BuffID.Poisoned, 60);
             if (abyssalAmulet)
             {
                 CalamityUtils.Inflict246DebuffsNPC(target, BuffType<RiptideDebuff>());

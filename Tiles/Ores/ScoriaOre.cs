@@ -12,10 +12,8 @@ using Terraria.ModLoader;
 namespace CalamityMod.Tiles.Ores
 {
     [LegacyName("ChaoticOre")]
-    public class ScoriaOre : ModTile, IMergeableTile
+    public class ScoriaOre : ModTile
     {
-        List<TileFraming.MergeFrameData> IMergeableTile.TileAdjacencies { get; } = [];
-
         public override void SetStaticDefaults()
         {
             Main.tileLighted[Type] = true;

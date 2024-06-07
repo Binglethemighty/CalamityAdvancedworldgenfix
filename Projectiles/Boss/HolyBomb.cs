@@ -47,6 +47,16 @@ namespace CalamityMod.Projectiles.Boss
                 if (Main.npc[CalamityGlobalNPC.holyBoss].active)
                     Projectile.maxPenetrate = (int)Main.npc[CalamityGlobalNPC.holyBoss].localAI[1];
             }
+            else if (CalamityGlobalNPC.doughnutBoss != -1)
+            {
+                if (Main.npc[CalamityGlobalNPC.doughnutBoss].active)
+                {
+                    if (Main.npc[CalamityGlobalNPC.doughnutBoss].Calamity().CurrentlyEnraged)
+                        Projectile.maxPenetrate = (int)Providence.BossMode.Night;
+                    else
+                        Projectile.maxPenetrate = (int)Providence.BossMode.Day;
+                }
+            }
             else
                 Projectile.maxPenetrate = (int)Providence.BossMode.Day;
 

@@ -43,8 +43,9 @@ namespace CalamityMod.Projectiles.Melee
                     }
                 }
             }
+
             Projectile.localAI[0] += 1f;
-            if (Projectile.localAI[0] >= 10f)
+            if (Projectile.localAI[0] >= 20f)
             {
                 Projectile.localAI[0] = 0f;
                 int projTimer = 0;
@@ -70,5 +71,7 @@ namespace CalamityMod.Projectiles.Melee
                 }
             }
         }
+
+        public override bool? CanDamage() => false;
     }
 }

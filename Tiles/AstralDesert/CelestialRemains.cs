@@ -10,10 +10,9 @@ using Terraria.ModLoader;
 namespace CalamityMod.Tiles.AstralDesert
 {
     [LegacyName("AstralFossil")]
-    public class CelestialRemains : ModTile, IMergeableTile
+    public class CelestialRemains : ModTile
     {
-        List<TileFraming.MergeFrameData> IMergeableTile.TileAdjacencies { get; } = [];
-        
+
         public override void SetStaticDefaults()
         {
             Main.tileSolid[Type] = true;

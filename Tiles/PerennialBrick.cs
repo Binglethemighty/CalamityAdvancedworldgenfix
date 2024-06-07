@@ -8,10 +8,9 @@ using Terraria.ModLoader;
 
 namespace CalamityMod.Tiles
 {
-    public class PerennialBrick : ModTile, IMergeableTile
+    public class PerennialBrick : ModTile
     {
-        List<TileFraming.MergeFrameData> IMergeableTile.TileAdjacencies { get; } = [];
-        
+
         public override void SetStaticDefaults()
         {
             Main.tileSolid[Type] = true;

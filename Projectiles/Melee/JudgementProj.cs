@@ -11,7 +11,7 @@ namespace CalamityMod.Projectiles.Melee
         public new string LocalizationCategory => "Projectiles.Melee";
         public override string Texture => "CalamityMod/Projectiles/InvisibleProj";
 
-        int whiteLightTimer = 5;
+        int whiteLightTimer = 15;
 
         public override void SetDefaults()
         {
@@ -20,7 +20,7 @@ namespace CalamityMod.Projectiles.Melee
             Projectile.friendly = true;
             Projectile.ignoreWater = true;
             Projectile.penetrate = -1;
-            Projectile.timeLeft = 60;
+            Projectile.timeLeft = 90;
             Projectile.DamageType = DamageClass.Melee;
             Projectile.usesIDStaticNPCImmunity = true;
             Projectile.idStaticNPCHitCooldown = 10;
@@ -41,15 +41,15 @@ namespace CalamityMod.Projectiles.Melee
                     for (i = 0; i < 1; i++)
                     {
                         offsetAngle = startAngle + deltaAngle * (i + i * i) / 2f + 32f * i;
-                        int projectile1 = Projectile.NewProjectile(Projectile.GetSource_FromThis(), Projectile.Center.X, Projectile.Center.Y, (float)(Math.Sin(offsetAngle) * 5f), (float)(Math.Cos(offsetAngle) * 5f), ModContent.ProjectileType<WhiteOrb>(), Projectile.damage, Projectile.knockBack, Projectile.owner, 0f, 0f);
-                        int projectile2 = Projectile.NewProjectile(Projectile.GetSource_FromThis(), Projectile.Center.X, Projectile.Center.Y, (float)(-Math.Sin(offsetAngle) * 5f), (float)(-Math.Cos(offsetAngle) * 5f), ModContent.ProjectileType<WhiteOrb>(), Projectile.damage, Projectile.knockBack, Projectile.owner, 0f, 0f);
+                        int projectile1 = Projectile.NewProjectile(Projectile.GetSource_FromThis(), Projectile.Center.X, Projectile.Center.Y, (float)(Math.Sin(offsetAngle) * 5f), (float)(Math.Cos(offsetAngle) * 5f), ModContent.ProjectileType<WhiteOrb>(), Projectile.damage / 2, Projectile.knockBack * 0.5f, Projectile.owner);
+                        int projectile2 = Projectile.NewProjectile(Projectile.GetSource_FromThis(), Projectile.Center.X, Projectile.Center.Y, (float)(-Math.Sin(offsetAngle) * 5f), (float)(-Math.Cos(offsetAngle) * 5f), ModContent.ProjectileType<WhiteOrb>(), Projectile.damage / 2, Projectile.knockBack * 0.5f, Projectile.owner);
                         Main.projectile[projectile1].velocity.X *= 0.1f;
                         Main.projectile[projectile1].velocity.Y *= 0.1f;
                         Main.projectile[projectile2].velocity.X *= 0.1f;
                         Main.projectile[projectile2].velocity.Y *= 0.1f;
                     }
                 }
-                whiteLightTimer = 5;
+                whiteLightTimer = 15;
             }
 
             Lighting.AddLight(Projectile.Center, (255 - Projectile.alpha) * 0.5f / 255f, (255 - Projectile.alpha) * 0.5f / 255f, (255 - Projectile.alpha) * 0.5f / 255f);
@@ -62,16 +62,14 @@ namespace CalamityMod.Projectiles.Melee
                 Main.dust[shinyDust].velocity += Projectile.velocity * 0.1f;
             }
 
-            CalamityUtils.HomeInOnNPC(Projectile, !Projectile.tileCollide, 200f, 9f, 20f);
+            CalamityUtils.HomeInOnNPC(Projectile, !Projectile.tileCollide, 200f, 10f, 20f);
         }
 
         public override void OnKill(int timeLeft)
         {
             SoundEngine.PlaySound(SoundID.Item122, Projectile.position);
             if (Projectile.owner == Main.myPlayer)
-            {
-                Projectile.NewProjectile(Projectile.GetSource_FromThis(), Projectile.Center.X, Projectile.Center.Y - 100, 0f, 0f, ModContent.ProjectileType<WhiteBoltAura>(), Projectile.damage, Projectile.knockBack, Projectile.owner, 0f, 0f);
-            }
+                Projectile.NewProjectile(Projectile.GetSource_FromThis(), Projectile.Center.X, Projectile.Center.Y - 100, 0f, 0f, ModContent.ProjectileType<WhiteBoltAura>(), Projectile.damage, Projectile.knockBack, Projectile.owner);
         }
     }
 }

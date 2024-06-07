@@ -18,14 +18,14 @@ namespace CalamityMod.Items.Weapons.Melee
         {
             Item.width = 54;
             Item.height = 54;
-            Item.damage = 27;
+            Item.damage = 37;
             Item.DamageType = DamageClass.Melee;
             Item.noMelee = true;
             Item.useTurn = true;
             Item.noUseGraphic = true;
-            Item.useAnimation = 23;
+            Item.useAnimation = 28;
             Item.useStyle = ItemUseStyleID.Shoot;
-            Item.useTime = 23;
+            Item.useTime = 28;
             Item.knockBack = 5.75f;
             Item.UseSound = SoundID.Item1;
             Item.autoReuse = true;

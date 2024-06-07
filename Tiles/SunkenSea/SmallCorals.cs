@@ -16,7 +16,7 @@ namespace CalamityMod.Tiles.SunkenSea
             Main.tileNoAttach[Type] = true;
             Main.tileNoFail[Type] = true;
             Main.tileLavaDeath[Type] = true;
-            Main.tileWaterDeath[Type] = true;
+            Main.tileWaterDeath[Type] = false;
             Main.tileFrameImportant[Type] = true;
             TileID.Sets.ReplaceTileBreakUp[Type] = true;
             TileID.Sets.SwaysInWindBasic[Type] = false;

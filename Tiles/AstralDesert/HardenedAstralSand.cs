@@ -8,10 +8,9 @@ using Terraria.ModLoader;
 
 namespace CalamityMod.Tiles.AstralDesert
 {
-    public class HardenedAstralSand : ModTile, IMergeableTile
+    public class HardenedAstralSand : ModTile
     {
-        List<TileFraming.MergeFrameData> IMergeableTile.TileAdjacencies { get; } = [];
-        
+
         public override void SetStaticDefaults()
         {
             Main.tileSolid[Type] = true;

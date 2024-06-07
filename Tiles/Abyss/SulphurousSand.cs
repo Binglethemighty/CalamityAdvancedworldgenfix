@@ -16,10 +16,8 @@ namespace CalamityMod.Tiles.Abyss
     // It would create block swap issues with regular sulphurous sand and was rendered obsolete with the removal of this tile's water emission mechanic.
     // For compatibility reasons (including with schematics), however, that tile is converted into this one.
     [LegacyName("SulphurousSandNoWater")]
-    public class SulphurousSand : ModTile, IMergeableTile
+    public class SulphurousSand : ModTile
     {
-        List<TileFraming.MergeFrameData> IMergeableTile.TileAdjacencies { get; } = [];
-
         public override void SetStaticDefaults()
         {
             Main.tileSolid[Type] = true;

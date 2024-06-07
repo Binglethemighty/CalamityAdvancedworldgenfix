@@ -11,12 +11,10 @@ using Terraria.ModLoader;
 
 namespace CalamityMod.Tiles.Abyss
 {
-    public class PyreMantle : ModTile, IMergeableTile
+    public class PyreMantle : ModTile
     {
         public static readonly SoundStyle MineSound = new("CalamityMod/Sounds/Custom/VoidstoneMine", 3) { Volume = 0.4f };
-
-        List<TileFraming.MergeFrameData> IMergeableTile.TileAdjacencies { get; } = [];
-
+        
         public override void SetStaticDefaults()
         {
             Main.tileSolid[Type] = true;

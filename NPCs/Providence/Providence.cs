@@ -366,7 +366,7 @@ namespace CalamityMod.NPCs.Providence
                     colorShiftTimer = 0;
                 }
             }
-            else if (!Main.IsItDay() || bossRush) //Normal Night time activity
+            else if ((!Main.dayTime && !Main.remixWorld) || bossRush) //Normal Night time activity
                 NPC.localAI[1] = (float)BossMode.Night;
             else
                 NPC.localAI[1] = (float)BossMode.Day;

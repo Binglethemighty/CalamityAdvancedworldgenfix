@@ -25,7 +25,7 @@ namespace CalamityMod.Items.Accessories
             Item.value = CalamityGlobalItem.RarityYellowBuyPrice;
             Item.rare = ItemRarityID.Yellow;
             Item.Calamity().donorItem = true;
-            Item.defense = 12;
+            Item.defense = 6;
             Item.accessory = true;
         }
 

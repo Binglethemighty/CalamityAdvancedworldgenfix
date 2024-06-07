@@ -8,12 +8,11 @@ using Terraria.ModLoader;
 
 namespace CalamityMod.Tiles.DraedonStructures
 {
-    public class LaboratoryPanels : ModTile, IMergeableTile
+    public class LaboratoryPanels : ModTile
     {
         public static readonly SoundStyle MinePlatingSound = new("CalamityMod/Sounds/Custom/PlatingMine", 3);
 
-        List<TileFraming.MergeFrameData> IMergeableTile.TileAdjacencies { get; } = [];
-        
+
         public override void SetStaticDefaults()
         {
             Main.tileSolid[Type] = true;

@@ -1,4 +1,7 @@
-﻿using Microsoft.Xna.Framework;
+﻿using System;
+using CalamityMod.Particles;
+using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Graphics;
 using Terraria;
 using Terraria.Audio;
 using Terraria.ID;
@@ -10,7 +13,14 @@ namespace CalamityMod.Projectiles.Ranged
     {
         public new string LocalizationCategory => "Projectiles.Ranged";
         public override string Texture => "CalamityMod/Projectiles/LaserProj";
-
+        public Color baseColor = Color.White;
+        public bool outOfTime = false;
+        public Vector2 baseVel;
+        public override void SetStaticDefaults()
+        {
+            ProjectileID.Sets.TrailCacheLength[Projectile.type] = 15;
+            ProjectileID.Sets.TrailingMode[Projectile.type] = 2;
+        }
         public override void SetDefaults()
         {
             Projectile.width = 5;
@@ -18,43 +28,78 @@ namespace CalamityMod.Projectiles.Ranged
             Projectile.friendly = true;
             Projectile.DamageType = DamageClass.Ranged;
             Projectile.penetrate = 1;
-            Projectile.MaxUpdates = 2;
-            Projectile.alpha = 255;
+            Projectile.extraUpdates = 6;
             Projectile.timeLeft = 360;
             Projectile.Calamity().pointBlankShotDuration = CalamityGlobalProjectile.DefaultPointBlankDuration;
         }
 
         public override void AI()
         {
-            if (Projectile.alpha > 0)
-                Projectile.alpha -= 25;
-            if (Projectile.alpha < 0)
-                Projectile.alpha = 0;
+            bool Shredder = Projectile.ai[2] == 0;
+            bool Infinity = Projectile.ai[2] == 1;
+            bool Svant = Projectile.ai[2] == 2 || Projectile.ai[2] == 3 || Projectile.ai[2] == 4;
 
-            float lightScale = 1f - Projectile.alpha / 255f;
-            Projectile.ai[2] = lightScale;
-            Lighting.AddLight(Projectile.Center, 0f, 0.3f * lightScale, 0.7f * lightScale);
+            Player Owner = Main.player[Projectile.owner];
+            float targetDist = Vector2.Distance(Owner.Center, Projectile.Center);
 
-            float beamLength = 60f;
-            float beamLengthGrowth = 1f;
-            Projectile.localAI[0] += beamLengthGrowth;
-            if (Projectile.localAI[0] > beamLength)
-                Projectile.localAI[0] = beamLength;
-        }
-
-        public override Color? GetAlpha(Color lightColor) => new Color(100, 100, 255, 0) * Projectile.ai[2];
-
-        public override bool PreDraw(ref Color lightColor) => Projectile.DrawBeam(100f, 3f, lightColor);
-
-        public override void OnKill(int timeLeft)
-        {
-            SoundEngine.PlaySound(SoundID.Item62, Projectile.position);
-            int projectiles = 2;
-            if (Projectile.owner == Main.myPlayer)
+            if (baseColor == Color.White)
             {
-                for (int k = 0; k < projectiles; k++)
-                    Projectile.NewProjectile(Projectile.GetSource_FromThis(), Projectile.Center, Main.rand.NextVector2CircularEdge(5f, 5f), ModContent.ProjectileType<ChargedBlast2>(), (int)(Projectile.damage * 0.5), Projectile.knockBack * 0.8f, Main.myPlayer);
+                baseColor = (Infinity ? new Color(229, 49, 39) : Svant ? Color.DarkViolet : Color.DodgerBlue);
+                if (Projectile.ai[2] == 3)
+                {
+                    baseColor = Color.DarkOrchid;
+                }
+                if (Projectile.ai[2] == 4)
+                {
+                    baseColor = Color.MediumOrchid;
+                }
+                baseVel = Projectile.velocity;
+                if (Svant)
+                    Projectile.ArmorPenetration = 100;
+                if (Infinity)
+                    Projectile.ArmorPenetration = 25;
+            }
+            Projectile.rotation = Projectile.velocity.ToRotation() + MathHelper.PiOver2;
+            if (Projectile.timeLeft == 2)
+                outOfTime = true;
+            if ((Svant || Infinity) && Projectile.timeLeft % 2 == 0 && targetDist < 1400f && Projectile.timeLeft < 340)
+            {
+                Particle spark = new LineParticle(Projectile.Center - Projectile.velocity * 3, -Projectile.velocity * 0.05f, false, 5, 2f, baseColor * 0.65f);
+                GeneralParticleHandler.SpawnParticle(spark);
             }
         }
+        public override void OnKill(int timeLeft)
+        {
+            if (!outOfTime)
+            {
+                SoundEngine.PlaySound(SoundID.Item62, Projectile.Center);
+                int projectiles = 2;
+                if (Projectile.owner == Main.myPlayer)
+                {
+                    for (int k = 0; k < projectiles; k++)
+                        Projectile.NewProjectileDirect(Projectile.GetSource_FromThis(), Projectile.Center, -baseVel.RotatedByRandom(0.9f) * Main.rand.NextFloat(0.6f, 0.7f), ModContent.ProjectileType<ChargedBlastSplit>(), (int)(Projectile.damage * (Projectile.ai[2] > 0 ? 0.3f : 0.5f)), Projectile.knockBack * 0.8f, Main.myPlayer, 0, 0, Projectile.ai[2]);
+                }
+                for (int k = 0; k < 3; k++)
+                {
+                    Particle spark2 = new LineParticle(Projectile.Center, (-baseVel * 4).RotatedByRandom(0.9f) * Main.rand.NextFloat(0.8f, 1.2f), false, Main.rand.Next(25, 32 + 1), Main.rand.NextFloat(1.5f, 2f), baseColor);
+                    GeneralParticleHandler.SpawnParticle(spark2);
+                }
+                if (Projectile.ai[2] == 1)
+                {
+                    Particle spark2 = new LineParticle(Projectile.Center, (-baseVel * 5).RotatedByRandom(0.9f) * Main.rand.NextFloat(0.8f, 1.2f), false, Main.rand.Next(35, 48 + 1), Main.rand.NextFloat(2.3f, 3f), baseColor);
+                    GeneralParticleHandler.SpawnParticle(spark2);
+                }
+            }
+        }
+        public override bool PreDraw(ref Color lightColor)
+        {
+            if (baseColor == Color.White)
+                return false;
+            Texture2D texture = ModContent.Request<Texture2D>("CalamityMod/Particles/DrainLineBloom").Value;
+            CalamityUtils.DrawAfterimagesCentered(Projectile, ProjectileID.Sets.TrailingMode[Projectile.type], (baseColor * 0.7f) with { A = 0 }, 1, texture);
+            Main.EntitySpriteDraw(texture, Projectile.Center - Main.screenPosition, null, baseColor with { A = 0 }, Projectile.rotation, texture.Size() * 0.5f, Projectile.scale, SpriteEffects.None, 0);
+            return false;
+        }
+        public override bool? Colliding(Rectangle projHitbox, Rectangle targetHitbox) => CalamityUtils.CircularHitboxCollision(Projectile.Center, 20, targetHitbox);
     }
 }

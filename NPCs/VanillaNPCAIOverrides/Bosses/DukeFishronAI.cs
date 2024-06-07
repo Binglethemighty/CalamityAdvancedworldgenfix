@@ -121,22 +121,16 @@ namespace CalamityMod.NPCs.VanillaNPCAIOverrides.Bosses
             Player player = Main.player[npc.target];
 
             // Get target
-            if (npc.target < 0 || npc.target == Main.maxPlayers || player.dead || !player.active)
+            if (npc.target < 0 || npc.target == Main.maxPlayers || player.dead || !player.active || Vector2.Distance(player.Center, npc.Center) > CalamityGlobalNPC.CatchUpDistance350Tiles)
             {
                 npc.TargetClosest();
                 player = Main.player[npc.target];
                 npc.netUpdate = true;
             }
 
-            // Despawn safety, make sure to target another player if the current player target is too far away
-            if (Vector2.Distance(player.Center, npc.Center) > CalamityGlobalNPC.CatchUpDistance200Tiles)
-                npc.TargetClosest();
-
             // Despawn
             if (player.dead || Vector2.Distance(player.Center, npc.Center) > CalamityGlobalNPC.CatchUpDistance350Tiles)
             {
-                npc.TargetClosest();
-
                 npc.velocity.Y -= 0.4f;
 
                 if (npc.timeLeft > 10)
@@ -477,7 +471,6 @@ namespace CalamityMod.NPCs.VanillaNPCAIOverrides.Bosses
                     npc.ai[1] = 0f;
                     npc.ai[2] = 0f;
                     npc.ai[3] += 2f;
-                    npc.TargetClosest();
                     npc.netUpdate = true;
                 }
             }
@@ -526,7 +519,6 @@ namespace CalamityMod.NPCs.VanillaNPCAIOverrides.Bosses
                     npc.ai[0] = 0f;
                     npc.ai[1] = 0f;
                     npc.ai[2] = 0f;
-                    npc.TargetClosest();
                     npc.netUpdate = true;
                 }
             }
@@ -566,7 +558,6 @@ namespace CalamityMod.NPCs.VanillaNPCAIOverrides.Bosses
                     npc.ai[0] = 0f;
                     npc.ai[1] = 0f;
                     npc.ai[2] = 0f;
-                    npc.TargetClosest();
                     npc.netUpdate = true;
                 }
             }
@@ -592,7 +583,6 @@ namespace CalamityMod.NPCs.VanillaNPCAIOverrides.Bosses
                     npc.ai[1] = 0f;
                     npc.ai[2] = 0f;
                     npc.ai[3] = 0f;
-                    npc.TargetClosest();
                     npc.netUpdate = true;
                 }
             }
@@ -751,7 +741,6 @@ namespace CalamityMod.NPCs.VanillaNPCAIOverrides.Bosses
                     npc.ai[1] = 0f;
                     npc.ai[2] = 0f;
                     npc.ai[3] += 2f;
-                    npc.TargetClosest();
                     npc.netUpdate = true;
                 }
             }
@@ -797,7 +786,6 @@ namespace CalamityMod.NPCs.VanillaNPCAIOverrides.Bosses
                     npc.ai[0] = 5f;
                     npc.ai[1] = 0f;
                     npc.ai[2] = 0f;
-                    npc.TargetClosest();
                     npc.netUpdate = true;
                 }
             }
@@ -825,7 +813,6 @@ namespace CalamityMod.NPCs.VanillaNPCAIOverrides.Bosses
                     npc.ai[0] = 5f;
                     npc.ai[1] = 0f;
                     npc.ai[2] = 0f;
-                    npc.TargetClosest();
                     npc.netUpdate = true;
                 }
             }
@@ -871,7 +858,6 @@ namespace CalamityMod.NPCs.VanillaNPCAIOverrides.Bosses
                     npc.ai[1] = 0f;
                     npc.ai[2] = 0f;
                     npc.ai[3] = 0f;
-                    npc.TargetClosest();
                     npc.netUpdate = true;
                 }
             }
@@ -1062,7 +1048,6 @@ namespace CalamityMod.NPCs.VanillaNPCAIOverrides.Bosses
                     if (!phase4 || !death)
                         npc.ai[3] += 1f;
 
-                    npc.TargetClosest();
                     npc.netUpdate = true;
                 }
             }
@@ -1163,7 +1148,7 @@ namespace CalamityMod.NPCs.VanillaNPCAIOverrides.Bosses
 
             Vector2 velocityVector = (Main.player[npc.target].Center - npc.Center).SafeNormalize(Vector2.UnitY);
             float inertia = 30f;
-            float velocity = 25f;
+            float velocity = 24f;
             npc.velocity = (npc.velocity * inertia + velocityVector * velocity) / (inertia + 1f);
             
             npc.scale = npc.ai[3];

@@ -27,8 +27,8 @@ namespace CalamityMod.Projectiles.Typeless
             Projectile.tileCollide = false;
             Projectile.penetrate = 1;
             Projectile.timeLeft = 4;
-            Projectile.usesLocalNPCImmunity = true;
-            Projectile.localNPCHitCooldown = -1;
+            Projectile.usesIDStaticNPCImmunity = true;
+            Projectile.idStaticNPCHitCooldown = 22;
         }
 
         public override void OnHitNPC(NPC target, NPC.HitInfo hit, int damageDone)

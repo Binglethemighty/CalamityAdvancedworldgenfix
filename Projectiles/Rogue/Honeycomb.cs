@@ -71,6 +71,11 @@ namespace CalamityMod.Projectiles.Rogue
 
         public void SpawnProjectiles()
         {
+            // If it's already spawned projectiles, don't do anything. Prevents it from spawning double the projectile amount when hitting enemies.
+            if (Projectile.ai[1] == 1f)
+                return;
+
+            Projectile.ai[1] = 1f;
             Player player = Main.player[Main.myPlayer];
             int fragAmt = 2;
             for (int i = 0; i < fragAmt; i++)

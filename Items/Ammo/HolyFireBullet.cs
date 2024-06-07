@@ -10,7 +10,7 @@ namespace CalamityMod.Items.Ammo
     public class HolyFireBullet : ModItem, ILocalizedModType
     {
         public new string LocalizationCategory => "Items.Ammo";
-        internal const float ExplosionMultiplier = 0.33f;
+        internal const float ExplosionMultiplier = 0.275f;
         public static readonly SoundStyle Explosion = new("CalamityMod/Sounds/Item/HolyFireBulletExplosion") { PitchVariance = 0.2f, Volume = 0.6f };
         public override void SetStaticDefaults()
         {
@@ -21,7 +21,7 @@ namespace CalamityMod.Items.Ammo
         {
             Item.width = 22;
             Item.height = 22;
-            Item.damage = 22;
+            Item.damage = 20;
             Item.DamageType = DamageClass.Ranged;
             Item.maxStack = 9999;
             Item.consumable = true;

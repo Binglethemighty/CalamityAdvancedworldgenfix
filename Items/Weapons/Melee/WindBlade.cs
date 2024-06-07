@@ -27,7 +27,7 @@ namespace CalamityMod.Items.Weapons.Melee
             Item.value = CalamityGlobalItem.RarityOrangeBuyPrice;
             Item.rare = ItemRarityID.Orange;
             Item.shoot = ModContent.ProjectileType<Cyclone>();
-            Item.shootSpeed = 3f;
+            Item.shootSpeed = 5f;
         }
 
         public override bool Shoot(Player player, EntitySource_ItemUse_WithAmmo source, Vector2 position, Vector2 velocity, int type, int damage, float knockback)

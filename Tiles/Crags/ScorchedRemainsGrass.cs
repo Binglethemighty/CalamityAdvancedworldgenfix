@@ -10,14 +10,12 @@ using Terraria.ModLoader;
 
 namespace CalamityMod.Tiles.Crags
 {
-    public class ScorchedRemainsGrass : ModTile, IMergeableTile
+    public class ScorchedRemainsGrass : ModTile
     {
         private const short subsheetWidth = 234;
         private const short subsheetHeight = 90;
         private int extraFrameHeight = 36;
         private int extraFrameWidth = 90;
-
-        List<TileFraming.MergeFrameData> IMergeableTile.TileAdjacencies { get; } = [];
 
         public override void SetStaticDefaults()
         {

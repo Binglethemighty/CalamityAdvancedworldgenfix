@@ -1,15 +1,15 @@
-﻿using System.Linq;
-using System.Reflection;
+﻿using System;
+using System.Linq;
 using CalamityMod.Balancing;
-using CalamityMod.Buffs.DamageOverTime;
-using CalamityMod.Buffs.StatDebuffs;
 using CalamityMod.DataStructures;
+using CalamityMod.Enums;
 using CalamityMod.Events;
 using CalamityMod.NPCs;
 using CalamityMod.NPCs.NormalNPCs;
 using CalamityMod.NPCs.OldDuke;
 using CalamityMod.NPCs.Providence;
 using CalamityMod.NPCs.SlimeGod;
+using CalamityMod.NPCs.Yharon;
 using CalamityMod.Projectiles.Boss;
 using CalamityMod.World;
 using Microsoft.Xna.Framework;
@@ -24,8 +24,85 @@ using static Terraria.ModLoader.ModContent;
 
 namespace CalamityMod
 {
+    #region Calamity Targeting Parameters Struct
+    public struct CalamityTargetingParameters
+    {
+        // Vanilla argument to TargetClosest. Defaults to true as it does in vanilla.
+        // If true, the NPC will turn to face the target.
+        public bool faceTarget = true;
+
+        // Vanilla argument to TargetClosestUpgraded. That function is never used, but the flexibility is implemented here.
+        // Allows targeting distance calculations to be measured from a different position than the NPC's center, if desired.
+        public Vector2? targetingCenter = null;
+
+        // Hard maximum range to search for targets. Players outside this physical Manhattan distance will always be ignored.
+        //
+        // Vanilla always uses infinity for this, leading to behavior like Queen Bee crossing the world to spawncamp you.
+        // Calamity defaults to a very high but not infinite value.
+        public float maxSearchRange = 9600f; // 600 tiles
+
+        // Targeting preference enum.
+        // Anyone = Target the "closest" player, no other considerations. Vanilla behavior.
+        // PreferSame = Always pick the same player if they're within the search range, even if another player is closer or has more aggro.
+        // ForceSwitch = Try to pick any other player but the current player, if possible. Similar to an "aggro drop" in MMOs.
+        //
+        // ForceSwitch intentionally does nothing in single player, because there is nobody to switch to.
+        public NPCTargetType targetType = NPCTargetType.Anyone;
+
+        // The ratio at which to consider aggro bonuses from player gear.
+        // 1f is vanilla. Set to 0f to ignore aggro bonuses entirely.
+        // Set to a negative value to make the NPC intentionally avoid tanks and preferentially go after other players.
+        public float aggroRatio = 1f;
+
+        // Whether or not players must have line of sight to the NPC to be considered valid targets.
+        // This is always line of sight to the NPC itself, even if a different targeting center for range finding is specified.
+        public bool requireLineOfSight = false;
+
+        // If true, the targeting algorithm counts missing health as a gigantic boost to aggro.
+        // This makes for a "merciless" or "bloodthirsty" NPC which is focused on killing the lowest health players.
+        public bool finishThemOff = false;
+        internal const float FinishThemOff_MaxAggroBoost = 4000f;
+
+        // If true, this NPC ignores the Stardust armor set bonus "JoJo Tank Minion" (or "Algalon the Observer" according to the wiki).
+        //
+        // This is set to false by default, because that's vanilla behavior.
+        // As Stardust armor is postgame in vanilla, no vanilla bosses ignore the Stardust Guardian.
+        // It is highly recommended to set this to true for all bosses, or their aggro can be abusively manipulated.
+        public bool ignoreTankMinions = false;
+
+        // If true, this NPC ignores players who have less than zero net aggro and are not actively using items.
+        //
+        // This is set to true by default, because it's (undocumented) vanilla behavior.
+        // Bosses will automatically attack stealthed players anyway -- you don't need to set this to false for that to occur.
+        public bool ignoreStealthedPlayers = true;
+
+        // If true, this targeting change forces a net update.
+        // In vanilla, targeting updates cause net updates if direction changed or the target player changed,
+        // but NEVER if the NPC has collideX or collideY set to true.
+        //
+        // Generally this doesn't need to be set to true, as bosses will never have collideX or collideY set to true.
+        public bool forceNetUpdate = false;
+
+        public CalamityTargetingParameters()
+        {
+        }
+
+        // Quick defaults for recommended boss settings.
+        public CalamityTargetingParameters(bool isBoss)
+        {
+            ignoreTankMinions = isBoss;
+        }
+
+        public static CalamityTargetingParameters BossDefaults => new(true);
+    }
+    #endregion
+
+
     public static partial class CalamityUtils
     {
+        public static T ModNPC<T>(this NPC npc) where T : ModNPC => npc.ModNPC as T;
+
+        #region NPC Counting
         /// <summary>
         /// Efficiently counts the amount of existing enemies. May be used for multiple enemies.
         /// </summary>
@@ -49,6 +126,22 @@ namespace CalamityMod
             return count;
         }
 
+        public static bool AnyBossNPCS(bool checkForMechs = false)
+        {
+            foreach (NPC npc in Main.ActiveNPCs)
+            {
+                if (npc.IsABoss())
+                {
+                    // Added due to the new mech boss ore progression, return true if any mech is alive and checkForMechs is true, reduces mech boss projectile damage if true.
+                    if (checkForMechs)
+                        return npc.type == NPCID.TheDestroyer || npc.type == NPCID.SkeletronPrime || npc.type == NPCID.Spazmatism || npc.type == NPCID.Retinazer;
+                    return true;
+                }
+            }
+            return FindFirstProjectile(ProjectileType<DeusRitualDrama>()) != -1;
+        }
+        #endregion
+
         /// <summary>
         /// Hides an NPC from the bestiary. This should be called in SetStaticDefaults.
         /// </summary>
@@ -62,23 +155,7 @@ namespace CalamityMod
             NPCID.Sets.NPCBestiaryDrawOffset.Add(n.Type, value);
         }
 
-        /// <summary>
-        /// Syncs position and velocity from a client to the server. This is to be used in contexts where these things are reliant on client-side information, such as <see cref="Main.MouseWorld"/>.
-        /// </summary>
-        /// <param name="npc"></param>
-        public static void SyncMotionToServer(this NPC npc)
-        {
-            if (Main.netMode != NetmodeID.MultiplayerClient)
-                return;
-
-            var netMessage = CalamityMod.Instance.GetPacket();
-            netMessage.Write((byte)CalamityModMessageType.SyncNPCMotionDataToServer);
-            netMessage.Write(npc.whoAmI);
-            netMessage.WriteVector2(npc.Center);
-            netMessage.WriteVector2(npc.velocity);
-            netMessage.Send();
-        }
-
+        #region Stat Setting
         /// <summary>
         /// Allows you to set the lifeMax value of a NPC to different values based on the mode. Called instead of npc.lifeMax = X.
         /// </summary>
@@ -123,7 +200,9 @@ namespace CalamityMod
             if (customDR.HasValue)
                 npc.Calamity().customDR = true;
         }
+        #endregion
 
+        #region NPC Threat Classification
         // This function controls the behavior of Proximity Rage.
         //
         // TODO -- In multiplayer, with more than one player, all enemies are listed as statue spawned.
@@ -171,39 +250,9 @@ namespace CalamityMod
             return npc.type == NPCType<EbonianPaladin>() || npc.type == NPCType<CrimulanPaladin>() ||
                 npc.type == NPCType<SplitEbonianPaladin>() || npc.type == NPCType<SplitCrimulanPaladin>();
         }
+        #endregion
 
-        public static bool AnyBossNPCS(bool checkForMechs = false)
-        {
-            foreach (NPC npc in Main.ActiveNPCs)
-            {
-                if (npc.IsABoss())
-                {
-                    // Added due to the new mech boss ore progression, return true if any mech is alive and checkForMechs is true, reduces mech boss projectile damage if true.
-                    if (checkForMechs)
-                        return npc.type == NPCID.TheDestroyer || npc.type == NPCID.SkeletronPrime || npc.type == NPCID.Spazmatism || npc.type == NPCID.Retinazer;
-                    return true;
-                }
-            }
-            return FindFirstProjectile(ProjectileType<DeusRitualDrama>()) != -1;
-        }
-
-        /// <summary>
-        /// Syncs <see cref="CalamityGlobalNPC.destroyerLaserColor"/>. This exists to sync the Destroyer's lasers so that the telegraphs and segment colors display properly.
-        /// </summary>
-        /// <param name="npc"></param>
-        public static void SyncDestroyerLaserColor(this NPC npc)
-        {
-            // Don't bother attempting to send packets in singleplayer.
-            if (Main.netMode == NetmodeID.SinglePlayer)
-                return;
-
-            ModPacket packet = CalamityMod.Instance.GetPacket();
-            packet.Write((byte)CalamityModMessageType.SyncDestroyerLaserColor);
-            packet.Write((byte)npc.whoAmI);
-            packet.Write(npc.Calamity().destroyerLaserColor);
-            packet.Send();
-        }
-
+        #region Net Synchronization
         /// <summary>
         /// Syncs <see cref="CalamityGlobalNPC.newAI"/>. This exists specifically for AIs manipulated in a global context, as <see cref="GlobalNPC"/> has no netUpdate related hooks.
         /// </summary>
@@ -244,6 +293,257 @@ namespace CalamityMod
             packet.Send();
         }
 
+        /// <summary>
+        /// Syncs position and velocity from a client to the server. This is to be used in contexts where these things are reliant on client-side information, such as <see cref="Main.MouseWorld"/>.
+        /// </summary>
+        /// <param name="npc"></param>
+        public static void SyncMotionToServer(this NPC npc)
+        {
+            if (Main.netMode != NetmodeID.MultiplayerClient)
+                return;
+
+            var netMessage = CalamityMod.Instance.GetPacket();
+            netMessage.Write((byte)CalamityModMessageType.SyncNPCMotionDataToServer);
+            netMessage.Write(npc.whoAmI);
+            netMessage.WriteVector2(npc.Center);
+            netMessage.WriteVector2(npc.velocity);
+            netMessage.Send();
+        }
+
+        /// <summary>
+        /// Syncs <see cref="CalamityGlobalNPC.destroyerLaserColor"/>. This exists to sync the Destroyer's lasers so that the telegraphs and segment colors display properly.
+        /// </summary>
+        /// <param name="npc"></param>
+        public static void SyncDestroyerLaserColor(this NPC npc)
+        {
+            // Don't bother attempting to send packets in singleplayer.
+            if (Main.netMode == NetmodeID.SinglePlayer)
+                return;
+
+            ModPacket packet = CalamityMod.Instance.GetPacket();
+            packet.Write((byte)CalamityModMessageType.SyncDestroyerLaserColor);
+            packet.Write((byte)npc.whoAmI);
+            packet.Write(npc.Calamity().destroyerLaserColor);
+            packet.Send();
+        }
+        #endregion
+
+        #region Smooth Movement
+        /// <summary>
+        /// Smoother movement for NPCs
+        /// </summary>
+        /// <param name="npc">The NPC getting the movement change.</param>
+        /// <param name="movementDistanceGateValue">The distance where the NPC should stop moving once it's close enough to its destination.</param>
+        /// <param name="distanceFromDestination">How far the NPC is from its destination.</param>
+        /// <param name="baseVelocity">How quickly the NPC moves towards its destination.</param>
+        /// <param name="useSimpleFlyMovement">Whether the NPC should use SimpleFlyMovement to make the movement more affected by acceleration.</param>
+        public static void SmoothMovement(NPC npc, float movementDistanceGateValue, Vector2 distanceFromDestination, float baseVelocity, float acceleration, bool useSimpleFlyMovement)
+        {
+            // Inverse lerp returns the percentage of progress between A and B
+            float lerpValue = Utils.GetLerpValue(movementDistanceGateValue, 2400f, distanceFromDestination.Length(), true);
+
+            // Min velocity
+            float minVelocity = distanceFromDestination.Length();
+            float minVelocityCap = baseVelocity;
+            if (minVelocity > minVelocityCap)
+                minVelocity = minVelocityCap;
+
+            // Max velocity
+            Vector2 maxVelocity = distanceFromDestination / 24f;
+            float maxVelocityCap = minVelocityCap * 3f;
+            if (maxVelocity.Length() > maxVelocityCap)
+                maxVelocity = distanceFromDestination.SafeNormalize(Vector2.Zero) * maxVelocityCap;
+
+            // Set the velocity
+            Vector2 desiredVelocity = Vector2.Lerp(distanceFromDestination.SafeNormalize(Vector2.Zero) * minVelocity, maxVelocity, lerpValue);
+            if (useSimpleFlyMovement)
+                npc.SimpleFlyMovement(desiredVelocity, acceleration);
+            else
+                npc.velocity = desiredVelocity;
+        }
+        #endregion
+
+        #region Calamity Style Targeting
+        /// <summary>
+        /// Replacement and extension for vanilla's NPC.TargetClosest. Has very flexible behavior.<br />
+        /// Like vanilla's function, this function does not return any value, but makes its changes in-place.
+        /// </summary>
+        /// <param name="options">Struct to specify all options. Refer to struct definition in NPCUtils for details.</param>
+        /// <returns>The targeted player ID.</returns>
+        public static int CalamityTargeting(this NPC npc, CalamityTargetingParameters options)
+        {
+            float distance = 0f;
+            // float realDist = 0f; // Defined but not used by vanilla. Commented out here.
+            bool anyTargetAvailable = false;
+            int tankMinionProjectileID = -1;
+
+            // The setup and initial loop is equivalent to vanilla NPC.TargetClosest, but optimized.
+            foreach (Player p in Main.ActivePlayers)
+            {
+                bool playerDead = p.dead || p.ghost;
+                if (playerDead)
+                    continue;
+
+                // ForceSwitch targeting. If the same player from last time is iterated over, just ignore them.
+                bool sameTargetAsLastTime = p.whoAmI == npc.oldTarget;
+                bool notSinglePlayer = Main.netMode != NetmodeID.SinglePlayer;
+                if (options.targetType == NPCTargetType.ForceSwitch && notSinglePlayer && sameTargetAsLastTime)
+                    continue;
+
+                //
+                // The below code is implemented in vanilla as a separate method. Here, it's inlined for efficiency.
+                //
+
+                Vector2 pCenter = p.Center;
+                Vector2 targetCenter = options.targetingCenter ?? npc.Center;
+                float manhattanDist = Math.Abs(targetCenter.X - pCenter.X) + Math.Abs(targetCenter.Y - pCenter.Y);
+
+                // Hard cutoff range specified in options. If the player is further, completely ignore them.
+                if (manhattanDist > options.maxSearchRange)
+                    continue;
+
+                // Line of sight requirement specified in options. Please don't use this without reducing the max search range.
+                if (options.requireLineOfSight && !Collision.CanHit(npc.Center, 1, 1, pCenter, 1, 1))
+                    continue;
+
+                float aggroAdjustedDist = manhattanDist - options.aggroRatio * p.aggro;
+
+                // Implementation of "Finish Them Off": Add enormous amounts of virtual aggro to low health players
+                if (options.finishThemOff)
+                {
+                    float missingHPRatio = MathHelper.Clamp(1f - p.statLife / (float)p.statLifeMax2, 0f, 1f);
+                    float bloodthirstAggro = MathHelper.Lerp(0f, CalamityTargetingParameters.FinishThemOff_MaxAggroBoost, missingHPRatio);
+                    aggroAdjustedDist -= bloodthirstAggro;
+                }
+
+                bool aggroDisabled = p.npcTypeNoAggro[npc.type];
+                if (aggroDisabled && npc.direction != 0)
+                    aggroAdjustedDist += 1000f;
+
+                bool cancelTargeting = false;
+
+                // PreferSame targeting. If the same player from last time is a valid target, even if not the "best" target, pick it anyway.
+                bool preferSameFound = options.targetType == NPCTargetType.PreferSame && sameTargetAsLastTime;
+
+                // Standard targeting. If the adjusted distance is lower, or this is the first valid target, actually choose the new target.
+                bool standardTargetingRequirementsMet = !anyTargetAvailable || aggroAdjustedDist < distance;
+
+                // If either targeting method succeeded, then this target is being engaged.
+                bool engageThisTarget = preferSameFound || standardTargetingRequirementsMet;
+                if (engageThisTarget)
+                {
+                    anyTargetAvailable = true;
+                    tankMinionProjectileID = -1; // Reset any Stardust Guardian aggro because a real player was found.
+                    distance = aggroAdjustedDist;
+                    npc.target = p.whoAmI;
+
+                    // If PreferSame targeting is active, and the same player was found, cancel further iteration. They are being chosen above all others.
+                    if (preferSameFound)
+                        cancelTargeting = true;
+                }
+
+                // "Tank pet" accomodation, AKA the 1.4+ Stardust Guardian
+                // Basically, if the player would be targeted, give a chance to instead target their tank minion
+                //
+                // This behavior is not documented on the vanilla wiki.
+                if (p.tankPet >= 0 && !aggroDisabled && !options.ignoreTankMinions)
+                {
+                    Projectile tankMinion = Main.projectile[p.tankPet];
+                    Vector2 tmCenter = tankMinion.Center;
+                    float manhattanDistToTankMinion = Math.Abs(targetCenter.X - tmCenter.X) + Math.Abs(targetCenter.Y - tmCenter.Y);
+
+                    // The Stardust Guardian is considered to have a 200 aggro bonus by default.
+                    // In Calamity this is scaled by the aggro ratio specified in options.
+                    manhattanDistToTankMinion -= options.aggroRatio * 200f;
+
+                    // The Stardust Guardian only attracts the attention of NPCs within a very short distance
+                    if (manhattanDistToTankMinion < distance && manhattanDistToTankMinion < 200f && Collision.CanHit(npc.Center, 1, 1, tmCenter, 1, 1))
+                        tankMinionProjectileID = p.tankPet;
+                }
+
+                // If targeting has been short-circuited for any reason, cancel iteration over players.
+                if (cancelTargeting)
+                    break;
+            }
+
+            // If the NPC has been aggroed by a Stardust Guardian instead of an actual player, account for that
+            if (tankMinionProjectileID >= 0)
+            {
+                Projectile tankMinion = Main.projectile[tankMinionProjectileID];
+                npc.targetRect = tankMinion.Hitbox;
+
+                // Always set direction to a nonzero value. This NPC has been engaged in combat.
+                npc.direction = 1;
+                if (tankMinion.Center.X < npc.Center.X)
+                    npc.direction = -1;
+
+                npc.directionY = 1;
+                if (tankMinion.Center.Y < npc.Center.Y)
+                    npc.directionY = -1;
+            }
+
+            // Standard player aggro occurs here
+            else
+            {
+                bool shouldFaceTarget = options.faceTarget;
+                
+                // Sanitize targeted player index
+                if (npc.target < 0 || npc.target >= Main.maxPlayers)
+                    npc.target = 0;
+
+                Player targetPlayer = Main.player[npc.target];
+                npc.targetRect = targetPlayer.Hitbox;
+
+                // Do not switch facing to look at dead players.
+                if (targetPlayer.dead)
+                    shouldFaceTarget = false;
+
+                // If already engaged in combat, do not switch facing to look at players that ignore your aggro.
+                if (targetPlayer.npcTypeNoAggro[npc.type] && npc.direction != 0)
+                    shouldFaceTarget = false;
+
+                if (shouldFaceTarget)
+                {
+                    bool oldTargetWasValid = npc.oldTarget >= 0 && npc.oldTarget < Main.maxPlayers;
+
+                    bool targetIsLowAggroNotUsingItem = targetPlayer.itemAnimation == 0 && targetPlayer.aggro < 0;
+                    bool willIgnoreStealthedPlayers = !npc.boss && options.ignoreStealthedPlayers;
+
+                    // Regular NPCs (not bosses) will voluntarily ignore otherwise-valid player targets with less than zero aggro if they are not actively using an item.
+                    // This ONLY WORKS if they already have another valid target, aka multiplayer.
+                    // As such, having net less than zero aggro enables you to remain "stealthed" to regular enemies if you are not doing anything.
+                    // This is undocumented vanilla behavior.
+                    bool ignoreStealthedPlayer = willIgnoreStealthedPlayers && oldTargetWasValid && targetIsLowAggroNotUsingItem;
+                    if (!ignoreStealthedPlayer)
+                    {
+                        // Always set direction to a nonzero value. This NPC has been engaged in combat.
+                        npc.direction = 1;
+                        if (targetPlayer.Center.X < npc.Center.X)
+                            npc.direction = -1;
+
+                        npc.directionY = 1;
+                        if (targetPlayer.Center.Y < npc.Center.Y)
+                            npc.directionY = -1;
+                    }
+                }
+            }
+
+            // Confused enemies always run in the exact wrong direction, horizontally at least.
+            if (npc.confused)
+                npc.direction *= -1;
+
+            // Apply net updates.
+            bool directionChange = npc.direction != npc.oldDirection || npc.directionY != npc.oldDirectionY;
+            bool targetChange = npc.target != npc.oldTarget;
+            bool shouldNetUpdate = (directionChange || targetChange) && !npc.collideX && !npc.collideY;
+            if (shouldNetUpdate || options.forceNetUpdate)
+                npc.netUpdate = true;
+
+            return npc.target;
+        }
+        #endregion
+
+        #region Minion Homing
         /// <summary>
         /// Detects nearby hostile NPCs from a given point
         /// </summary>
@@ -307,6 +607,53 @@ namespace CalamityMod
         }
 
         /// <summary>
+        /// Detects the hostile NPC that is closest angle-wise to the rotation vector
+        /// </summary>
+        /// <param name="origin">The position that will be used to find the rotation vector to NPCs</param>
+        /// <param name="checkRotationVector">The rotation vector that the other rotation vectors to NPCs will be compared to</param>
+        /// <param name="maxDistanceToCheck">Maximum amount of pixels to check around the origin</param>
+        /// <param name="wantedHalfCone">When the angle between the rotation vector and the vector to the NPC is less than or equal to this, NPCs start getting ranked by distance. Set to 0 or less to ignore</param>
+        /// <param name="ignoreTiles">Whether or not to ignore tiles when finding a target</param>
+        /// <returns>The NPC that best fits the parameters. Null if no NPC is found</returns>
+        public static NPC ClosestNPCToAngle(this Vector2 origin, Vector2 checkRotationVector, float maxDistanceToCheck, float wantedHalfCone = 0.125f, bool ignoreTiles = true)
+        {
+            NPC closestTarget = null;
+            float distance = maxDistanceToCheck;
+            float angle = MathHelper.Pi;
+            for (int i = 0; i < Main.maxNPCs; i++)
+            {
+                NPC npc = Main.npc[i];
+                if (!npc.CanBeChasedBy(null, false))
+                    continue;
+
+                float checkDist = origin.Distance(npc.Center);
+                if (checkDist >= distance) // Immediately disqualify anything beyond the distance that must be beaten
+                    continue;
+
+                float angleBetween = checkRotationVector.AngleBetween(npc.Center - origin);
+                if (angleBetween > angle) // Narrow down to the closest npc to the angle
+                    continue;
+
+                if (!ignoreTiles && !Collision.CanHit(origin, 1, 1, npc.Center, 1, 1)) // Tile LoS check if wanted
+                    continue;
+
+                if (angle <= wantedHalfCone)
+                {
+                    angle = wantedHalfCone; 
+                    distance = checkDist; // We are within the cone. Now npcs are further narrowed down by distance
+                    closestTarget = npc;
+                }
+                else
+                {
+                    angle = angleBetween;
+                    closestTarget = npc;
+                }
+            }
+
+            return closestTarget;
+        }
+
+        /// <summary>
         /// Detects nearby hostile NPCs from a given point with minion support
         /// </summary>
         /// <param name="origin">The position where we wish to check for nearby NPCs</param>
@@ -329,39 +676,7 @@ namespace CalamityMod
             }
             return ClosestNPCAt(origin, maxDistanceToCheck, ignoreTiles);
         }
-
-        /// <summary>
-        /// Smoother movement for NPCs
-        /// </summary>
-        /// <param name="npc">The NPC getting the movement change.</param>
-        /// <param name="movementDistanceGateValue">The distance where the NPC should stop moving once it's close enough to its destination.</param>
-        /// <param name="distanceFromDestination">How far the NPC is from its destination.</param>
-        /// <param name="baseVelocity">How quickly the NPC moves towards its destination.</param>
-        /// <param name="useSimpleFlyMovement">Whether the NPC should use SimpleFlyMovement to make the movement more affected by acceleration.</param>
-        public static void SmoothMovement(NPC npc, float movementDistanceGateValue, Vector2 distanceFromDestination, float baseVelocity, float acceleration, bool useSimpleFlyMovement)
-        {
-            // Inverse lerp returns the percentage of progress between A and B
-            float lerpValue = Utils.GetLerpValue(movementDistanceGateValue, 2400f, distanceFromDestination.Length(), true);
-
-            // Min velocity
-            float minVelocity = distanceFromDestination.Length();
-            float minVelocityCap = baseVelocity;
-            if (minVelocity > minVelocityCap)
-                minVelocity = minVelocityCap;
-
-            // Max velocity
-            Vector2 maxVelocity = distanceFromDestination / 24f;
-            float maxVelocityCap = minVelocityCap * 3f;
-            if (maxVelocity.Length() > maxVelocityCap)
-                maxVelocity = distanceFromDestination.SafeNormalize(Vector2.Zero) * maxVelocityCap;
-
-            // Set the velocity
-            Vector2 desiredVelocity = Vector2.Lerp(distanceFromDestination.SafeNormalize(Vector2.Zero) * minVelocity, maxVelocity, lerpValue);
-            if (useSimpleFlyMovement)
-                npc.SimpleFlyMovement(desiredVelocity, acceleration);
-            else
-                npc.velocity = desiredVelocity;
-        }
+        #endregion
 
         /// <summary>
         /// Check if an NPC is organic
@@ -375,29 +690,11 @@ namespace CalamityMod
                 target.HitSound != SoundID.NPCHit34 && target.HitSound != SoundID.NPCHit36 && target.HitSound != SoundID.NPCHit42 &&
                 target.HitSound != SoundID.NPCHit49 && target.HitSound != SoundID.NPCHit52 && target.HitSound != SoundID.NPCHit53 &&
                 target.HitSound != SoundID.NPCHit54 && target.HitSound != null) || target.type == NPCType<Providence>() ||
-                target.type == NPCType<ScornEater>())
+                target.type == NPCType<ScornEater>() || target.type == NPCType<Yharon>())
             {
                 return true;
             }
             return false;
-        }
-
-        /// <summary>
-        /// Shortcut for the generic boss summon message.
-        /// </summary>
-        /// <param name="npcIndex">The whoAmI index of the summoned npc.</param>
-        public static void BossAwakenMessage(int npcIndex)
-        {
-            // TODO -- this should use MiscUtils DisplayLocalizedText.
-            string typeName = Main.npc[npcIndex].TypeName;
-            if (Main.netMode == NetmodeID.SinglePlayer)
-            {
-                Main.NewText(Language.GetTextValue("Announcement.HasAwoken", typeName), new Color(175, 75, 255));
-            }
-            else if (Main.netMode == NetmodeID.Server)
-            {
-                ChatHelper.BroadcastChatMessage(NetworkText.FromKey("Announcement.HasAwoken", new object[] { Main.npc[npcIndex].GetTypeNetName() }), new Color(175, 75, 255));
-            }
         }
 
         public static void Inflict246DebuffsNPC(NPC target, int buff, float timeBase = 2f)
@@ -416,8 +713,6 @@ namespace CalamityMod
             }
         }
 
-        public static T ModNPC<T>(this NPC npc) where T : ModNPC => npc.ModNPC as T;
-
         public static NPCShop AddWithCustomValue(this NPCShop shop, int itemType, int customValue, params Condition[] conditions)
         {
             var item = new Item(itemType)
@@ -430,6 +725,38 @@ namespace CalamityMod
         public static NPCShop AddWithCustomValue<T>(this NPCShop shop, int customValue, params Condition[] conditions) where T : ModItem
         {
             return shop.AddWithCustomValue(ItemType<T>(), customValue, conditions);
+        }
+
+        public static void DrawBackglow(this NPC npc, Color backglowColor, float backglowArea, SpriteEffects spriteEffects, Rectangle frame, Vector2 screenPos, Texture2D overrideTexture = null)
+        {
+            Texture2D texture = overrideTexture is null ? TextureAssets.Npc[npc.type].Value : overrideTexture;
+            Vector2 drawPosition = npc.Center - screenPos;
+            Vector2 origin = frame.Size() * 0.5f;
+            Color backAfterimageColor = backglowColor * npc.Opacity;
+            for (int i = 0; i < 10; i++)
+            {
+                Vector2 drawOffset = (MathHelper.TwoPi * i / 10f).ToRotationVector2() * backglowArea;
+                Main.spriteBatch.Draw(texture, drawPosition + drawOffset, frame, backAfterimageColor, npc.rotation, origin, npc.scale, spriteEffects, 0f);
+            }
+        }
+
+        #region Boss Spawning
+        /// <summary>
+        /// Shortcut for the generic boss summon message.
+        /// </summary>
+        /// <param name="npcIndex">The whoAmI index of the summoned npc.</param>
+        public static void BossAwakenMessage(int npcIndex)
+        {
+            // TODO -- this should use MiscUtils DisplayLocalizedText.
+            string typeName = Main.npc[npcIndex].TypeName;
+            if (Main.netMode == NetmodeID.SinglePlayer)
+            {
+                Main.NewText(Language.GetTextValue("Announcement.HasAwoken", typeName), new Color(175, 75, 255));
+            }
+            else if (Main.netMode == NetmodeID.Server)
+            {
+                ChatHelper.BroadcastChatMessage(NetworkText.FromKey("Announcement.HasAwoken", new object[] { Main.npc[npcIndex].GetTypeNetName() }), new Color(175, 75, 255));
+            }
         }
 
         /// <summary>
@@ -465,19 +792,6 @@ namespace CalamityMod
                 return null;
         }
 
-        public static void DrawBackglow(this NPC npc, Color backglowColor, float backglowArea, SpriteEffects spriteEffects, Rectangle frame, Vector2 screenPos, Texture2D overrideTexture = null)
-        {
-            Texture2D texture = overrideTexture is null ? TextureAssets.Npc[npc.type].Value : overrideTexture;
-            Vector2 drawPosition = npc.Center - screenPos;
-            Vector2 origin = frame.Size() * 0.5f;
-            Color backAfterimageColor = backglowColor * npc.Opacity;
-            for (int i = 0; i < 10; i++)
-            {
-                Vector2 drawOffset = (MathHelper.TwoPi * i / 10f).ToRotationVector2() * backglowArea;
-                Main.spriteBatch.Draw(texture, drawPosition + drawOffset, frame, backAfterimageColor, npc.rotation, origin, npc.scale, spriteEffects, 0f);
-            }
-        }
-
         /// <summary>
         /// Spawns Old Duke on a player. Only works server side, and only works if the player owns a fishing bobber.<br />
         /// Old Duke will spawn above the fishing bobber if one is found.
@@ -508,5 +822,6 @@ namespace CalamityMod
             int oldDuke = NPC.NewNPC(NPC.GetBossSpawnSource(playerIndex), (int)projectile.Center.X, (int)projectile.Center.Y + 100, NPCType<OldDuke>());
             BossAwakenMessage(oldDuke);
         }
+        #endregion
     }
 }

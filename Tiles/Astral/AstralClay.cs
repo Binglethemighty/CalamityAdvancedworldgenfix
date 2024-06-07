@@ -9,10 +9,9 @@ using Terraria.ModLoader;
 
 namespace CalamityMod.Tiles.Astral
 {
-    public class AstralClay : ModTile, IMergeableTile
+    public class AstralClay : ModTile
     {
-        List<TileFraming.MergeFrameData> IMergeableTile.TileAdjacencies { get; } = [];
-        
+
         public override void SetStaticDefaults()
         {
             Main.tileSolid[Type] = true;

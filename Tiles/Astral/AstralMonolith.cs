@@ -10,12 +10,10 @@ using Terraria.ModLoader;
 
 namespace CalamityMod.Tiles.Astral
 {
-    public class AstralMonolith : ModTile, IMergeableTile
+    public class AstralMonolith : ModTile
     {
         private static int sheetWidth = 216;
         private static int sheetHeight = 72;
-
-        List<TileFraming.MergeFrameData> IMergeableTile.TileAdjacencies { get; } = [];
 
         public override void SetStaticDefaults()
         {

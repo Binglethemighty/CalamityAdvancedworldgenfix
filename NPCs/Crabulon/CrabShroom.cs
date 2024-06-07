@@ -76,7 +76,10 @@ namespace CalamityMod.NPCs.Crabulon
             float xVelocityLimit = BossRushEvent.BossRushActive ? 12f : death ? 8f : revenge ? 6f : 5f;
             float yVelocityLimit = (CalamityWorld.LegendaryMode && CalamityWorld.revenge) ? 0.25f : death ? 0.75f : revenge ? 0.9f : 1f;
 
-            NPC.TargetClosest();
+            // Get a target
+            if (NPC.target < 0 || NPC.target == Main.maxPlayers || Main.player[NPC.target].dead || !Main.player[NPC.target].active)
+                NPC.TargetClosest();
+
             Player player = Main.player[NPC.target];
 
             NPC.velocity.Y += 0.02f;

@@ -116,7 +116,8 @@ namespace CalamityMod.Projectiles
                 { ProjectileID.AdamantiteChainsaw, standardChainsawTweaks },
                 { ProjectileID.AdamantiteDrill, standardDrillTweaks },
                 { ProjectileID.Anchor, Do(ExtraUpdatesExact(1)) },
-                { ProjectileID.Bee, Do(PiercingExact(2)) },
+                { ProjectileID.Bee, Do(PiercingExact(2), ExtraUpdatesExact(2)) },
+                { ProjectileID.BeeArrow, Do(PointBlank, ExtraUpdatesExact(1)) },
                 { ProjectileID.BlackCounterweight, counterweightTweaks },
                 { ProjectileID.BlueCounterweight, counterweightTweaks },
                 { ProjectileID.BlueMoon, Do(ExtraUpdatesExact(1)) },
@@ -153,7 +154,7 @@ namespace CalamityMod.Projectiles
                 { ProjectileID.FlyingKnife, Do(ExtraUpdatesExact(1)) },
                 { ProjectileID.FrostBoltStaff, Do(ExtraUpdatesExact(1)) },
                 { ProjectileID.FruitcakeChakram, Do(ExtraUpdatesExact(1)) },
-                { ProjectileID.GiantBee, Do(PiercingExact(2)) },
+                { ProjectileID.GiantBee, Do(PiercingExact(2), ExtraUpdatesExact(2)) },
                 { ProjectileID.GoldenBullet, standardBulletTweaks },
                 { ProjectileID.GoldenShowerFriendly, Do(PiercingExact(2)) },
                 { ProjectileID.GreenCounterweight, counterweightTweaks },
@@ -209,6 +210,7 @@ namespace CalamityMod.Projectiles
                 { ProjectileID.VenomFang, Do(LocalIFrames(10)) },
                 { ProjectileID.VortexDrill, standardDrillTweaks },
                 { ProjectileID.Wasp, Do(PiercingExact(2)) },
+                { ProjectileID.WeatherPainShot, Do(ExtraUpdatesExact(2), TimeLeftExact(1400)) },
                 { ProjectileID.YellowCounterweight, counterweightTweaks },
                 #endregion
 
@@ -251,7 +253,6 @@ namespace CalamityMod.Projectiles
                 #endregion
 
                 #region CATEGORY 4: Point Blank support
-                { ProjectileID.BeeArrow, pointBlank },
                 { ProjectileID.Blizzard, pointBlank }, // Blizzard Staff projectiles, re-used in Frostbite Blaster.
                 { ProjectileID.BlueFlare, pointBlank },
                 { ProjectileID.BoneArrow, pointBlank },
@@ -268,8 +269,8 @@ namespace CalamityMod.Projectiles
                 { ProjectileID.Flare, pointBlank },
                 { ProjectileID.FrostburnArrow, pointBlank },
                 { ProjectileID.Harpoon, pointBlank },
-                { ProjectileID.HellfireArrow, pointBlank },
                 { ProjectileID.Hellwing, pointBlank },
+                { ProjectileID.HellfireArrow, pointBlank },
                 { ProjectileID.HolyArrow, pointBlank },
                 { ProjectileID.IchorArrow, pointBlank },
                 { ProjectileID.JestersArrow, pointBlank },

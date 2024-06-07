@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using CalamityMod.Balancing;
 using CalamityMod.Buffs.DamageOverTime;
+using CalamityMod.Buffs.Placeables;
 using CalamityMod.Buffs.Potions;
 using CalamityMod.Buffs.StatBuffs;
 using CalamityMod.Buffs.StatDebuffs;
@@ -310,9 +311,9 @@ namespace CalamityMod.CalPlayer
                     SparkParticle spark2 = new SparkParticle(Player.Center + Player.velocity.RotatedBy(-2f * Player.direction) * 1.5f, SparkVelocity2, false, Main.rand.Next(11, 13), sparkscale, Main.rand.NextBool() ? Color.DarkOrange : Color.OrangeRed);
                     GeneralParticleHandler.SpawnParticle(spark2);
 
-                    if (Player.miscCounter % 5 == 0 && Player.velocity != Vector2.Zero) //every other frame spawn the hitbox
+                    if (Player.miscCounter % 6 == 0 && Player.velocity != Vector2.Zero)
                     {
-                        int damage = Player.ApplyArmorAccDamageBonusesTo(Player.GetBestClassDamage().ApplyTo(175));
+                        int damage = Player.ApplyArmorAccDamageBonusesTo(Player.GetBestClassDamage().ApplyTo(170));
                         Projectile.NewProjectile(Player.GetSource_FromThis(), Player.Center + Player.velocity * 1.5f, Vector2.Zero, ModContent.ProjectileType<PauldronDash>(), damage, 10f, Player.whoAmI);
                     }
                 }
@@ -1337,6 +1338,22 @@ namespace CalamityMod.CalPlayer
             if (expiredCooldowns.Count > 0)
                 SyncCooldownRemoval(Main.netMode == NetmodeID.Server, expiredCooldowns);
 
+            // Grant the player 5 seconds of immunity to immobilizing debuffs after an immobilizing debuff wears off.
+            if (Player.stoned || Player.frozen || Player.webbed || gState)
+            {
+                ImmobilityDebuffImmunityTimer = ImmobilityDebuffImmunityTimerMax;
+            }
+            else if (ImmobilityDebuffImmunityTimer > 0)
+            {
+                ImmobilityDebuffImmunityTimer--;
+                Player.buffImmune[BuffID.Stoned] = true;
+                Player.buffImmune[BuffID.Frozen] = true;
+                Player.buffImmune[BuffID.Webbed] = true;
+                Player.buffImmune[ModContent.BuffType<GlacialState>()] = true;
+            }
+
+            if (ascendantInsigniaCooldown > 0 && ascendantInsigniaBuffTime <= 0)
+                ascendantInsigniaCooldown--;
             if (DragonsBreathAudioCooldown > 0)
                 DragonsBreathAudioCooldown--;
             if (DragonsBreathAudioCooldown2 > 0)
@@ -1373,6 +1390,8 @@ namespace CalamityMod.CalPlayer
                 astralStarRainCooldown--;
             if (AbaddonCooldown > 0)
                 AbaddonCooldown--;
+            if (AlchFlaskCooldown > 0)
+                AlchFlaskCooldown--;
             if (tarraRangedCooldown > 0)
                 tarraRangedCooldown--;
             if (bloodflareMageCooldown > 0)
@@ -2012,6 +2031,13 @@ namespace CalamityMod.CalPlayer
             }
 
             // This section of code ensures set bonuses and accessories with cooldowns go on cooldown immediately if the armor or accessory is removed.
+            if (!ascendantInsignia && ascendantInsigniaBuffTime > 0)
+            {
+                ascendantInsigniaBuffTime = 0;
+                ascendantInsigniaCooldown = 2400;
+                Player.AddCooldown(AscendEffect.ID, 2400);
+            }
+
             if (!brimflameSet && brimflameFrenzy)
             {
                 brimflameFrenzy = false;
@@ -2519,6 +2545,21 @@ namespace CalamityMod.CalPlayer
             if (AdamantiteSet)
                 Player.statDefense += AdamantiteSetDefenseBoost;
 
+            // Warmth makes Chilled, Frozen, and Glacial State tick down 3x as fast
+            if (Player.HasBuff(BuffID.Warmth))
+            {
+                for (int b = 0; b < Player.MaxBuffs; b++)
+                {
+                    if (Player.buffType[b] == BuffID.Chilled || Player.buffType[b] == BuffID.Frozen || Player.buffType[b] == ModContent.BuffType<GlacialState>())
+                    {
+                        if (Player.buffTime[b] > 3)
+                        {
+                            Player.buffTime[b] -= 2;
+                        }
+                    }
+                }
+            }
+
             if (astralInjection)
             {
                 if (Player.statMana < Player.statManaMax2)
@@ -2581,10 +2622,13 @@ namespace CalamityMod.CalPlayer
             }
 
             if (crawCarapace)
-                Player.GetDamage<GenericDamageClass>() += 0.05f;
+                Player.GetDamage<GenericDamageClass>() += 0.07f;
 
             if (baroclaw)
+            {
+                Player.endurance += 0.05f;
                 Player.GetDamage<GenericDamageClass>() += 0.1f;
+            }
 
             if (aeroStone && !Player.slowFall && Player.wingTime < Player.wingTimeMax)
             {
@@ -2819,15 +2863,12 @@ namespace CalamityMod.CalPlayer
                 (harpyRing ? 0.2 : 0D) +
                 (reaverSpeed ? 0.1 : 0D) +
                 (angelTreads ? 0.1 : 0D) +
-                (blueCandle ? 0.1 : 0D) +
+                (blueCandle ? CirrusBlueCandleBuff.WingTimeBoost : 0D) +
                 (soaring ? 0.1 : 0D) +
                 (prismaticGreaves ? 0.1 : 0D) +
                 (plagueReaper ? 0.05 : 0D) +
                 (ascendantInsignia ? 0.05 : 0D) + // Added to soaring insignia's flight to get 30%
                 (Player.empressBrooch ? 0.25 : 0D);
-
-            if (blueCandle)
-                Player.moveSpeed += 0.1f;
 
             if (community)
             {
@@ -2915,15 +2956,14 @@ namespace CalamityMod.CalPlayer
             }
 
             if (wDeath && !purity)
-                Player.GetDamage<GenericDamageClass>() -= 0.25f;
+                Player.GetDamage<GenericDamageClass>() -= 0.2f;
 
             if (astralInfection && !(infectedJewel || purity))
-                Player.GetDamage<GenericDamageClass>() -= 0.15f;
+                Player.GetDamage<GenericDamageClass>() -= 0.1f;
 
             if (pFlames && !purity)
             {
-                Player.blind = true;
-                Player.GetDamage<GenericDamageClass>() -= 0.15f;
+                Player.GetDamage<GenericDamageClass>() -= 0.1f;
             }
 
             if (aCrunch && !laudanum && !purity)
@@ -3072,27 +3112,13 @@ namespace CalamityMod.CalPlayer
                 }
             }
 
-            if (ascendantInsignia)
+            if (ascendantInsignia && ascendantInsigniaBuffTime > 0)
             {
-                if (CalamityKeybinds.AscendantInsigniaHotKey.JustPressed && ascendantInsigniaCooldown <= 0)
-                {
-                    var source = Player.GetSource_Accessory(FindAccessory(ModContent.ItemType<AscendantInsignia>()));
-                    Projectile.NewProjectileDirect(source, Player.Center - Vector2.UnitY * 45f, Vector2.Zero, ModContent.ProjectileType<AscendantAura>(), 0, 0f);
-                    SoundEngine.PlaySound(new SoundStyle("CalamityMod/Sounds/Item/AscendantActivate"));
-                    ascendantInsigniaCooldown = 2400;
-                    ascendantInsigniaBuffTime = 240; //4 seconds
-                }
-
-                if (ascendantInsigniaCooldown > 0 && ascendantInsigniaBuffTime <= 0)
-                    ascendantInsigniaCooldown--;
+                ascendantTrail = true;
+                infiniteFlight = true;
                 if (ascendantInsigniaBuffTime == 1)
                     Player.AddCooldown(AscendEffect.ID, 2400);
-                if (ascendantInsigniaBuffTime > 0)
-                {
-                    ascendantTrail = true;
-                    infiniteFlight = true;
-                    ascendantInsigniaBuffTime--;
-                }
+                ascendantInsigniaBuffTime--;
             }
 
             if (abyssalDivingSuit && !Player.IsUnderwater())
@@ -4142,9 +4168,6 @@ namespace CalamityMod.CalPlayer
                         CalamityUtils.DisplayLocalizedText("Mods.CalamityMod.Misc.WikiStatus1");
                         CalamityUtils.DisplayLocalizedText("Mods.CalamityMod.Misc.WikiStatus2");
                     }
-
-                    // 04JAN2024: Ozzatron: Plushie message always appears.
-                    CalamityUtils.DisplayLocalizedText("Mods.CalamityMod.Misc.GimmeSwagPlushieCampaign");
                 }
 
                 --startMessageDisplayDelay;

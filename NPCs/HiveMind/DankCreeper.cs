@@ -1,4 +1,5 @@
 ﻿using System;
+using CalamityMod.Buffs.DamageOverTime;
 using CalamityMod.Events;
 using CalamityMod.Projectiles.Boss;
 using CalamityMod.World;
@@ -25,7 +26,7 @@ namespace CalamityMod.NPCs.HiveMind
             NPC.height = 70;
             NPC.defense = 6;
 
-            NPC.lifeMax = 90;
+            NPC.lifeMax = 120;
             if (BossRushEvent.BossRushActive)
                 NPC.lifeMax = 2000;
             if (Main.getGoodWorld)
@@ -58,10 +59,13 @@ namespace CalamityMod.NPCs.HiveMind
             // Avoid cheap bullshit
             NPC.damage = 0;
 
-            NPC.TargetClosest();
+            // Get a target
+            if (NPC.target < 0 || NPC.target == Main.maxPlayers || Main.player[NPC.target].dead || !Main.player[NPC.target].active)
+                NPC.TargetClosest();
 
+            bool masterMode = Main.masterMode;
             bool revenge = CalamityWorld.revenge;
-            float speed = revenge ? 12f : 11f;
+            float speed = masterMode ? 15f : revenge ? 13f : 11f;
             if (BossRushEvent.BossRushActive)
                 speed = 18f;
 
@@ -73,56 +77,66 @@ namespace CalamityMod.NPCs.HiveMind
             NPC.rotation = NPC.velocity.X * 0.05f;
 
             Vector2 targetDirection = new Vector2(NPC.Center.X + (NPC.direction * 20), NPC.Center.Y + 6f);
-            float playerXDist = Main.player[NPC.target].position.X + Main.player[NPC.target].width * 0.5f - targetDirection.X;
-            float playerYDist = Main.player[NPC.target].Center.Y - targetDirection.Y;
-            float playerDistance = (float)Math.Sqrt(playerXDist * playerXDist + playerYDist * playerYDist);
-            float timeToReachTarget = speed / playerDistance;
-            playerXDist *= timeToReachTarget;
-            playerYDist *= timeToReachTarget;
+            Vector2 targetLocation = Main.player[NPC.target].Center;
 
-            NPC.ai[0] -= 1f;
-            if (playerDistance < 200f || NPC.ai[0] > 0f)
+            // Fly above if below 25% HP and burst to spawn a Rain Cloud when high enough
+            bool killYourself = NPC.life / (float)NPC.lifeMax < 0.25f;
+            if (killYourself && (Main.expertMode || BossRushEvent.BossRushActive))
             {
-                // Set damage
-                NPC.damage = NPC.defDamage;
+                targetLocation -= Vector2.UnitY * 400f;
+                if (NPC.Distance(targetLocation) < 80f)
+                {
+                    NPC.life = 0;
+                    NPC.HitEffect();
+                    NPC.checkDead();
+                    return;
+                }
+            }
 
-                if (playerDistance < 200f)
-                    NPC.ai[0] = 20f;
+            if (!killYourself)
+            {
+                NPC.ai[0] -= 1f;
+                bool dash = NPC.Distance(targetLocation) < 200f;
+                if (dash || NPC.ai[0] > 0f)
+                {
+                    // Set damage
+                    NPC.damage = NPC.defDamage;
 
-                if (NPC.velocity.X < 0f)
-                    NPC.direction = -1;
-                else
-                    NPC.direction = 1;
+                    if (dash)
+                        NPC.ai[0] = 20f;
 
+                    if (NPC.velocity.X < 0f)
+                        NPC.direction = -1;
+                    else
+                        NPC.direction = 1;
+
+                    return;
+                }
+            }
+
+            float inertia = (NPC.Distance(targetLocation) < 300f || killYourself) ? 8f : NPC.Distance(targetLocation) < 400f ? 20f : 50f;
+            Vector2 idealVelocity = (targetLocation - targetDirection).SafeNormalize(Vector2.UnitX * NPC.direction) * speed;
+            NPC.velocity = (NPC.velocity * inertia + idealVelocity) / (inertia + 1f);
+        }
+
+        public override void OnHitPlayer(Player target, Player.HurtInfo hurtInfo)
+        {
+            if (hurtInfo.Damage < 0)
                 return;
-            }
 
-            NPC.velocity.X = (NPC.velocity.X * 50f + playerXDist) / 51f;
-            NPC.velocity.Y = (NPC.velocity.Y * 50f + playerYDist) / 51f;
-            if (playerDistance < 350f)
-            {
-                NPC.velocity.X = (NPC.velocity.X * 10f + playerXDist) / 11f;
-                NPC.velocity.Y = (NPC.velocity.Y * 10f + playerYDist) / 11f;
-            }
-            if (playerDistance < 300f)
-            {
-                NPC.velocity.X = (NPC.velocity.X * 7f + playerXDist) / 8f;
-                NPC.velocity.Y = (NPC.velocity.Y * 7f + playerYDist) / 8f;
-            }
+            target.AddBuff(ModContent.BuffType<BrainRot>(), 180);
         }
 
         public override void HitEffect(NPC.HitInfo hit)
         {
             for (int k = 0; k < 5; k++)
-            {
                 Dust.NewDust(NPC.position, NPC.width, NPC.height, DustID.Glass, hit.HitDirection, -1f, 0, default, 1f);
-            }
+
             if (NPC.life <= 0)
             {
                 for (int k = 0; k < 20; k++)
-                {
                     Dust.NewDust(NPC.position, NPC.width, NPC.height, DustID.Glass, hit.HitDirection, -1f, 0, default, 1f);
-                }
+
                 if (Main.netMode != NetmodeID.Server)
                 {
                     Gore.NewGore(NPC.GetSource_Death(), NPC.position, NPC.velocity, Mod.Find<ModGore>("DankCreeperGore").Type, 1f);

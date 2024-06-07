@@ -66,7 +66,7 @@ namespace CalamityMod.Projectiles.Rogue
                     Vector2 velocity = CalamityUtils.RandomVelocity(100f, 70f, 100f);
                     Projectile.NewProjectile(Projectile.GetSource_FromThis(), Projectile.Center, velocity, ModContent.ProjectileType<BallisticPoisonBombSpike>(), Projectile.damage, 0f, Projectile.owner);
                 }
-                int cloudAmt = Projectile.Calamity().stealthStrike ? Main.rand.Next(8, 12+1) : Main.rand.Next(3, 5+1);
+                int cloudAmt = Projectile.Calamity().stealthStrike ? Main.rand.Next(7, 10+1) : Main.rand.Next(3, 5+1);
                 for (int c = 0; c < cloudAmt; c++)
                 {
                     Vector2 velocity = CalamityUtils.RandomVelocity(100f, 10f, 200f, 0.01f);

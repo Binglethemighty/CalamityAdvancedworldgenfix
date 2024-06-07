@@ -124,7 +124,7 @@ namespace CalamityMod.Projectiles.Boss
                 Vector2 fireFrom = new Vector2(Main.npc[(int)Projectile.ai[1]].Center.X + (Main.npc[(int)Projectile.ai[1]].spriteDirection > 0 ? 34f : -34f), Main.npc[(int)Projectile.ai[1]].Center.Y - 74f) + velocity * distanceBetweenProjectiles;
                 int projectileAmt = (int)(Projectile.localAI[1] / distanceBetweenProjectiles);
                 int type = ModContent.ProjectileType<BrimstoneBarrage>();
-                int damage = Projectile.GetProjectileDamage(ModContent.NPCType<BrimstoneElemental>());
+                int damage = (int)Math.Round(Projectile.damage * 0.6);
                 float projectileVelocityToPass = 12f;
 
                 for (int i = 0; i < projectileAmt; i++)

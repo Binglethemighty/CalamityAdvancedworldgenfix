@@ -14,7 +14,7 @@ namespace CalamityMod.Items.SummonItems
         public new string LocalizationCategory => "Items.SummonItems";
         public override void SetStaticDefaults()
         {
-            ItemID.Sets.SortingPriorityBossSpawns[Type] = 14; // Frost Moon
+            ItemID.Sets.SortingPriorityBossSpawns[Type] = 12; // Truffle Worm
         }
 
         public override void SetDefaults()

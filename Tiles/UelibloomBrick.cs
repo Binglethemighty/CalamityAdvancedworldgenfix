@@ -10,12 +10,10 @@ using Terraria.ModLoader;
 
 namespace CalamityMod.Tiles
 {
-    public class UelibloomBrick : ModTile, IMergeableTile
+    public class UelibloomBrick : ModTile
     {
         private int extraFrameHeight = 36;
         private int extraFrameWidth = 90;
-
-        List<TileFraming.MergeFrameData> IMergeableTile.TileAdjacencies { get; } = [];
 
         public override void SetStaticDefaults()
         {

@@ -33,6 +33,7 @@ namespace CalamityMod.NPCs.DesertScourge
                 BodyTexture3 = ModContent.Request<Texture2D>(Texture + "3", AssetRequestMode.AsyncLoad);
                 BodyTexture4 = ModContent.Request<Texture2D>(Texture + "4", AssetRequestMode.AsyncLoad);
             }
+            NPCID.Sets.CantTakeLunchMoney[Type] = true;
         }
 
         public override void SetDefaults()

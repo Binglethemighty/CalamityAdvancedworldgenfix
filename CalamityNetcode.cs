@@ -6,6 +6,7 @@ using CalamityMod.NPCs;
 using CalamityMod.NPCs.NormalNPCs;
 using CalamityMod.NPCs.Providence;
 using CalamityMod.NPCs.TownNPCs;
+using CalamityMod.Systems;
 using CalamityMod.TileEntities;
 using CalamityMod.World;
 using Microsoft.Xna.Framework;
@@ -301,6 +302,17 @@ namespace CalamityMod
                         break;
 
                     //
+                    // Music event syncs
+                    //
+                    case CalamityModMessageType.MusicEventSyncRequest:
+                        MusicEventSystem.FulfillSyncRequest(whoAmI);
+                        break;
+
+                    case CalamityModMessageType.MusicEventSyncResponse:
+                        MusicEventSystem.ReceiveSyncResponse(reader);
+                        break;
+
+                    //
                     // Default case: with no idea how long the packet is, we can't safely read data.
                     // Throw an exception now instead of allowing the network stream to corrupt.
                     //
@@ -421,6 +433,10 @@ namespace CalamityMod
         MousePositionSync,
 
         // World state sync
-        SyncDifficulties
+        SyncDifficulties,
+
+        // Music events
+        MusicEventSyncRequest,
+        MusicEventSyncResponse
     }
 }

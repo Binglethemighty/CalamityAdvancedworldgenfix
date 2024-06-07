@@ -168,9 +168,9 @@ namespace CalamityMod
             // Is this sorted... like... at all??
             EnemyStats.DebuffImmunities = new SortedDictionary<int, Tuple<GeneralImmunityStatus, int[]>>
             {
-                { ModContent.NPCType<KingSlimeJewel>(), immuneToEverything },
-                { ModContent.NPCType<KingSlimeJewel2>(), immuneToEverything },
-                { ModContent.NPCType<KingSlimeJewel3>(), immuneToEverything },
+                { ModContent.NPCType<KingSlimeJewelRuby>(), immuneToEverything },
+                { ModContent.NPCType<KingSlimeJewelSapphire>(), immuneToEverything },
+                { ModContent.NPCType<KingSlimeJewelEmerald>(), immuneToEverything },
 
                 { NPCID.Deerclops, ice },
 

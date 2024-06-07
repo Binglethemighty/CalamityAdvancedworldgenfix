@@ -24,10 +24,10 @@ namespace CalamityMod.Projectiles.Rogue
             Projectile.alpha = 255;
             Projectile.ignoreWater = true;
             Projectile.DamageType = RogueDamageClass.Instance;
-            Projectile.timeLeft = 180;
+            Projectile.timeLeft = 240;
         }
 
-        public override bool? CanHitNPC(NPC target) => Projectile.timeLeft < 150 && target.CanBeChasedBy(Projectile);
+        public override bool? CanHitNPC(NPC target) => Projectile.timeLeft < 200 && target.CanBeChasedBy(Projectile);
 
         public override void AI()
         {

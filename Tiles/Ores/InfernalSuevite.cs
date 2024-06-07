@@ -10,13 +10,11 @@ using Terraria.ModLoader;
 namespace CalamityMod.Tiles.Ores
 {
     [LegacyName("CharredOre")]
-    public class InfernalSuevite : ModTile, IMergeableTile
+    public class InfernalSuevite : ModTile
     {
         private int sheetWidth = 234;
         private int sheetHeight = 90;
-
-        List<TileFraming.MergeFrameData> IMergeableTile.TileAdjacencies { get; } = [];
-
+        
         public override void SetStaticDefaults()
         {
             Main.tileSolid[Type] = true;

@@ -9,10 +9,9 @@ using Terraria.ModLoader;
 
 namespace CalamityMod.Tiles.AstralSnow
 {
-    public class AstralIce : ModTile, IMergeableTile
+    public class AstralIce : ModTile
     {
-        List<TileFraming.MergeFrameData> IMergeableTile.TileAdjacencies { get; } = [];
-        
+
         public override void SetStaticDefaults()
         {
             Main.tileSolid[Type] = true;

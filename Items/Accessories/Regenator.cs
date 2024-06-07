@@ -14,7 +14,7 @@ namespace CalamityMod.Items.Accessories
             Item.height = 56;
             Item.value = CalamityGlobalItem.RarityLimeBuyPrice;
             Item.rare = ItemRarityID.Lime;
-            Item.defense = 10;
+            Item.defense = 4; // This should have less defense due to the regen it provides
             Item.accessory = true;
         }
 

@@ -13,7 +13,8 @@ namespace CalamityMod.Items.Fishing
             Item.ResearchUnlockCount = 10;
             ItemID.Sets.CanBePlacedOnWeaponRacks[Item.type] = true;
             // For some reason Life/Mana boosting items are in this set (along with Magic Mirror+)
-            ItemID.Sets.SortingPriorityBossSpawns[Type] = 19; // Mana Crystal
+            ItemID.Sets.SortingPriorityBossSpawns[Type] = 21; // Mana Crystal
+            ItemID.Sets.ShimmerTransformToItem[Type] = ItemID.ArcaneCrystal;
         }
 
         public override void SetDefaults()

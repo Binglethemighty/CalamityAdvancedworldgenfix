@@ -330,6 +330,24 @@ namespace CalamityMod.CalPlayer
                 }
             }
 
+            // Prideful Hunter's Planar Ripper movement speed boost
+            if (calamityPlayer.planarSpeedBoost > 0 && drawInfo.shadow == 0f)
+            {
+                int spawnChance = (int)(13 - (calamityPlayer.planarSpeedBoost / 2));
+                if (Main.rand.NextBool(spawnChance))
+                {
+                    Vector2 sparkVelocity = -(Vector2.UnitY * Main.rand.NextFloat(2.5f, 5f)).RotatedByRandom(MathHelper.Pi / 10);
+                    Vector2 sparkPos = new Vector2(Player.position.X + Main.rand.NextFloat(-8f, 40f), Player.position.Y + Main.rand.NextFloat(-8f, 56f));
+                    Particle movementSpark = new AltLineParticle(sparkPos, sparkVelocity, false, 20, Main.rand.NextFloat(0.375f, 0.5f), new Color(130, 255, 255));
+                    GeneralParticleHandler.SpawnParticle(movementSpark);
+
+                    sparkVelocity = -(Vector2.UnitY * Main.rand.NextFloat(3f, 5.5f)).RotatedByRandom(MathHelper.Pi / 6);
+                    sparkPos = new Vector2(Player.position.X + Main.rand.NextFloat(-8f, 40f), Player.position.Y + Main.rand.NextFloat(-8f, 56f));
+                    Particle addSparks = new CustomPulse(sparkPos, sparkVelocity, new Color(180, 255, 255), "CalamityMod/Particles/ElectricSpark", Vector2.One, 0f, 0.5f, 0.65f, 20);
+                    GeneralParticleHandler.SpawnParticle(addSparks);
+                }
+            }
+
             // Some extraneous and probably undocumented visual effect caused by the heart lad pet thing
             if ((calamityPlayer.ladHearts > 0) && !Player.loveStruck && Main.netMode != NetmodeID.Server && drawInfo.shadow == 0f)
             {

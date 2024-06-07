@@ -15,6 +15,7 @@ namespace CalamityMod.NPCs.DesertScourge
         public override void SetStaticDefaults()
         {
             this.HideFromBestiary();
+            NPCID.Sets.CantTakeLunchMoney[Type] = true;
         }
 
         public override void SetDefaults()

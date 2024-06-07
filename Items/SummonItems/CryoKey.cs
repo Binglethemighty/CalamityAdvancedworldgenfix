@@ -18,7 +18,7 @@ namespace CalamityMod.Items.SummonItems
         public new string LocalizationCategory => "Items.SummonItems";
         public override void SetStaticDefaults()
         {
-            ItemID.Sets.SortingPriorityBossSpawns[Type] = 7; // Mechanical Eye
+            ItemID.Sets.SortingPriorityBossSpawns[Type] = 7; // Ocram's Razor (1 below Mechanical Eye)
         }
 
         public override void SetDefaults()

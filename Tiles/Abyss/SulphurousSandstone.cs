@@ -8,10 +8,8 @@ using Terraria.ModLoader;
 
 namespace CalamityMod.Tiles.Abyss
 {
-    public class SulphurousSandstone : ModTile, IMergeableTile
+    public class SulphurousSandstone : ModTile
     {
-        List<TileFraming.MergeFrameData> IMergeableTile.TileAdjacencies { get; } = [];
-
         public override void SetStaticDefaults()
         {
             Main.tileSolid[Type] = true;

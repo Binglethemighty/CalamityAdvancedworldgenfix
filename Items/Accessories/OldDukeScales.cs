@@ -12,7 +12,7 @@ namespace CalamityMod.Items.Accessories
     {
         public new string LocalizationCategory => "Items.Accessories";
 
-        public static int RecoverTime = 120;
+        public static int RecoverTime = 90;
         public static int DashFatigueIncrease = 240;
         public static int MaxFatigue = 1200; // This is also the time that it takes the player to recover from the loss of all stamina.
 
@@ -128,8 +128,9 @@ namespace CalamityMod.Items.Accessories
                 RecoverTimer--;
 
             // If the player has recovered, start decreasing the fatigue.
+            bool PressingMoveKeys = Player.controlLeft || Player.controlRight || Player.controlDown || Player.controlJump;
             if (Fatigue > 0 && RecoverTimer <= 0)
-                Fatigue -= Player.StandingStill() ? 2 : 1;
+                Fatigue -= PressingMoveKeys ? 3 : 5;
 
             // The fatigue cannot go higher than the max.
             if (Fatigue >= OldDukeScales.MaxFatigue)

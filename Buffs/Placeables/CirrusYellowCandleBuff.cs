@@ -1,24 +1,37 @@
 ﻿using Terraria;
 using Terraria.ID;
 using Terraria.ModLoader;
+using static Terraria.NPC;
 
 namespace CalamityMod.Buffs.Placeables
 {
     public class CirrusYellowCandleBuff : ModBuff
     {
+        public static float ExtraChipDamageRatio = 0.07f;
+        
         public override void SetStaticDefaults()
         {
-            Main.buffNoTimeDisplay[Type] = true;
-            Main.debuff[Type] = true;
+            // These settings are standard for a "opt-in eternal" buff, which has the following properties:
+            // - Is not removed on death
+            // - Saves with the player / is not removed on logout
+            // - Does not display its time
+            // - Never reduces its duration
+            // - Can be manually canceled
             Main.pvpBuff[Type] = true;
+            Main.persistentBuff[Type] = true;
             Main.buffNoSave[Type] = false;
-            BuffID.Sets.NurseCannotRemoveDebuff[Type] = true;
-
-            // Spite (the +5% final damage effect of Yellow Candle) is a tag buff. Nothing is immune to it.
-            // They may however be unaffected by it (including only temporarily) if they have incredibly high DR.
-            BuffID.Sets.IsATagBuff[Type] = true;
+            Main.buffNoTimeDisplay[Type] = true;
+            BuffID.Sets.TimeLeftDoesNotDecrease[Type] = true;
         }
 
+        // Implementation is performed elsewhere using the yellowCandle bool.
         public override void Update(Player player, ref int buffIndex) => player.Calamity().yellowCandle = true;
+
+        // Yellow Candle is implemented as a dirty modifier.
+        internal static void ModifyHitInfo_Spite(ref HitInfo info)
+        {
+            int damageBoost = (int)(info.SourceDamage * ExtraChipDamageRatio);
+            info.Damage += damageBoost;
+        }
     }
 }

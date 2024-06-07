@@ -9,13 +9,11 @@ using Terraria.ModLoader;
 
 namespace CalamityMod.Tiles.Abyss
 {
-    public class AbyssGravel : ModTile, IMergeableTile
+    public class AbyssGravel : ModTile
     {
         int animationFrameWidth = 234;
 
         public static readonly SoundStyle MineSound = new("CalamityMod/Sounds/Custom/AbyssGravelMine", 3);
-        
-        List<TileFraming.MergeFrameData> IMergeableTile.TileAdjacencies { get; } = [];
 
         public override void SetStaticDefaults()
         {

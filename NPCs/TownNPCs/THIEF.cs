@@ -103,12 +103,12 @@ namespace CalamityMod.NPCs.TownNPCs
         public override List<string> SetNPCNameList() => new List<string>()
         {
             // Patron names
-            "Xplizzy", // <@!98826096237109248> (Whitegiraffe#6342)
-            "Freakish", // <@!750363283520749598> (Freakish#0001)
+            "Xplizzy", // <@!98826096237109248> (whitegiraffe)
+            "Freakish", // <@!750363283520749598> (freak5650)
             "Calder", // <@!601897959176798228> (hardlightcaster)
-            "Hunter Jinx", // <@!757401399783850134> (Jinx_enthusiast#1580)
-            "Goose", // <@!591421917706321962> (DullElili#8016)
-            "Jackson", // <@!525827730646892549> (ChowChow, Sin of Sleep Schedules#1235)
+            "Hunter Jinx", // <@!757401399783850134> (dragonslayerornstein.)
+            "Goose", // <@!591421917706321962> (dullelili)
+            "Jackson", // <@!525827730646892549> (chowchow360)
             "Altarca", // <@!1140673052108128337> (altarca_27226_49175)
             "Jackie", // <@!353241811717718016> (jackalchan)
 
@@ -244,6 +244,9 @@ namespace CalamityMod.NPCs.TownNPCs
 
         public override bool PreDraw(SpriteBatch spriteBatch, Vector2 screenPos, Color drawColor)
         {
+            if (Main.LocalPlayer.Calamity().trippy)
+                return false;
+
             var something = NPC.direction == -1 ? SpriteEffects.None : SpriteEffects.FlipHorizontally;
             spriteBatch.Draw(BirthdayParty.PartyIsUp ? AltTexture.Value : TextureAssets.Npc[NPC.type].Value, NPC.Center - screenPos + new Vector2(0, NPC.gfxOffY) - new Vector2(0f, 6f), NPC.frame, drawColor, NPC.rotation, NPC.frame.Size() / 2, NPC.scale, something, 0);
             return false;

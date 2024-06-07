@@ -211,8 +211,6 @@ namespace CalamityMod.Projectiles.Summon
             }
         }
 
-        public bool KILLYOURSELF { get; set; }
-
         #endregion
 
         #region AI and Collisions
@@ -222,8 +220,11 @@ namespace CalamityMod.Projectiles.Summon
             Owner ??= Main.player[Projectile.owner];
             Projectile.width = Projectile.height = Variant == 0 ? 28 : (Variant == 1 ? 22 : 20);
 
-            if (Animation == AnimationState.Grow && (MySentry is null || Projectile.Distance(MySentry.Center) > 600f))
+            if (Animation == AnimationState.Grow && (MySentry is null || Projectile.Distance(MySentry.Center) > 600f) && Main.myPlayer == Projectile.owner)
+            {
                 Projectile.Kill();
+                return;
+            }
 
             Target = Projectile.Center.MinionHoming(State == AIState.Still ? PlantedEnemyDistanceDetection : NormalEnemyDistanceDetection, Owner, false);
 
@@ -242,9 +243,6 @@ namespace CalamityMod.Projectiles.Summon
 
             if (IdleJumpCooldown > 0)
                 IdleJumpCooldown--;
-
-            if (KILLYOURSELF)
-                Projectile.Kill();
 
             Projectile.timeLeft = 2;
             DoGravity();
@@ -296,7 +294,11 @@ namespace CalamityMod.Projectiles.Summon
                 return;
 
             Projectile.ExpandHitboxBy(4f);
-            Projectile.Damage();
+            if (Main.myPlayer == Projectile.owner)
+                Projectile.Damage();
+
+            if (Main.dedServ)
+                return;
 
             for (int i = 0; i < (int)Utils.Remap(Variant, 0f, 2f, 4f, 2f); i++)
             {
@@ -305,11 +307,6 @@ namespace CalamityMod.Projectiles.Summon
                 Gore gore = Gore.NewGoreDirect(Projectile.GetSource_Death(), Projectile.Center, velocity, Mod.Find<ModGore>($"PumpkinGore{Main.rand.Next(6) + 1}").Type, Utils.Remap(Variant, 0f, 2f, 1f, 0.5f));
                 gore.timeLeft = 15;
             }
-
-            KILLYOURSELF = true;
-
-            if (Main.dedServ)
-                return;
 
             for (int i = 0; i < 20; i++)
             {
@@ -556,28 +553,26 @@ namespace CalamityMod.Projectiles.Summon
 
         public override void SendExtraAI(BinaryWriter writer)
         {
-            writer.Write(Direction);
-            writer.Write(IdleWalkingTime);
-            writer.Write(IdleWalkingTimer);
-            writer.Write(IdleJumpCount);
-            writer.Write(IdleJumpCooldown);
-            writer.Write(IdleWalkingDirection);
-            writer.Write(AnimationFrames);
-            writer.Write(FramesUntilNextAnimationFrame);
-            writer.Write(KILLYOURSELF);
+            writer.Write7BitEncodedInt(Direction);
+            writer.Write7BitEncodedInt(IdleWalkingTime);
+            writer.Write7BitEncodedInt(IdleWalkingTimer);
+            writer.Write7BitEncodedInt(IdleJumpCount);
+            writer.Write7BitEncodedInt(IdleJumpCooldown);
+            writer.Write7BitEncodedInt(IdleWalkingDirection);
+            writer.Write7BitEncodedInt(AnimationFrames);
+            writer.Write7BitEncodedInt(FramesUntilNextAnimationFrame);
         }
 
         public override void ReceiveExtraAI(BinaryReader reader)
         {
-            Direction = reader.ReadInt32();
-            IdleWalkingTime = reader.ReadInt32();
-            IdleWalkingTimer = reader.ReadInt32();
-            IdleJumpCount = reader.ReadInt32();
-            IdleJumpCooldown = reader.ReadInt32();
-            IdleWalkingDirection = reader.ReadInt32();
-            AnimationFrames = reader.ReadInt32();
-            FramesUntilNextAnimationFrame = reader.ReadInt32();
-            KILLYOURSELF = reader.ReadBoolean();
+            Direction = reader.Read7BitEncodedInt();
+            IdleWalkingTime = reader.Read7BitEncodedInt();
+            IdleWalkingTimer = reader.Read7BitEncodedInt();
+            IdleJumpCount = reader.Read7BitEncodedInt();
+            IdleJumpCooldown = reader.Read7BitEncodedInt();
+            IdleWalkingDirection = reader.Read7BitEncodedInt();
+            AnimationFrames = reader.Read7BitEncodedInt();
+            FramesUntilNextAnimationFrame = reader.Read7BitEncodedInt();
         }
 
         public override bool? CanDamage() => State == AIState.Attack ? null : false;

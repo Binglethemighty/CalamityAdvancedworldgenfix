@@ -356,7 +356,8 @@ namespace CalamityMod
                 ItemID.PalmWoodSword,
                 ItemID.EbonwoodSword,
                 ItemID.ShadewoodSword,
-                ItemID.PearlwoodSword
+                ItemID.PearlwoodSword,
+                ItemID.AshWoodSword
             });
             AnyWoodenSword = RecipeGroup.RegisterGroup("AnyWoodenSword", group);
 

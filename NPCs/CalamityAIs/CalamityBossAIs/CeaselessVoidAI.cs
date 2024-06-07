@@ -448,7 +448,7 @@ namespace CalamityMod.NPCs.CalamityAIs.CalamityBossAIs
             void Movement(bool succ)
             {
                 float velocity = moveVeryFast ? 25f : bossRush ? 15f : ((expertMode ? 7.5f : 6f) + (float)(death ? 2f * (1D - lifeRatio) : 0f)) * tileEnrageMult;
-                float acceleration = moveVeryFast ? 0.75f : bossRush ? 0.3f : death ? 0.2f : expertMode ? 0.16f : 0.12f;
+                float acceleration = (moveVeryFast ? 0.75f : bossRush ? 0.3f : death ? 0.2f : expertMode ? 0.16f : 0.12f) + (float)(death ? 0.04f * (1D - lifeRatio) : 0f) * tileEnrageMult;
 
                 // Increase speed dramatically in succ phase
                 if (succ)
@@ -472,7 +472,7 @@ namespace CalamityMod.NPCs.CalamityAIs.CalamityBossAIs
                 {
                     // Move to a new location every few seconds
                     calamityGlobalNPC.newAI[2] += 1f;
-                    float newPositionGateValue = bossRush ? 180f : death ? 270f : revenge ? 300f : expertMode ? 360f : 480f;
+                    float newPositionGateValue = bossRush ? 120f : death ? 180f : revenge ? 210f : expertMode ? 240f : 300f;
                     if (calamityGlobalNPC.newAI[2] > newPositionGateValue)
                     {
                         calamityGlobalNPC.newAI[2] = 0f;
@@ -520,7 +520,18 @@ namespace CalamityMod.NPCs.CalamityAIs.CalamityBossAIs
                 Vector2 distanceFromDestination = destination - npc.Center;
 
                 // Movement
-                CalamityUtils.SmoothMovement(npc, 0f, distanceFromDestination, velocity, acceleration, true);
+                if (npc.Distance(destination) > maxDistance || succ)
+                {
+                    CalamityUtils.SmoothMovement(npc, 0f, distanceFromDestination, velocity, acceleration, true);
+                }
+                else
+                {
+                    // Slow down
+                    if (npc.velocity.Length() > 0.5f)
+                        npc.velocity *= 0.8f;
+                    else
+                        npc.velocity = Vector2.Zero;
+                }
             }
 
             // Spawn more Dark Energies as the fight progresses

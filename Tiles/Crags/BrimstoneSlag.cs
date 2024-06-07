@@ -8,12 +8,10 @@ using Terraria.ModLoader;
 
 namespace CalamityMod.Tiles.Crags
 {
-    public class BrimstoneSlag : ModTile, IMergeableTile
+    public class BrimstoneSlag : ModTile
     {
         private const short subsheetWidth = 450;
         private const short subsheetHeight = 198;
-        
-        List<TileFraming.MergeFrameData> IMergeableTile.TileAdjacencies { get; } = [];
         
         public override void SetStaticDefaults()
         {

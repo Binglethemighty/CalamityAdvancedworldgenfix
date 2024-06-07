@@ -9,10 +9,9 @@ using Terraria.ModLoader;
 
 namespace CalamityMod.Tiles.Ores
 {
-    public class HallowedOre : ModTile, IMergeableTile
+    public class HallowedOre : ModTile
     {
-        List<TileFraming.MergeFrameData> IMergeableTile.TileAdjacencies { get; } = [];
-        
+
         public override void SetStaticDefaults()
         {
             Main.tileLighted[Type] = true;

@@ -37,10 +37,6 @@ namespace CalamityMod.NPCs.VanillaNPCAIOverrides.Bosses
             if (npc.target < 0 || npc.target == Main.maxPlayers || Main.player[npc.target].dead || !Main.player[npc.target].active)
                 npc.TargetClosest();
 
-            // Despawn safety, make sure to target another player if the current player target is too far away
-            if (Vector2.Distance(Main.player[npc.target].Center, npc.Center) > CalamityGlobalNPC.CatchUpDistance200Tiles && npc.type == NPCID.EaterofWorldsHead)
-                npc.TargetClosest();
-
             bool enrage = true;
             int targetTileX = (int)Main.player[npc.target].Center.X / 16;
             int targetTileY = (int)Main.player[npc.target].Center.Y / 16;
@@ -785,7 +781,7 @@ namespace CalamityMod.NPCs.VanillaNPCAIOverrides.Bosses
 
             npc.realLife = -1;
 
-            if (npc.target < 0 || npc.target == Main.maxPlayers || Main.player[npc.target].dead)
+            if (npc.target < 0 || npc.target == Main.maxPlayers || Main.player[npc.target].dead || !Main.player[npc.target].active)
                 npc.TargetClosest();
 
             if (Main.player[npc.target].dead)
@@ -998,7 +994,6 @@ namespace CalamityMod.NPCs.VanillaNPCAIOverrides.Bosses
             {
                 if (!flag2)
                 {
-                    npc.TargetClosest();
                     npc.velocity.Y += 0.11f;
                     if (Main.masterMode && npc.velocity.Y > 0f)
                         npc.velocity.Y += 0.07f;

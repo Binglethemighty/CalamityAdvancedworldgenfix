@@ -17,6 +17,7 @@ namespace CalamityMod.Tiles.FurnitureAuric
             Main.tileLavaDeath[Type] = false;
             Main.tileWaterDeath[Type] = false;
             Main.tileSolidTop[Type] = true;
+            Main.tileTable[Type] = true;
             TileObjectData.newTile.CopyFrom(TileObjectData.Style2x2);
             TileObjectData.newTile.LavaDeath = false;
             TileObjectData.addTile(Type);

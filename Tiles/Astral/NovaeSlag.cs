@@ -11,10 +11,9 @@ using Terraria.ModLoader;
 namespace CalamityMod.Tiles.Astral
 {
     [LegacyName("AstralSilt")]
-    public class NovaeSlag : ModTile, IMergeableTile
+    public class NovaeSlag : ModTile
     {
-        List<TileFraming.MergeFrameData> IMergeableTile.TileAdjacencies { get; } = [];
-        
+
         public override void SetStaticDefaults()
         {
             Main.tileSolid[Type] = true;

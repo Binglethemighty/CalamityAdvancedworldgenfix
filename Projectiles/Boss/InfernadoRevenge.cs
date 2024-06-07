@@ -72,6 +72,8 @@ namespace CalamityMod.Projectiles.Boss
 
         public override bool PreDraw(ref Color lightColor)
         {
+            Main.spriteBatch.EnterShaderRegion();
+
             GameShaders.Misc["CalamityMod:Bordernado"].UseSaturation(-0.2f);
             GameShaders.Misc["CalamityMod:Bordernado"].SetShaderTexture(ModContent.Request<Texture2D>("Terraria/Images/Misc/Perlin"));
             Vector2[] drawPoints = new Vector2[5];
@@ -85,6 +87,8 @@ namespace CalamityMod.Projectiles.Boss
 
             drawPoints[drawPoints.Length - 1] = bottom;
             PrimitiveRenderer.RenderTrail(drawPoints, new((_) => Projectile.width * 0.5f + 16f, ColorFunction, shader: GameShaders.Misc["CalamityMod:Bordernado"]), 85);
+
+            Main.spriteBatch.ExitShaderRegion();
 
             Texture2D vortexTexture = ModContent.Request<Texture2D>("CalamityMod/Projectiles/Boss/OldDukeVortex").Value;
             for (int i = 0; i < 110; i++)

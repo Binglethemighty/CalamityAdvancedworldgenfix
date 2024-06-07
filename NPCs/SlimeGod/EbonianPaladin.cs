@@ -787,8 +787,6 @@ namespace CalamityMod.NPCs.SlimeGod
             return newColor * NPC.Opacity;
         }
 
-        public override bool CheckActive() => NPC.ai[0] == 4f;
-
         public override void HitEffect(NPC.HitInfo hit)
         {
             Color dustColor = Color.Lavender;

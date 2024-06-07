@@ -14,14 +14,13 @@ using Terraria.ObjectData;
 
 namespace CalamityMod.Tiles.Ores
 {
-    public class AuricOre : ModTile, IMergeableTile
+    public class AuricOre : ModTile
     {
         public static readonly SoundStyle MineSound = new("CalamityMod/Sounds/Custom/AuricMine", 3);
         public static bool Animate;
         internal static Texture2D GlowTexture;
 
-        List<TileFraming.MergeFrameData> IMergeableTile.TileAdjacencies { get; } = [];
-        
+
         public override void SetStaticDefaults()
         {
             if (!Main.dedServ)

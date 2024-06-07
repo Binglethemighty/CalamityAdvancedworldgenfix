@@ -33,8 +33,8 @@ namespace CalamityMod.Projectiles.Typeless
             Projectile.penetrate = 2;
             Projectile.timeLeft = 300;
             Projectile.ignoreWater = true;
-            Projectile.usesIDStaticNPCImmunity = true;
-            Projectile.idStaticNPCHitCooldown = 5;
+            Projectile.usesLocalNPCImmunity = true;
+            Projectile.localNPCHitCooldown = 12;
         }
 
         public override void AI()
@@ -81,9 +81,8 @@ namespace CalamityMod.Projectiles.Typeless
 
                     if (Main.rand.NextBool())
                     {
-                        Dust dust = Dust.NewDustPerfect(Projectile.Center, 303, -Projectile.velocity.RotatedByRandom(0.2f) * Main.rand.NextFloat(0.2f, 0.6f), 0, default, Main.rand.NextFloat(0.35f, 0.55f));
+                        Dust dust = Dust.NewDustPerfect(Projectile.Center, 89, -Projectile.velocity.RotatedByRandom(0.2f) * Main.rand.NextFloat(0.2f, 0.6f), 0, default, Main.rand.NextFloat(0.5f, 0.8f));
                         dust.noGravity = true;
-                        dust.color = Color.Black;
                         dust.alpha = Main.rand.Next(90, 220 + 1);
                     }
                 }
@@ -125,7 +124,7 @@ namespace CalamityMod.Projectiles.Typeless
                 center.X = Projectile.Center.X + Projectile.velocity.X * 100f;
                 center.Y = Projectile.Center.Y + Projectile.velocity.Y * 100f;
             }
-            float speed = 10f;
+            float speed = 8f;
             float velocityTweak = 0.30f;
             Vector2 projPos = Projectile.Center;
             Vector2 velocity = center - projPos;
@@ -202,7 +201,11 @@ namespace CalamityMod.Projectiles.Typeless
             }
         }
 
-        public override void OnHitNPC(NPC target, NPC.HitInfo hit, int damageDone) => target.AddBuff(ModContent.BuffType<Plague>(), (int)(Projectile.ai[1]));
+        public override void OnHitNPC(NPC target, NPC.HitInfo hit, int damageDone)
+        {
+            target.AddBuff(ModContent.BuffType<Plague>(), (int)(Projectile.ai[1]));
+            Projectile.ai[0] = 15;
+        }
 
         public override void OnHitPlayer(Player target, Player.HurtInfo info) => target.AddBuff(ModContent.BuffType<Plague>(), (int)(Projectile.ai[1]));
 

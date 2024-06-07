@@ -9,10 +9,9 @@ using Terraria.ModLoader;
 
 namespace CalamityMod.Tiles.Ores
 {
-    public class UelibloomOre : ModTile, IMergeableTile
+    public class UelibloomOre : ModTile
     {
-        List<TileFraming.MergeFrameData> IMergeableTile.TileAdjacencies { get; } = [];
-        
+
         public override void SetStaticDefaults()
         {
             Main.tileSolid[Type] = true;

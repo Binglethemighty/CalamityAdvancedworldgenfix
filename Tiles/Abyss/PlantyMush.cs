@@ -14,11 +14,9 @@ namespace CalamityMod.Tiles.Abyss
 {
     // Transforms any and all Tenebris in old worlds into planty mush.
     [LegacyName("Tenebris")]
-    public class PlantyMush : ModTile, IMergeableTile
+    public class PlantyMush : ModTile
     {
         public static readonly SoundStyle MineSound = new("CalamityMod/Sounds/Custom/PlantyMushMine", 3);
-        
-        List<TileFraming.MergeFrameData> IMergeableTile.TileAdjacencies { get; } = [];
 
         public override void SetStaticDefaults()
         {

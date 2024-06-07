@@ -15,7 +15,7 @@ namespace CalamityMod.Items.SummonItems
         public override void SetStaticDefaults()
         {
             NPCID.Sets.MPAllowedEnemies[NPCID.Golem] = true;
-            ItemID.Sets.SortingPriorityBossSpawns[Type] = 15; // Lihzahrd Power Cell
+            ItemID.Sets.SortingPriorityBossSpawns[Type] = 16; // Lihzahrd Power Cell
         }
 
         public override void SetDefaults()

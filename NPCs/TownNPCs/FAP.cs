@@ -822,6 +822,9 @@ namespace CalamityMod.NPCs.TownNPCs
 
         public override bool PreDraw(SpriteBatch spriteBatch, Vector2 screenPos, Color drawColor)
         {
+            if (Main.LocalPlayer.Calamity().trippy)
+                return false;
+
             var something = NPC.direction == -1 ? SpriteEffects.None : SpriteEffects.FlipHorizontally;
             spriteBatch.Draw(BirthdayParty.PartyIsUp ? AltTexture.Value : TextureAssets.Npc[NPC.type].Value, NPC.Center - screenPos + new Vector2(0, NPC.gfxOffY) - new Vector2(0f, 6f), NPC.frame, drawColor, NPC.rotation, NPC.frame.Size() / 2, NPC.scale, something, 0);
             return false;
@@ -882,11 +885,14 @@ namespace CalamityMod.NPCs.TownNPCs
 
         public override void AddShops()
         {
-            Condition potionSells = CalamityConditions.PotionSellingConfig;
-            Condition downedAureus = CalamityConditions.DownedAstrumAureus;
+            Mod musicMod = CalamityMod.Instance.musicMod;
+            musicMod.TryFind("Interlude1MusicBox", out ModItem interlude1Box);
+            musicMod.TryFind("Interlude2MusicBox", out ModItem interlude2Box);
+            musicMod.TryFind("Interlude3MusicBox", out ModItem interlude3Box);
+            musicMod.TryFind("DevourerofGodsEulogyMusicBox", out ModItem eulogyBox);
 
             NPCShop shop = new(Type);
-            shop.AddWithCustomValue(ItemID.LovePotion, Item.buyPrice(silver: 25), potionSells, Condition.HappyEnough)
+            shop.AddWithCustomValue(ItemID.LovePotion, Item.buyPrice(silver: 25), CalamityConditions.PotionSellingConfig, Condition.HappyEnough)
                 .AddWithCustomValue(ModContent.ItemType<GrapeBeer>(), Item.buyPrice(silver: 30))
                 .AddWithCustomValue(ModContent.ItemType<RedWine>(), Item.buyPrice(gold: 1))
                 .AddWithCustomValue(ModContent.ItemType<Whiskey>(), Item.buyPrice(gold: 2))
@@ -902,9 +908,9 @@ namespace CalamityMod.NPCs.TownNPCs
                 .AddWithCustomValue(ModContent.ItemType<Margarita>(), Item.buyPrice(gold: 8), Condition.DownedPlantera)
                 .AddWithCustomValue(ModContent.ItemType<OldFashioned>(), Item.buyPrice(gold: 8), Condition.DownedPlantera)
                 .AddWithCustomValue(ItemID.EmpressButterfly, Item.buyPrice(gold: 10), Condition.DownedPlantera)
-                .AddWithCustomValue(ModContent.ItemType<Everclear>(), Item.buyPrice(gold: 3), downedAureus)
-                .AddWithCustomValue(ModContent.ItemType<BloodyMary>(), Item.buyPrice(gold: 4), downedAureus, Condition.BloodMoon)
-                .AddWithCustomValue(ModContent.ItemType<StarBeamRye>(), Item.buyPrice(gold: 6), downedAureus, Condition.TimeNight)
+                .AddWithCustomValue(ModContent.ItemType<Everclear>(), Item.buyPrice(gold: 3), CalamityConditions.DownedAstrumAureus)
+                .AddWithCustomValue(ModContent.ItemType<BloodyMary>(), Item.buyPrice(gold: 4), CalamityConditions.DownedAstrumAureus, Condition.BloodMoon)
+                .AddWithCustomValue(ModContent.ItemType<StarBeamRye>(), Item.buyPrice(gold: 6), CalamityConditions.DownedAstrumAureus, Condition.TimeNight)
                 .AddWithCustomValue(ModContent.ItemType<Moonshine>(), Item.buyPrice(gold: 2), Condition.DownedGolem)
                 .AddWithCustomValue(ModContent.ItemType<MoscowMule>(), Item.buyPrice(gold: 8), Condition.DownedGolem)
                 .AddWithCustomValue(ModContent.ItemType<CinnamonRoll>(), Item.buyPrice(gold: 8), Condition.DownedGolem)
@@ -918,6 +924,10 @@ namespace CalamityMod.NPCs.TownNPCs
                 .AddWithCustomValue(ModContent.ItemType<ResilientCandle>(), Item.buyPrice(gold: 50))
                 .AddWithCustomValue(ModContent.ItemType<SpitefulCandle>(), Item.buyPrice(gold: 50))
                 .AddWithCustomValue(ModContent.ItemType<OddMushroom>(), Item.buyPrice(1))
+                .AddWithCustomValue(interlude1Box.Type, Item.buyPrice(gold: 10), CalamityConditions.DownedCalamitasClone)
+                .AddWithCustomValue(interlude2Box.Type, Item.buyPrice(gold: 10), Condition.DownedMoonLord)
+                .AddWithCustomValue(interlude3Box.Type, Item.buyPrice(gold: 10), CalamityConditions.DownedYharon)
+                .AddWithCustomValue(eulogyBox.Type, Item.buyPrice(gold: 10), CalamityConditions.DownedDevourerOfGods)
                 .AddWithCustomValue(ItemID.UnicornHorn, Item.buyPrice(0, 2, 50), Condition.HappyEnough, Condition.InHallow)
                 .AddWithCustomValue(ItemID.Milkshake, Item.buyPrice(gold: 5), Condition.HappyEnough, Condition.InHallow, Condition.NpcIsPresent(NPCID.Stylist))
                 .AddWithCustomValue(ModContent.ItemType<CirrusCouch>(), Item.buyPrice(gold: 25), Condition.HappyEnough, Condition.NpcIsPresent(NPCID.Stylist), Condition.NpcIsPresent(NPCID.BestiaryGirl))

@@ -19,6 +19,7 @@ namespace CalamityMod.Tiles.DraedonStructures
             Main.tileNoAttach[Type] = true;
             Main.tileLavaDeath[Type] = false;
             Main.tileWaterDeath[Type] = false;
+            Main.tileTable[Type] = true;
             Main.tileSolidTop[Type] = true;
             TileObjectData.newTile.CopyFrom(TileObjectData.Style2x2);
             TileObjectData.newTile.LavaDeath = false;

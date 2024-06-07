@@ -36,7 +36,7 @@ namespace CalamityMod.Items.SummonItems
 
         public override bool CanUseItem(Player player)
         {
-            return !NPC.AnyNPCs(ModContent.NPCType<ProfanedGuardianCommander>()) && (Main.dayTime || Main.remixWorld) && (player.ZoneHallow || player.ZoneUnderworldHeight) && !BossRushEvent.BossRushActive;
+            return !NPC.AnyNPCs(ModContent.NPCType<ProfanedGuardianCommander>()) && (player.ZoneHallow || player.ZoneUnderworldHeight) && !BossRushEvent.BossRushActive;
         }
 
         public override bool? UseItem(Player player)

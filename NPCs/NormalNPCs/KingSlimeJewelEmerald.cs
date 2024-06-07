@@ -10,7 +10,7 @@ using Terraria.ModLoader;
 
 namespace CalamityMod.NPCs.NormalNPCs
 {
-    public class KingSlimeJewel3 : ModNPC
+    public class KingSlimeJewelEmerald : ModNPC
     {
         public override string Texture => "CalamityMod/NPCs/NormalNPCs/KingSlimeJewel";
 
@@ -35,7 +35,7 @@ namespace CalamityMod.NPCs.NormalNPCs
             NPC.defense = 15;
             NPC.DR_NERD(0.15f);
 
-            NPC.lifeMax = 280;
+            NPC.lifeMax = 240;
             double HPBoost = CalamityConfig.Instance.BossHealthBoost * 0.01;
             NPC.lifeMax += (int)(NPC.lifeMax * HPBoost);
 

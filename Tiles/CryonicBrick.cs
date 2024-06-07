@@ -7,13 +7,12 @@ using Terraria.ModLoader;
 
 namespace CalamityMod.Tiles
 {
-    public class CryonicBrick : ModTile, IMergeableTile
+    public class CryonicBrick : ModTile
     {
         int subsheetHeight = 90;
         int subsheetWidth = 234;
 
-        List<TileFraming.MergeFrameData> IMergeableTile.TileAdjacencies { get; } = [];
-        
+
         public override void SetStaticDefaults()
         {
             Main.tileSolid[Type] = true;

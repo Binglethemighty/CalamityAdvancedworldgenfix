@@ -23,10 +23,6 @@ namespace CalamityMod.NPCs.VanillaNPCAIOverrides.Bosses
             if (npc.target < 0 || npc.target == Main.maxPlayers || Main.player[npc.target].dead || !Main.player[npc.target].active)
                 npc.TargetClosest();
 
-            // Despawn safety, make sure to target another player if the current player target is too far away
-            if (Vector2.Distance(Main.player[npc.target].Center, npc.Center) > CalamityGlobalNPC.CatchUpDistance200Tiles)
-                npc.TargetClosest();
-
             bool bossRush = BossRushEvent.BossRushActive;
             bool masterMode = Main.masterMode || bossRush;
             bool death = CalamityWorld.death || bossRush;
@@ -426,7 +422,7 @@ namespace CalamityMod.NPCs.VanillaNPCAIOverrides.Bosses
                         bool spawnBee = phase4 && calamityGlobalNPC.newAI[0] % beeSpawnGateValue == 0f && Collision.CanHit(npc.Center, 1, 1, Main.player[npc.target].position, Main.player[npc.target].width, Main.player[npc.target].height);
                         if (spawnBee)
                         {
-                            SoundEngine.PlaySound(SoundID.NPCHit1, npc.Center);
+                            SoundEngine.PlaySound(SoundID.NPCHit18, npc.Center);
 
                             if (Main.netMode != NetmodeID.MultiplayerClient)
                             {
@@ -619,10 +615,7 @@ namespace CalamityMod.NPCs.VanillaNPCAIOverrides.Bosses
                 // Spawn bees
                 if (Collision.CanHit(beeSpawnLocation, 1, 1, Main.player[npc.target].position, Main.player[npc.target].width, Main.player[npc.target].height) && spawnBee && (!beeLimitReached || !hornetLimitReached))
                 {
-                    if (!phase3 || Main.zenithWorld)
-                        SoundEngine.PlaySound(SoundID.NPCHit1, beeSpawnLocation);
-                    else
-                        SoundEngine.PlaySound(SoundID.NPCHit18, beeSpawnLocation);
+                    SoundEngine.PlaySound(SoundID.NPCHit18, beeSpawnLocation);
 
                     if (Main.netMode != NetmodeID.MultiplayerClient)
                     {
@@ -721,9 +714,9 @@ namespace CalamityMod.NPCs.VanillaNPCAIOverrides.Bosses
 
                 // Get target location and shoot from ass
                 float stingerAttackSpeed = 16f + enrageScale * 4f;
-                float stingerAttackAccel = phase6 ? 0.32f : 0.24f;
+                float stingerAttackAccel = phase6 ? 0.24f : 0.18f;
                 if (enrageScale > 0f)
-                    stingerAttackAccel = MathHelper.Lerp(phase6 ? 0.4f : 0.32f, phase6 ? 0.8f : 0.64f, enrageScale / maxEnrageScale);
+                    stingerAttackAccel = MathHelper.Lerp(phase6 ? 0.3f : 0.24f, phase6 ? 0.6f : 0.48f, enrageScale / maxEnrageScale);
 
                 if (masterMode)
                 {
@@ -1031,6 +1024,7 @@ namespace CalamityMod.NPCs.VanillaNPCAIOverrides.Bosses
                 }
                 while ((float)num647 == num646);
 
+                npc.TargetClosest();
                 npc.ai[0] = num647;
                 npc.ai[1] = 0f;
                 npc.ai[2] = 0f;
@@ -1081,8 +1075,6 @@ namespace CalamityMod.NPCs.VanillaNPCAIOverrides.Bosses
                 {
                     // Avoid cheap bullshit
                     npc.damage = 0;
-
-                    npc.TargetClosest();
                     
                     float chargeDistanceY = 20f;
                     chargeDistanceY += 20f * num644;
@@ -1239,8 +1231,6 @@ namespace CalamityMod.NPCs.VanillaNPCAIOverrides.Bosses
                     // Avoid cheap bullshit
                     npc.damage = 0;
 
-                    npc.TargetClosest();
-
                     float playerLocation = npc.Center.X - Main.player[npc.target].Center.X;
                     npc.direction = playerLocation < 0 ? 1 : -1;
                     npc.spriteDirection = npc.direction;
@@ -1290,8 +1280,6 @@ namespace CalamityMod.NPCs.VanillaNPCAIOverrides.Bosses
                 // Avoid cheap bullshit
                 npc.damage = 0;
 
-                npc.TargetClosest();
-
                 float playerLocation = npc.Center.X - Main.player[npc.target].Center.X;
                 npc.direction = playerLocation < 0 ? 1 : -1;
                 npc.spriteDirection = npc.direction;
@@ -1322,7 +1310,6 @@ namespace CalamityMod.NPCs.VanillaNPCAIOverrides.Bosses
                 npc.damage = 0;
 
                 npc.localAI[0] = 0f;
-                npc.TargetClosest();
 
                 float num672 = Main.masterMode ? 16f : 14f;
                 float num673 = Main.masterMode ? 0.15f : 0.1f;
@@ -1369,7 +1356,7 @@ namespace CalamityMod.NPCs.VanillaNPCAIOverrides.Bosses
 
                 if (Collision.CanHit(beeSpawnLocation, 1, 1, Main.player[npc.target].position, Main.player[npc.target].width, Main.player[npc.target].height) && flag35)
                 {
-                    SoundEngine.PlaySound(SoundID.NPCHit1, npc.Center);
+                    SoundEngine.PlaySound(SoundID.NPCHit18, npc.Center);
                     if (Main.netMode != NetmodeID.MultiplayerClient)
                     {
                         int num670 = Main.rand.Next(NPCID.Bee, NPCID.BeeSmall + 1);

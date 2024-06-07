@@ -21,7 +21,7 @@ namespace CalamityMod.Items.Weapons.DraedonsArsenal
             Item.width = 50;
             Item.height = 26;
             Item.DamageType = DamageClass.Ranged;
-            Item.damage = 15;
+            Item.damage = 20;
             Item.knockBack = 0f;
             Item.useTime = Item.useAnimation = 28;
             Item.autoReuse = true;
@@ -34,7 +34,7 @@ namespace CalamityMod.Items.Weapons.DraedonsArsenal
             Item.rare = ItemRarityID.Orange;
 
             Item.shoot = ModContent.ProjectileType<TaserHook>();
-            Item.shootSpeed = 15f;
+            Item.shootSpeed = 25f;
 
             modItem.UsesCharge = true;
             modItem.MaxCharge = 50f;

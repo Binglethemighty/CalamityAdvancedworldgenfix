@@ -1,59 +1,59 @@
-﻿using System;
+﻿using System.IO;
 using CalamityMod.Items.Weapons.Ranged;
 using CalamityMod.Particles;
+using CalamityMod.Projectiles.BaseProjectiles;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using ReLogic.Utilities;
 using Terraria;
 using Terraria.Audio;
 using Terraria.ID;
-using Terraria.Localization;
-using Terraria.ModLoader;
 using static CalamityMod.CalamityUtils;
 using static Terraria.ModLoader.ModContent;
 
 namespace CalamityMod.Projectiles.Ranged
 {
-    public class AdamantiteAcceleratorHoldout : ModProjectile
+    public class AdamantiteAcceleratorHoldout : BaseGunHoldoutProjectile
     {
-        public override LocalizedText DisplayName => CalamityUtils.GetItemName<AdamantiteParticleAccelerator>();
-        public override string Texture => "CalamityMod/Items/Weapons/Ranged/AdamantiteParticleAccelerator";
-        const float maxTimeAnim = 35;
-        public Player Owner => Main.player[Projectile.owner];
-        public float Timer => maxTimeAnim - Projectile.timeLeft;
+        public override int AssociatedItemID => ItemType<AdamantiteParticleAccelerator>();
+        public override Vector2 GunTipPosition => Owner.MountedCenter + Projectile.rotation.ToRotationVector2() * 70f + (Vector2.UnitY * -12f * Owner.direction).RotatedBy(Projectile.rotation);
+        public override float MaxOffsetLengthFromArm => base.MaxOffsetLengthFromArm;
+        public override float OffsetXUpwards => base.OffsetXUpwards;
+        public override float OffsetXDownwards => base.OffsetXDownwards;
+        public override float BaseOffsetY => base.BaseOffsetY;
+        public override float OffsetYUpwards => base.OffsetYUpwards;
+        public override float OffsetYDownwards => base.OffsetYDownwards;
+
         public ref float ChargeTimer => ref Projectile.ai[0];
         public ref float DelayTimer => ref Projectile.ai[1];
         public ref float ChargeRate => ref Projectile.localAI[0];
         public ref float BounceBackPower => ref Projectile.localAI[1];
-        public Vector2 NuzzlePosition => Owner.MountedCenter + Projectile.rotation.ToRotationVector2() * 70f + (Vector2.UnitY * -12f * Owner.direction).RotatedBy(Projectile.rotation);
 
         private SlotId ChargeupSoundSlot;
 
-        public override void SetDefaults()
+        public override void KillHoldoutLogic()
         {
-            Projectile.width = 54;
-            Projectile.height = 52;
-            // This projectile has no hitboxes and no damage type.
-            Projectile.friendly = false;
-            Projectile.tileCollide = false;
-            Projectile.ignoreWater = true;
-            Projectile.timeLeft = 900;
-            Projectile.velocity = Vector2.Zero;
+            int maxTime = AdamantiteParticleAccelerator.ChargeFrames + AdamantiteParticleAccelerator.CooldownFrames;
+            if (ChargeTimer > maxTime)
+            {
+                if (!Owner.CantUseHoldout())
+                    ResetToStart();
+                else
+                {
+                    Projectile.Kill();
+                    return;
+                }
+            }
         }
 
         // ChargeTimer is a time-dilated frame counter. DelayTimer is the frame counter for when the beams are fired.
         // ChargeRate is the rate at which the "frame" counter increases. BounceBackPower is there for the visuals of the gun recoiling in the players hands.
-        public override void AI()
+        public override void HoldoutAI()
         {
-            Player player = Main.player[Projectile.owner];
-            Vector2 rrp = player.RotatedRelativePoint(player.MountedCenter, true);
-
-            Projectile.rotation = Owner.MountedCenter.AngleTo(Owner.Calamity().mouseWorld);
-
             // Calculate how quickly the gun should charge. Charge increases by some number close to 1 every frame.
             // Speed increasing reforges make this number greater than 1. Slowing reforges make it smaller than 1.
             if (ChargeRate == 0f)
-                ChargeRate = 44f / player.ActiveItem().useTime;
+                ChargeRate = 44f / HeldItem.useTime;
 
             if (ChargeTimer == 0f)
                 ChargeupSoundSlot = SoundEngine.PlaySound(SoundID.DD2_WitherBeastAuraPulse with { Volume = SoundID.DD2_WitherBeastAuraPulse.Volume * 1.6f }, Projectile.Center);
@@ -69,23 +69,9 @@ namespace CalamityMod.Projectiles.Ranged
 
             // Increment the timer for the gun. If the timer has passed 44, destroy it.
             ChargeTimer += ChargeRate;
-            int maxTime = AdamantiteParticleAccelerator.ChargeFrames + AdamantiteParticleAccelerator.CooldownFrames;
-            if (ChargeTimer > maxTime)
-            {
-                if (Owner.channel)
-                    ResetToStart();
-                else
-                {
-                    Projectile.Kill();
-                    return;
-                }
-            }
 
             // Compute the weapon's charge.
             float chargeLevel = MathHelper.Clamp(Projectile.ai[0] / AdamantiteParticleAccelerator.ChargeFrames, 0f, 1f);
-
-            // Common code among holdouts to keep the holdout projectile directly in the player's hand
-            UpdatePlayerVisuals(player, rrp);
 
             // Firing or charging?
             if (chargeLevel >= 1f)
@@ -96,8 +82,8 @@ namespace CalamityMod.Projectiles.Ranged
                     FiringEffects(new Color(235, 40, 121));
                     if (Projectile.owner == Main.myPlayer)
                     {
-                        Projectile redLaser = Projectile.NewProjectileDirect(Projectile.GetSource_FromThis(), NuzzlePosition, Projectile.rotation.ToRotationVector2(), ProjectileType<AdamAcceleratorBeam>(), Projectile.damage, Projectile.knockBack, Projectile.owner, 0, 120);
-                        redLaser.Center = NuzzlePosition;
+                        Projectile redLaser = Projectile.NewProjectileDirect(Projectile.GetSource_FromThis(), GunTipPosition, Projectile.rotation.ToRotationVector2(), ProjectileType<AdamAcceleratorBeam>(), Projectile.damage, Projectile.knockBack, Projectile.owner, 0, 120);
+                        redLaser.Center = GunTipPosition;
                     }
                 }
 
@@ -107,8 +93,8 @@ namespace CalamityMod.Projectiles.Ranged
                     FiringEffects(new Color(49, 161, 246));
                     if (Projectile.owner == Main.myPlayer)
                     {
-                        Projectile blueLaser = Projectile.NewProjectileDirect(Projectile.GetSource_FromThis(), NuzzlePosition, Projectile.rotation.ToRotationVector2(), ProjectileType<AdamAcceleratorBeam>(), Projectile.damage, Projectile.knockBack, Projectile.owner, 0, -120);
-                        blueLaser.Center = NuzzlePosition;
+                        Projectile blueLaser = Projectile.NewProjectileDirect(Projectile.GetSource_FromThis(), GunTipPosition, Projectile.rotation.ToRotationVector2(), ProjectileType<AdamAcceleratorBeam>(), Projectile.damage, Projectile.knockBack, Projectile.owner, 0, -120);
+                        blueLaser.Center = GunTipPosition;
                     }
                 }
                 DelayTimer += 1f;
@@ -124,27 +110,12 @@ namespace CalamityMod.Projectiles.Ranged
         public CurveSegment oversquish = new CurveSegment(SineBumpEasing, 0.7f, 0f, -0.6f);
         internal float RecoilSquish => PiecewiseAnimation(1 - MathHelper.Clamp(BounceBackPower * 2f, 0f, 1f), new CurveSegment[] { unsquish, oversquish });
 
-        private void UpdatePlayerVisuals(Player player, Vector2 rrp)
-        {
-            // Place the projectile directly into the player's hand at all times
-            Projectile.Center = rrp;
-
-            // The gun is a holdout projectile, so change the player's variables to reflect that
-            player.ChangeDir(Math.Sign(Projectile.rotation.ToRotationVector2().X));
-            player.heldProj = Projectile.whoAmI;
-            player.itemTime = 2;
-            player.itemAnimation = 2;
-
-            player.SetCompositeArmFront(true, Player.CompositeArmStretchAmount.Full, Projectile.rotation - MathHelper.PiOver2);
-
-        }
-
         private void FiringEffects(Color color)
         {
-            SoundEngine.PlaySound(SoundID.Item92, NuzzlePosition);
-            SoundEngine.PlaySound(SoundID.Item60, NuzzlePosition);
+            SoundEngine.PlaySound(SoundID.Item92, GunTipPosition);
+            SoundEngine.PlaySound(SoundID.Item60, GunTipPosition);
 
-            Particle pulse = new DirectionalPulseRing(NuzzlePosition + Projectile.rotation.ToRotationVector2() * 5f, Vector2.Zero, color, new Vector2(0.5f, 1f), Projectile.rotation, 0.05f, 0.34f + Main.rand.NextFloat(0.3f), 30);
+            Particle pulse = new DirectionalPulseRing(GunTipPosition + Projectile.rotation.ToRotationVector2() * 5f, Vector2.Zero, color, new Vector2(0.5f, 1f), Projectile.rotation, 0.05f, 0.34f + Main.rand.NextFloat(0.3f), 30);
             GeneralParticleHandler.SpawnParticle(pulse);
 
             if (Owner == Main.LocalPlayer && Owner.Calamity().GeneralScreenShakePower < 5)
@@ -174,7 +145,7 @@ namespace CalamityMod.Projectiles.Ranged
 
         public override bool PreKill(int timeLeft)
         {
-            if (Owner.channel)
+            if (!Owner.CantUseHoldout())
             {
                 ResetToStart();
                 return false;
@@ -185,9 +156,20 @@ namespace CalamityMod.Projectiles.Ranged
 
         public void ResetToStart()
         {
-            Projectile.timeLeft = 900;
             ChargeTimer = 0f;
             DelayTimer = 0f;
+        }
+
+        public override void SendExtraAIHoldout(BinaryWriter writer)
+        {
+            writer.Write(ChargeRate);
+            writer.Write(BounceBackPower);
+        }
+
+        public override void ReceiveExtraAIHoldout(BinaryReader reader)
+        {
+            ChargeRate = reader.ReadSingle();
+            BounceBackPower = reader.ReadSingle();
         }
     }
 }

@@ -59,7 +59,7 @@ namespace CalamityMod.Projectiles.Ranged
             Projectile.penetrate = -1;
             Projectile.usesLocalNPCImmunity = true;
             Projectile.localNPCHitCooldown = 10;
-            Projectile.damage /= 2;
+            Projectile.damage /= 3;
             Projectile.Damage();
         }
     }

@@ -26,7 +26,7 @@ namespace CalamityMod.Items.SummonItems
         public int spawnYAdd = 0;
         public override void SetStaticDefaults()
         {
-            ItemID.Sets.SortingPriorityBossSpawns[Type] = 10; // Pirate Map
+            ItemID.Sets.SortingPriorityBossSpawns[Type] = 11; // Pirate Map (1 above Mechanical Skull)
         }
 
         public override void SetDefaults()

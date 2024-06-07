@@ -88,13 +88,6 @@ namespace CalamityMod.Buffs
             {
                 player.endurance += BalancingConstants.SolarFlareShieldDR;
             }
-
-            else if (type == BuffID.Warmth)
-            {
-                player.buffImmune[ModContent.BuffType<GlacialState>()] = true;
-                player.buffImmune[BuffID.Frozen] = true;
-                player.buffImmune[BuffID.Chilled] = true;
-            }
             else if (type == BuffID.Rabies)
             {
                 player.GetDamage<GenericDamageClass>() -= 0.2f;

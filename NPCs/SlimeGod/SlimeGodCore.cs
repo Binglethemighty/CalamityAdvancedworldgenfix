@@ -100,6 +100,7 @@ namespace CalamityMod.NPCs.SlimeGod
 
         public override void SendExtraAI(BinaryWriter writer)
         {
+            writer.Write(slimesSpawned);
             writer.Write(buffedSlime);
             writer.Write(NPC.Opacity);
             for (int i = 0; i < 4; i++)
@@ -108,6 +109,7 @@ namespace CalamityMod.NPCs.SlimeGod
 
         public override void ReceiveExtraAI(BinaryReader reader)
         {
+            slimesSpawned = reader.ReadBoolean();
             buffedSlime = reader.ReadInt32();
             NPC.Opacity = reader.ReadSingle();
             for (int i = 0; i < 4; i++)
@@ -135,11 +137,14 @@ namespace CalamityMod.NPCs.SlimeGod
 
             Player player = Main.player[NPC.target];
 
-            if (Main.netMode != NetmodeID.MultiplayerClient && !slimesSpawned)
+            if (!slimesSpawned)
             {
                 slimesSpawned = true;
-                NPC.NewNPC(NPC.GetSource_FromAI(), (int)NPC.Center.X, (int)NPC.Center.Y, ModContent.NPCType<EbonianPaladin>());
-                NPC.NewNPC(NPC.GetSource_FromAI(), (int)NPC.Center.X, (int)NPC.Center.Y, ModContent.NPCType<CrimulanPaladin>());
+                if (Main.netMode != NetmodeID.MultiplayerClient)
+                {
+                    NPC.NewNPC(NPC.GetSource_FromAI(), (int)NPC.Center.X, (int)NPC.Center.Y, ModContent.NPCType<EbonianPaladin>());
+                    NPC.NewNPC(NPC.GetSource_FromAI(), (int)NPC.Center.X, (int)NPC.Center.Y, ModContent.NPCType<CrimulanPaladin>());
+                }
             }
 
             // Enrage based on large slimes
@@ -158,6 +163,9 @@ namespace CalamityMod.NPCs.SlimeGod
                     calamityGlobalNPC.newAI[0] = Main.npc[CalamityGlobalNPC.slimeGodPurple].Center.X;
                     calamityGlobalNPC.newAI[1] = Main.npc[CalamityGlobalNPC.slimeGodPurple].Center.Y;
 
+                    // Despawn check
+                    calamityGlobalNPC.newAI[3] = Main.npc[CalamityGlobalNPC.slimeGodPurple].ai[0] == 4f ? 1f : 0f;
+
                     purpleSlimeAlive = true;
                 }
             }
@@ -173,6 +181,9 @@ namespace CalamityMod.NPCs.SlimeGod
 
                     NPC.ai[1] = Main.npc[CalamityGlobalNPC.slimeGodRed].Center.X;
                     NPC.ai[2] = Main.npc[CalamityGlobalNPC.slimeGodRed].Center.Y;
+                    
+                    // Despawn check
+                    calamityGlobalNPC.newAI[3] = Main.npc[CalamityGlobalNPC.slimeGodRed].ai[0] == 3f ? 1f : 0f;
 
                     redSlimeAlive = true;
                 }
@@ -182,7 +193,7 @@ namespace CalamityMod.NPCs.SlimeGod
             bool phase2 = !purpleSlimeAlive || !redSlimeAlive;
 
             // Vanish phase
-            if (!purpleSlimeAlive && !redSlimeAlive)
+            if ((!purpleSlimeAlive && !redSlimeAlive) || calamityGlobalNPC.newAI[3] == 1f || NPC.ai[3] == 1f)
             {
                 // Avoid cheap bullshit
                 NPC.damage = 0;
@@ -251,24 +262,42 @@ namespace CalamityMod.NPCs.SlimeGod
                         Main.dust[slimyDust2].velocity *= 2f;
                     }
 
-                    // Let the player know that the Slime God isn't dead fr
-                    if (!DownedBossSystem.downedSlimeGod)
+                    if (calamityGlobalNPC.newAI[3] != 1f)
                     {
-                        string key = "Mods.CalamityMod.Status.Boss.SlimeGodRun";
-                        Color messageColor = Color.Magenta;
+                        // Let the player know that the Slime God isn't dead fr
+                        if (!DownedBossSystem.downedSlimeGod)
+                        {
+                            string key = "Mods.CalamityMod.Status.Boss.SlimeGodRun";
+                            Color messageColor = Color.Magenta;
 
-                        CalamityUtils.DisplayLocalizedText(key, messageColor);
+                            CalamityUtils.DisplayLocalizedText(key, messageColor);
+                        }
+
+                        // Set Slime God to have interacted with all players
+                        for (int i = Main.maxPlayers - 1; i >= 0; i--)
+                            NPC.ApplyInteraction(i);
+
+                        NPC.active = false;
+                        NPC.HitEffect();
+                        NPC.NPCLoot();
+                        NPC.netUpdate = true;
                     }
-
-                    // Set Slime God to have interacted with all players
-                    for (int i = Main.maxPlayers - 1; i >= 0; i--)
+                    else
                     {
-                        NPC.ApplyInteraction(i);
+                        for (int x = 0; x < Main.maxNPCs; x++)
+                        {
+                            if (Main.npc[x].type == ModContent.NPCType<EbonianPaladin>() || Main.npc[x].type == ModContent.NPCType<SplitEbonianPaladin>() ||
+                                Main.npc[x].type == ModContent.NPCType<CrimulanPaladin>() || Main.npc[x].type == ModContent.NPCType<SplitCrimulanPaladin>())
+                            {
+                                Main.npc[x].active = false;
+                                Main.npc[x].netUpdate = true;
+                            }
+                        }
+
+                        NPC.active = false;
+                        NPC.HitEffect();
+                        NPC.netUpdate = true;
                     }
-                    NPC.active = false;
-                    NPC.HitEffect();
-                    NPC.NPCLoot();
-                    NPC.netUpdate = true;
                 }
 
                 return;

@@ -10,8 +10,10 @@ using Terraria.ModLoader;
 
 namespace CalamityMod.NPCs.NormalNPCs
 {
-    public class KingSlimeJewel : ModNPC
+    public class KingSlimeJewelRuby : ModNPC
     {
+        public override string Texture => "CalamityMod/NPCs/NormalNPCs/KingSlimeJewel";
+
         private const int BoltShootGateValue = 60;
         private const int BoltShootGateValue_Death = 75;
         private const int BoltShootGateValue_BossRush = 45;
@@ -33,7 +35,7 @@ namespace CalamityMod.NPCs.NormalNPCs
             NPC.defense = 10;
             NPC.DR_NERD(0.1f);
 
-            NPC.lifeMax = 140;
+            NPC.lifeMax = 120;
             double HPBoost = CalamityConfig.Instance.BossHealthBoost * 0.01;
             NPC.lifeMax += (int)(NPC.lifeMax * HPBoost);
 
@@ -152,8 +154,8 @@ namespace CalamityMod.NPCs.NormalNPCs
                     int damage = NPC.GetProjectileDamage(type);
                     if (CalamityWorld.death || BossRushEvent.BossRushActive)
                     {
-                        int numProj = 5;
-                        float rotation = MathHelper.ToRadians(12);
+                        int numProj = Main.masterMode ? 5 : 4;
+                        float rotation = MathHelper.ToRadians(18);
                         for (int i = 0; i < numProj; i++)
                         {
                             Vector2 perturbedSpeed = projVector.RotatedBy(MathHelper.Lerp(-rotation, rotation, i / (float)(numProj - 1)));

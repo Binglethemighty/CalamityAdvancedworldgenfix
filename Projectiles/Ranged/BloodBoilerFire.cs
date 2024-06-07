@@ -186,7 +186,7 @@ namespace CalamityMod.Projectiles.Ranged
                     {
                         if (!Main.player[Projectile.owner].moonLeech)
                         {
-                            int bonusHeal = Main.rand.NextBool(3) ? 6 : 4;
+                            int bonusHeal = Main.rand.NextBool(3) ? 5 : 3;
                             int heal = improvedHeal ? bonusHeal : 2;
 
                             if (Main.player[Main.myPlayer].lifeSteal <= 0f)

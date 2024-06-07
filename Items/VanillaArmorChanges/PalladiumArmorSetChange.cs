@@ -28,5 +28,10 @@ namespace CalamityMod.Items.VanillaArmorChanges
         {
             player.GetDamage<GenericDamageClass>() += LeggingsDamagePercentageBoost * 0.01f;
         }
+
+        public override void UpdateSetBonusText(ref string setBonusText)
+        {
+            setBonusText = $"{CalamityUtils.GetTextValue($"Vanilla.Armor.SetBonus.{ArmorSetName}")}";
+        }
     }
 }

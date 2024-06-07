@@ -8,13 +8,12 @@ using Terraria.ModLoader;
 
 namespace CalamityMod.Tiles.Crags
 {
-    public class ScorchedRemains : ModTile, IMergeableTile
+    public class ScorchedRemains : ModTile
     {
         private int sheetWidth = 234;
         private int sheetHeight = 90;
 
-        List<TileFraming.MergeFrameData> IMergeableTile.TileAdjacencies { get; } = [];
-        
+
         public override void SetStaticDefaults()
         {
             Main.tileSolid[Type] = true;

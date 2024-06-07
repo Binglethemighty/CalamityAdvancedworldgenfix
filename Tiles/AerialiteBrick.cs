@@ -7,10 +7,9 @@ using Terraria.ModLoader;
 
 namespace CalamityMod.Tiles
 {
-    public class AerialiteBrick : ModTile, IMergeableTile
+    public class AerialiteBrick : ModTile
     {
-        List<TileFraming.MergeFrameData> IMergeableTile.TileAdjacencies { get; } = [];
-        
+
         public override void SetStaticDefaults()
         {
             Main.tileSolid[Type] = true;

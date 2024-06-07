@@ -61,8 +61,7 @@ namespace CalamityMod.Projectiles.Melee
             Projectile.width = 6;
             Projectile.height = 6;
             Projectile.friendly = true;
-            Projectile.DamageType = DamageClass.Ranged;
-            Projectile.DamageType = DamageClass.Melee;
+            Projectile.DamageType = MeleeRangedHybridDamageClass.Instance;
             Projectile.scale = 1.5f;
             Projectile.penetrate = -1;
             Projectile.tileCollide = false;

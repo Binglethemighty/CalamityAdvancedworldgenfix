@@ -51,7 +51,7 @@ namespace CalamityMod.Items.Weapons.Ranged
         public override bool Shoot(Player player, EntitySource_ItemUse_WithAmmo source, Vector2 position, Vector2 velocity, int type, int damage, float knockback)
         {
             Vector2 spawnPosition = player.RotatedRelativePoint(player.MountedCenter, true);
-            Projectile.NewProjectileDirect(source, spawnPosition, player.Calamity().mouseWorld - spawnPosition, ModContent.ProjectileType<OpalStrikerHoldout>(), 0, 0f, player.whoAmI);
+            Projectile.NewProjectileDirect(source, spawnPosition, player.Calamity().mouseWorld - spawnPosition, ModContent.ProjectileType<OpalStrikerHoldout>(), damage, knockback, player.whoAmI);
             return false;
         }
 

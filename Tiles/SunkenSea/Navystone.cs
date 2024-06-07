@@ -8,10 +8,8 @@ using Terraria.ModLoader;
 
 namespace CalamityMod.Tiles.SunkenSea
 {
-    public class Navystone : ModTile, IMergeableTile
+    public class Navystone : ModTile
     {
-        List<TileFraming.MergeFrameData> IMergeableTile.TileAdjacencies { get; } = [];
-
         public override void SetStaticDefaults()
         {
             Main.tileSolid[Type] = true;

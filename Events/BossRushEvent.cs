@@ -150,14 +150,12 @@ namespace CalamityMod.Events
                     DownedBossSystem.startedBossRushAtLeastOnce = true;
                 },
                 permittedNPCs: new int[] { NPCID.BlueSlime, NPCID.YellowSlime, NPCID.PurpleSlime, NPCID.RedSlime, NPCID.GreenSlime, NPCID.RedSlime,
-                    NPCID.IceSlime, NPCID.UmbrellaSlime, NPCID.Pinky, NPCID.SlimeSpiked, NPCID.RainbowSlime, ModContent.NPCType<KingSlimeJewel>(),
-                    ModContent.NPCType<KingSlimeJewel2>(), ModContent.NPCType<KingSlimeJewel3>() }),
+                    NPCID.IceSlime, NPCID.UmbrellaSlime, NPCID.Pinky, NPCID.SlimeSpiked, NPCID.RainbowSlime, ModContent.NPCType<KingSlimeJewelRuby>(),
+                    ModContent.NPCType<KingSlimeJewelSapphire>(), ModContent.NPCType<KingSlimeJewelEmerald>() }),
 
                 new Boss(ModContent.NPCType<DesertScourgeHead>(), spawnContext: type =>
                 {
                     NPC.SpawnOnPlayer(ClosestPlayerToWorldCenter, ModContent.NPCType<DesertScourgeHead>());
-                    NPC.SpawnOnPlayer(ClosestPlayerToWorldCenter, ModContent.NPCType<DesertNuisanceHead>());
-                    NPC.SpawnOnPlayer(ClosestPlayerToWorldCenter, ModContent.NPCType<DesertNuisanceHeadYoung>());
                 }, permittedNPCs: new int[] { ModContent.NPCType<DesertScourgeBody>(), ModContent.NPCType<DesertScourgeTail>(), ModContent.NPCType<DesertNuisanceHead>(),
                     ModContent.NPCType<DesertNuisanceBody>(), ModContent.NPCType<DesertNuisanceTail>(), ModContent.NPCType<DesertNuisanceHeadYoung>(),
                     ModContent.NPCType<DesertNuisanceBodyYoung>(), ModContent.NPCType<DesertNuisanceTailYoung>() }),

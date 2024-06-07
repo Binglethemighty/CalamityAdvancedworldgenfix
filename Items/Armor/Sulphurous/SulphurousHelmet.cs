@@ -33,7 +33,7 @@ namespace CalamityMod.Items.Armor.Sulphurous
             var modPlayer = player.Calamity();
             modPlayer.sulphurSet = true;
             player.GetJumpState<SulphurJump>().Enable();
-            modPlayer.rogueStealthMax += 0.7f;
+            modPlayer.rogueStealthMax += 0.65f;
             modPlayer.wearingRogueArmor = true;
             player.ignoreWater = true;
         }

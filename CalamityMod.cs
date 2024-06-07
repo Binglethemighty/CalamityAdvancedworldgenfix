@@ -132,8 +132,10 @@ namespace CalamityMod
         internal static CalamityMod Instance;
 
         // TODO -- Mod references should be contained in a ModSystem (example name "ModLoadedChecker")
-        internal Mod musicMod = null; // This is Calamity's official music mod, CalamityModMusic
-        internal bool MusicAvailable => !(musicMod is null);
+
+        // This is Calamity's official music mod, CalamityModMusic. It is now a hard dependency.
+        internal Mod musicMod = null;
+        internal bool MusicAvailable => musicMod is not null;
 
         // Please keep this in alphabetical order so it's easy to read
         internal Mod ancientsAwakened = null;

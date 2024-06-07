@@ -22,8 +22,8 @@ namespace CalamityMod.Items.Armor.Sulphurous
 
         public override void UpdateEquip(Player player)
         {
-            player.GetDamage<ThrowingDamageClass>() += 0.08f;
-            player.GetCritChance<ThrowingDamageClass>() += 5;
+            player.GetDamage<ThrowingDamageClass>() += 0.06f;
+            player.GetCritChance<ThrowingDamageClass>() += 4;
         }
 
         public override void AddRecipes()

@@ -81,7 +81,7 @@ namespace CalamityMod.Projectiles.Ranged
 
         public override void OnKill(int timeLeft)
         {
-            // Spawn an on-hit explosion which deals 75% of the projectile's damage.
+            // Spawn an on-hit explosion which deals 30% of the projectile's damage.
             if (Projectile.owner == Main.myPlayer)
             {
                 Projectile.damage = (int)(Projectile.damage * HolyFireBullet.ExplosionMultiplier);

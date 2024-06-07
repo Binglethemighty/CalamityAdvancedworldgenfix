@@ -24,7 +24,6 @@ namespace CalamityMod.NPCs.ProfanedGuardians
     public class ProfanedGuardianDefender : ModNPC
     {
         private int healTimer = 0;
-        private int biomeEnrageTimer = CalamityGlobalNPC.biomeEnrageTimerMax;
         private const float TimeForShieldDespawn = 120f;
         public static readonly SoundStyle DashSound = new("CalamityMod/Sounds/Custom/ProfanedGuardians/GuardianDash");
         public static readonly SoundStyle RockShieldSpawnSound = new("CalamityMod/Sounds/Custom/ProfanedGuardians/GuardianRockShieldActivate");
@@ -100,7 +99,6 @@ namespace CalamityMod.NPCs.ProfanedGuardians
         public override void SendExtraAI(BinaryWriter writer)
         {
             writer.Write(healTimer);
-            writer.Write(biomeEnrageTimer);
             writer.Write(NPC.chaseable);
             writer.Write(NPC.localAI[0]);
             writer.Write(NPC.localAI[1]);
@@ -111,7 +109,6 @@ namespace CalamityMod.NPCs.ProfanedGuardians
         public override void ReceiveExtraAI(BinaryReader reader)
         {
             healTimer = reader.ReadInt32();
-            biomeEnrageTimer = reader.ReadInt32();
             NPC.chaseable = reader.ReadBoolean();
             NPC.localAI[0] = reader.ReadSingle();
             NPC.localAI[1] = reader.ReadSingle();
@@ -250,28 +247,21 @@ namespace CalamityMod.NPCs.ProfanedGuardians
             bool expertMode = Main.expertMode || bossRush;
             bool revenge = CalamityWorld.revenge || bossRush;
             bool death = CalamityWorld.death || bossRush;
-            bool isHoly = player.ZoneHallow;
-            bool isHell = player.ZoneUnderworldHeight;
 
-            // Become immune over time if target isn't in hell or hallow
-            if (!isHoly && !isHell && !bossRush)
+            // Enrage at nighttime
+            bool enraged = false;
+            if (!Main.dayTime && !Main.remixWorld)
             {
-                if (biomeEnrageTimer > 0)
-                    biomeEnrageTimer--;
-                else
-                    NPC.Calamity().CurrentlyEnraged = true;
+                enraged = true;
+                NPC.Calamity().CurrentlyEnraged = true;
             }
-            else
-                biomeEnrageTimer = CalamityGlobalNPC.biomeEnrageTimerMax;
-
-            bool biomeEnraged = biomeEnrageTimer <= 0;
 
             bool phase1 = healerAlive;
 
             NPC.chaseable = !phase1;
 
             // Phase durations
-            float commanderGuardPhase2Duration = (bossRush || biomeEnraged) ? 420f : death ? 480f : revenge ? 510f : expertMode ? 540f : 600f;
+            float commanderGuardPhase2Duration = (bossRush || enraged) ? 420f : death ? 480f : revenge ? 510f : expertMode ? 540f : 600f;
             float timeBeforeRocksRespawnInPhase2 = 90f;
             float throwRocksGateValue = 60f;
 
@@ -280,7 +270,7 @@ namespace CalamityMod.NPCs.ProfanedGuardians
 
             // Charge variables
             float chargeVelocityMult = 0.25f;
-            float maxChargeVelocity = (bossRush || biomeEnraged) ? 25f : death ? 22f : revenge ? 20.5f : expertMode ? 19f : 16f;
+            float maxChargeVelocity = (bossRush || enraged) ? 25f : death ? 22f : revenge ? 20.5f : expertMode ? 19f : 16f;
             if (Main.getGoodWorld)
                 maxChargeVelocity *= 1.15f;
 
@@ -400,7 +390,7 @@ namespace CalamityMod.NPCs.ProfanedGuardians
                 }
             }
 
-            float moveVelocity = (bossRush || biomeEnraged) ? 24f : death ? 22f : revenge ? 21f : expertMode ? 20f : 18f;
+            float moveVelocity = (bossRush || enraged) ? 24f : death ? 22f : revenge ? 21f : expertMode ? 20f : 18f;
             if (Main.getGoodWorld)
                 moveVelocity *= 1.25f;
             if (healerAlive)
@@ -450,7 +440,7 @@ namespace CalamityMod.NPCs.ProfanedGuardians
                 // Lay a holy bomb every once in a while in phase 1 and while not doing the laser attack
                 if (!commanderUsingLaser)
                 {
-                    float projectileShootGateValue = (bossRush || biomeEnraged) ? 420f : death ? 480f : revenge ? 510f : expertMode ? 540f : 600f;
+                    float projectileShootGateValue = (bossRush || enraged) ? 420f : death ? 480f : revenge ? 510f : expertMode ? 540f : 600f;
                     NPC.ai[1] += 1f;
                     if (NPC.ai[1] >= projectileShootGateValue)
                     {
@@ -520,7 +510,7 @@ namespace CalamityMod.NPCs.ProfanedGuardians
                     float shootMoltenBlastsGateValue = commanderGuardPhase2Duration / moltenBlastsDivisor;
                     if (NPC.ai[1] % shootMoltenBlastsGateValue == 0f && !commanderGoingLowOrHighInPhase2)
                     {
-                        float moltenBlastVelocity = (bossRush || biomeEnraged) ? 18f : death ? 16f : revenge ? 15f : expertMode ? 14f : 12f;
+                        float moltenBlastVelocity = (bossRush || enraged) ? 18f : death ? 16f : revenge ? 15f : expertMode ? 14f : 12f;
                         int projTimeLeft = (int)(2400f / moltenBlastVelocity);
                         Vector2 velocity = Vector2.Normalize(player.Center - shootFrom) * moltenBlastVelocity;
                         if (Main.netMode != NetmodeID.MultiplayerClient)
@@ -627,7 +617,7 @@ namespace CalamityMod.NPCs.ProfanedGuardians
                 NPC.spriteDirection = Math.Sign(NPC.velocity.X);
 
                 NPC.ai[1] += 1f;
-                float phaseGateValue = (bossRush || biomeEnraged) ? 120f : death ? 140f : revenge ? 150f : expertMode ? 160f : 180f;
+                float phaseGateValue = (bossRush || enraged) ? 120f : death ? 140f : revenge ? 150f : expertMode ? 160f : 180f;
                 if (NPC.ai[1] >= phaseGateValue)
                 {
                     NPC.ai[0] = 3f;
@@ -648,7 +638,7 @@ namespace CalamityMod.NPCs.ProfanedGuardians
                         // Accelerate
                         if (NPC.velocity.Length() < maxChargeVelocity)
                         {
-                            float velocityMult = (bossRush || biomeEnraged) ? 1.04f : death ? 1.036667f : revenge ? 1.035f : expertMode ? 1.033333f : 1.03f;
+                            float velocityMult = (bossRush || enraged) ? 1.04f : death ? 1.036667f : revenge ? 1.035f : expertMode ? 1.033333f : 1.03f;
                             NPC.velocity = targetVector * (NPC.velocity.Length() * velocityMult);
                             if (NPC.velocity.Length() > maxChargeVelocity)
                             {
@@ -660,7 +650,7 @@ namespace CalamityMod.NPCs.ProfanedGuardians
                     else
                     {
                         // Charge towards target
-                        float inertia = (bossRush || biomeEnraged) ? 57f : death ? 63f : revenge ? 66f : expertMode ? 69f : 75f;
+                        float inertia = (bossRush || enraged) ? 57f : death ? 63f : revenge ? 66f : expertMode ? 69f : 75f;
                         NPC.velocity = (NPC.velocity * (inertia - 1f) + targetVector * (NPC.velocity.Length() + (0.111111117f * inertia))) / inertia;
                     }
 
@@ -773,10 +763,15 @@ namespace CalamityMod.NPCs.ProfanedGuardians
 
                 texture2D15 = Texture_Glow.Value;
                 Color timeBasedGlowColor = Color.Lerp(Color.White, Color.Yellow, 0.5f);
-                if (Main.remixWorld)
+                if (NPC.Calamity().CurrentlyEnraged)
                 {
                     texture2D15 = TextureNight_Glow.Value;
-                    timeBasedGlowColor = Color.Cyan;
+                    timeBasedGlowColor = Color.Lerp(Color.White, Color.Cyan, 0.75f);
+                }
+                if (Main.zenithWorld)
+                {
+                    texture2D15 = TextureNight_Glow.Value;
+                    timeBasedGlowColor = Main.DiscoColor;
                 }
                 if (colorOverride != null)
                     timeBasedGlowColor = colorOverride.Value;
@@ -867,14 +862,14 @@ namespace CalamityMod.NPCs.ProfanedGuardians
                 Vector2 shieldDrawPos = NPC.Center - screenPos;
                 shieldDrawPos -= new Vector2(shieldTexture.Width, shieldTexture.Height) * NPC.scale / 2f;
                 shieldDrawPos += origin * NPC.scale + new Vector2(0f, NPC.gfxOffY);
-                float minHue = 0.06f;
-                float maxHue = 0.18f;
+                float minHue = NPC.Calamity().CurrentlyEnraged ? 0.4f : 0.06f;
+                float maxHue = minHue + 0.12f;
                 float opacityScaleDuringShieldDespawn = (TimeForShieldDespawn - NPC.localAI[1]) / TimeForShieldDespawn;
                 float scaleDuringShieldDespawnScale = 1.8f;
                 float scaleDuringShieldDespawn = (1f - opacityScaleDuringShieldDespawn) * scaleDuringShieldDespawnScale;
                 float colorScale = MathHelper.Lerp(0f, shieldOpacity, opacityScaleDuringShieldDespawn);
-                Color color = Main.hslToRgb(MathHelper.Lerp(maxHue - minHue, maxHue, ((float)Math.Sin(Main.GlobalTimeWrappedHourly * MathHelper.TwoPi) + 1f) * 0.5f), 1f, 0.5f) * colorScale;
-                Color color2 = Main.hslToRgb(MathHelper.Lerp(minHue, maxHue - minHue, ((float)Math.Sin(Main.GlobalTimeWrappedHourly * MathHelper.Pi * 3f) + 1f) * 0.5f), 1f, 0.5f) * colorScale;
+                Color color = Main.hslToRgb(MathHelper.Lerp(NPC.Calamity().CurrentlyEnraged ? minHue : maxHue - minHue, maxHue, ((float)Math.Sin(Main.GlobalTimeWrappedHourly * MathHelper.TwoPi) + 1f) * 0.5f), 1f, 0.5f) * colorScale;
+                Color color2 = Main.hslToRgb(MathHelper.Lerp(minHue, NPC.Calamity().CurrentlyEnraged ? maxHue : maxHue - minHue, ((float)Math.Sin(Main.GlobalTimeWrappedHourly * MathHelper.Pi * 3f) + 1f) * 0.5f), 1f, 0.5f) * colorScale;
                 color2.A = 0;
                 color *= 0.6f;
                 color2 *= 0.6f;

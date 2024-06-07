@@ -22,7 +22,7 @@ namespace CalamityMod.Items.Accessories
         public override void UpdateAccessory(Player player, bool hideVisual)
         {
             CalamityPlayer modPlayer = player.Calamity();
-            player.statLifeMax2 += 70;
+            player.statLifeMax2 += 50;
 
             // bool left in for abyss light purposes and life regen effects
             modPlayer.aAmpoule = true;

@@ -16,7 +16,7 @@ namespace CalamityMod.Items.Weapons.Ranged
         public new string LocalizationCategory => "Items.Weapons.Ranged";
 
         #region GFB Arrow Array
-        public int[] arrowArr =
+        public static int[] arrowArr =
         {
             ProjectileID.WoodenArrowFriendly,
             ProjectileID.FireArrow,
@@ -143,7 +143,7 @@ namespace CalamityMod.Items.Weapons.Ranged
 
                 int projType;
                 if (Main.zenithWorld)
-                    projType = arrowArr[Main.rand.Next(0, arrowArr.Length)];
+                    projType = arrowArr[Main.rand.Next(arrowArr.Length)];
                 else
                     projType = ProjectileID.Leaf;
 

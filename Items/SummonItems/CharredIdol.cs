@@ -14,7 +14,7 @@ namespace CalamityMod.Items.SummonItems
         public new string LocalizationCategory => "Items.SummonItems";
         public override void SetStaticDefaults()
         {
-            ItemID.Sets.SortingPriorityBossSpawns[Type] = 9; // Mechanical Skull
+            ItemID.Sets.SortingPriorityBossSpawns[Type] = 10; // Mechanical Skull
         }
 
         public override void SetDefaults()

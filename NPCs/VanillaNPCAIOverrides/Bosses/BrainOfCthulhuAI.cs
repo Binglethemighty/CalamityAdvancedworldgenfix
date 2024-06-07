@@ -29,10 +29,6 @@ namespace CalamityMod.NPCs.VanillaNPCAIOverrides.Bosses
             if (npc.target < 0 || npc.target == Main.maxPlayers || Main.player[npc.target].dead || !Main.player[npc.target].active)
                 npc.TargetClosest();
 
-            // Despawn safety, make sure to target another player if the current player target is too far away
-            if (Vector2.Distance(Main.player[npc.target].Center, npc.Center) > CalamityGlobalNPC.CatchUpDistance200Tiles)
-                npc.TargetClosest();
-
             bool enrage = true;
             int targetTileX = (int)Main.player[npc.target].Center.X / 16;
             int targetTileY = (int)Main.player[npc.target].Center.Y / 16;
@@ -517,7 +513,6 @@ namespace CalamityMod.NPCs.VanillaNPCAIOverrides.Bosses
                         npc.ai[1] = 0f;
                         npc.ai[2] = 0f;
                         npc.ai[3] = 0f;
-                        npc.TargetClosest();
                         npc.netUpdate = true;
                     }
                 }
@@ -879,11 +874,15 @@ namespace CalamityMod.NPCs.VanillaNPCAIOverrides.Bosses
             if (npc.target < 0 || npc.target == Main.maxPlayers || Main.player[npc.target].dead || !Main.player[npc.target].active)
                 npc.TargetClosest();
 
-            float enrageScale = bossRush ? 1.5f : masterMode ? 0.5f : 0f;
-            if ((npc.position.Y / 16f) < Main.worldSurface || bossRush)
+            float enrageScaleMax = 2f;
+            float enrageScale = bossRush ? enrageScaleMax : masterMode ? 0.5f : 0f;
+            if ((npc.position.Y / 16f) < Main.worldSurface)
                 enrageScale += 0.5f;
-            if (!Main.player[npc.target].ZoneCrimson || bossRush)
-                enrageScale += 2f;
+            if (!Main.player[npc.target].ZoneCrimson)
+                enrageScale += 1f;
+
+            if (enrageScale > enrageScaleMax)
+                enrageScale = enrageScaleMax;
 
             bool brainIsNotTeleportingOrCharging = Main.npc[NPC.crimsonBoss].ai[0] == 0f || Main.npc[NPC.crimsonBoss].ai[0] == -1f || Main.npc[NPC.crimsonBoss].ai[0] == -6f;
             bool brainIsInPhase2 = Main.npc[NPC.crimsonBoss].ai[0] < 0f;
@@ -906,7 +905,9 @@ namespace CalamityMod.NPCs.VanillaNPCAIOverrides.Bosses
                 creeperRatio = creeperCount / (float)GetBrainOfCthuluCreepersCountRevDeath();
 
             // Scale the aggressiveness of the charges with amount of Creepers remaining
-            float chargeAggressionScale = creeperRatio <= 0.1f ? 3.5f : creeperRatio <= 0.2f ? 2.5f : creeperRatio <= 0.4f ? 1.75f : creeperRatio <= 0.6f ? 1f : creeperRatio <= 0.8f ? 0.5f : 0f;
+            float chargeAggressionScale = creeperRatio <= 0.1f ? 1.75f : creeperRatio <= 0.2f ? 1.25f : creeperRatio <= 0.4f ? 0.875f : creeperRatio <= 0.6f ? 0.5f : creeperRatio <= 0.8f ? 0.25f : 0f;
+            if (enrageScale > 0f)
+                chargeAggressionScale *= 1f + enrageScale;
             if (death)
                 chargeAggressionScale *= 1.25f;
 

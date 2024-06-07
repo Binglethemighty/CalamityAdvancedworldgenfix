@@ -1,4 +1,5 @@
-﻿using CalamityMod.Buffs.StatDebuffs;
+﻿using CalamityMod.Buffs.DamageOverTime;
+using CalamityMod.Buffs.StatDebuffs;
 using CalamityMod.Particles;
 using Microsoft.Xna.Framework;
 using Terraria;
@@ -59,7 +60,7 @@ namespace CalamityMod.Projectiles.Ranged
 
             rotIncrease += 0.1f * (rotDirection ? -1 : 1);
 
-            Projectile.velocity *= 0.982f;
+            Projectile.velocity *= 0.984f;
 
             if (Projectile.localAI[0] > 100f && Projectile.localAI[0] < 300 && Projectile.localAI[0] % 9 == 0)
             {
@@ -71,12 +72,15 @@ namespace CalamityMod.Projectiles.Ranged
         public override void OnHitNPC(NPC target, NPC.HitInfo hit, int damageDone)
         {
             Player Owner = Main.player[Projectile.owner];
-            target.AddBuff(BuffID.Frostburn, 120);
+            target.AddBuff(BuffID.Frostburn2, 120);
             if (hit.Crit)
             {
                 SoundStyle crit = new("CalamityMod/Sounds/NPCHit/CryogenPhaseTransitionCrack");
                 SoundEngine.PlaySound(crit with { Volume = 0.35f, Pitch = 1f }, Projectile.Center);
-                target.AddBuff(BuffID.Frostburn2, 300);
+
+                if (!target.boss)
+                    target.AddBuff(ModContent.BuffType<GlacialState>(), 120);
+
                 int points = 6;
                 float radians = MathHelper.TwoPi / points;
                 Vector2 spinningPoint = Vector2.Normalize(new Vector2(-1f, -1f));
@@ -88,7 +92,7 @@ namespace CalamityMod.Projectiles.Ranged
                     WaterFlavoredParticle subTrail = new WaterFlavoredParticle(Projectile.Center + velocity * 4.5f + addedPlacement, velocity * 7, false, 6, 0.65f, Color.SkyBlue);
                     GeneralParticleHandler.SpawnParticle(subTrail);
                 }
-                int onHitDamage = Owner.CalcIntDamage<RangedDamageClass>(0.36f * Projectile.damage);
+                int onHitDamage = (int)(Projectile.damage * 0.5f);
                 Owner.ApplyDamageToNPC(target, onHitDamage, 0f, 0, false);
             }
         }

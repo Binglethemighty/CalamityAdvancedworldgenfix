@@ -46,7 +46,7 @@ namespace CalamityMod.Projectiles.Ranged
 
             if (Projectile.localAI[0] == 0)
             {
-                player.statLife -= Main.player[Main.myPlayer].lifeSteal <= 0f ? 0 : 1;
+                player.statLife -= 1;
                 if (player.statLife <= 0)
                 {
                     PlayerDeathReason pdr = PlayerDeathReason.ByCustomReason(CalamityUtils.GetText("Status.Death.BloodFireArrow" + Main.rand.Next(1, 2 + 1)).Format(player.name));

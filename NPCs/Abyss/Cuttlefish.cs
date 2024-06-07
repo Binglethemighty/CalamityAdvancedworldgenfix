@@ -379,7 +379,7 @@ namespace CalamityMod.NPCs.Abyss
         public override void ModifyNPCLoot(NPCLoot npcLoot)
         {
             npcLoot.Add(ModContent.ItemType<AnechoicCoating>(), 2);
-            npcLoot.Add(ItemDropRule.NormalvsExpert(ModContent.ItemType<InkBomb>(), 20, 10));
+            npcLoot.Add(ItemDropRule.NormalvsExpert(ModContent.ItemType<InkBomb>(), 10, 5));
         }
 
         public override void HitEffect(NPC.HitInfo hit)

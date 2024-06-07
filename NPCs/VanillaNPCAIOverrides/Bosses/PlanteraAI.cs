@@ -39,10 +39,6 @@ namespace CalamityMod.NPCs.VanillaNPCAIOverrides.Bosses
             if (npc.target < 0 || npc.target == Main.maxPlayers || Main.player[npc.target].dead || !Main.player[npc.target].active)
                 npc.TargetClosest();
 
-            // Despawn safety, make sure to target another player if the current player target is too far away
-            if (Vector2.Distance(Main.player[npc.target].Center, npc.Center) > CalamityGlobalNPC.CatchUpDistance200Tiles)
-                npc.TargetClosest();
-
             // Percent life remaining
             float lifeRatio = npc.life / (float)npc.lifeMax;
 
@@ -300,6 +296,8 @@ namespace CalamityMod.NPCs.VanillaNPCAIOverrides.Bosses
                                 Projectile.NewProjectile(npc.GetSource_FromAI(), adjustProjectileShootLocation ? npc.Center : spawnOffset, projectileVelocity * randomSpeed, type, damage, 0f, Main.myPlayer, ai0);
                         }
                     }
+
+                    npc.TargetClosest();
 
                     npc.ai[1] = -SeedGatlingDuration;
                 }
@@ -622,7 +620,6 @@ namespace CalamityMod.NPCs.VanillaNPCAIOverrides.Bosses
                     if (npc.localAI[1] >= shootProjectileGateValue)
                     {
                         npc.localAI[1] = 0f;
-                        npc.TargetClosest();
                         bool shootPoisonSeed = CalamityWorld.LegendaryMode || Main.rand.NextBool(masterMode ? 2 : 4);
                         int projectileType = shootPoisonSeed ? ProjectileID.PoisonSeedPlantera : ProjectileID.SeedPlantera;
                         float projectileSpeed = masterMode ? 16f : 14f;
@@ -1208,7 +1205,11 @@ namespace CalamityMod.NPCs.VanillaNPCAIOverrides.Bosses
         {
             bool flag39 = false;
             bool flag40 = false;
-            npc.TargetClosest();
+
+            // Get a target
+            if (npc.target < 0 || npc.target == Main.maxPlayers || Main.player[npc.target].dead || !Main.player[npc.target].active)
+                npc.TargetClosest();
+
             if (Main.player[npc.target].dead)
             {
                 flag40 = true;

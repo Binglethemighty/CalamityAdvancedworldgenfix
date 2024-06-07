@@ -25,13 +25,11 @@ namespace CalamityMod.Projectiles.Melee
         public override void AI()
         {
             Lighting.AddLight(Projectile.Center, 0.2f, 0.2f, 0.2f);
-            for (int i = 0; i < 2; i++)
-            {
-                int shiny = Dust.NewDust(Projectile.position, Projectile.width, Projectile.height, DustID.GemDiamond, 0f, 0f, 100, default, 1.25f);
-                Main.dust[shiny].noGravity = true;
-                Main.dust[shiny].velocity *= 0.5f;
-                Main.dust[shiny].velocity += Projectile.velocity * 0.1f;
-            }
+
+            int shiny = Dust.NewDust(Projectile.position, Projectile.width, Projectile.height, DustID.GemDiamond, 0f, 0f, 100, default, 1.25f);
+            Main.dust[shiny].noGravity = true;
+            Main.dust[shiny].velocity *= 0.5f;
+            Main.dust[shiny].velocity += Projectile.velocity * 0.1f;
         }
     }
 }

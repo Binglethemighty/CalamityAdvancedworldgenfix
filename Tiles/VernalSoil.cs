@@ -11,10 +11,9 @@ using Terraria.ModLoader;
 
 namespace CalamityMod.Tiles
 {
-    public class VernalSoil : ModTile, IMergeableTile
+    public class VernalSoil : ModTile
     {
-        List<TileFraming.MergeFrameData> IMergeableTile.TileAdjacencies { get; } = [];
-        
+
         public override void SetStaticDefaults()
         {
             Main.tileSolid[Type] = true;

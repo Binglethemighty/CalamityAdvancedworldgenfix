@@ -96,22 +96,14 @@ namespace CalamityMod.NPCs.VanillaNPCAIOverrides.Bosses
                 idleTime = 20;
             }
 
-            // Get a target
-            if (npc.target < 0 || npc.target == Main.maxPlayers || Main.player[npc.target].dead || !Main.player[npc.target].active)
-                npc.TargetClosest(false);
-
             // Center and target
             Player player = Main.player[npc.target];
-            if (npc.target < 0 || npc.target == Main.maxPlayers || player.dead || !player.active)
+            if (npc.target < 0 || npc.target == Main.maxPlayers || player.dead || !player.active || Vector2.Distance(player.Center, npc.Center) > CalamityGlobalNPC.CatchUpDistance350Tiles)
             {
                 npc.TargetClosest(false);
                 player = Main.player[npc.target];
                 npc.netUpdate = true;
             }
-
-            // Despawn safety, make sure to target another player if the current player target is too far away
-            if (Vector2.Distance(player.Center, npc.Center) > CalamityGlobalNPC.CatchUpDistance200Tiles)
-                npc.TargetClosest(false);
 
             // Enrage
             if (!Collision.CanHit(npc.position, npc.width, npc.height, player.position, player.width, player.height) || CalamityWorld.LegendaryMode)
@@ -157,6 +149,7 @@ namespace CalamityMod.NPCs.VanillaNPCAIOverrides.Bosses
                 npc.ai[1] = 0f;
                 npc.ai[3] += 1f;
                 npc.velocity = Vector2.Zero;
+                npc.TargetClosest(false);
                 npc.netUpdate = true;
 
                 if (Main.netMode != NetmodeID.MultiplayerClient)
@@ -170,7 +163,7 @@ namespace CalamityMod.NPCs.VanillaNPCAIOverrides.Bosses
             }
 
             // Despawn
-            if (player.dead || Vector2.Distance(player.Center, npc.Center) > CalamityGlobalNPC.CatchUpDistance350Tiles)
+            if (player.dead || !player.active || Vector2.Distance(player.Center, npc.Center) > CalamityGlobalNPC.CatchUpDistance350Tiles)
             {
                 npc.life = 0;
                 npc.HitEffect(0, 10.0);
@@ -803,6 +796,7 @@ namespace CalamityMod.NPCs.VanillaNPCAIOverrides.Bosses
                     npc.ai[1] = 0f;
                     npc.ai[3] += 1f;
                     npc.velocity = Vector2.Zero;
+                    npc.TargetClosest(false);
                     npc.netUpdate = true;
                 }
             }
@@ -1309,6 +1303,7 @@ namespace CalamityMod.NPCs.VanillaNPCAIOverrides.Bosses
                 npc.ai[1] = 0f;
                 npc.ai[3] += 1f;
                 npc.velocity = Vector2.Zero;
+                npc.TargetClosest(false);
                 npc.netUpdate = true;
                 List<int> list = new List<int>();
                 for (int i = 0; i < Main.maxNPCs; i++)
@@ -2030,6 +2025,7 @@ namespace CalamityMod.NPCs.VanillaNPCAIOverrides.Bosses
                     npc.ai[1] = 0f;
                     npc.ai[3] += 1f;
                     npc.velocity = Vector2.Zero;
+                    npc.TargetClosest(false);
                     npc.netUpdate = true;
                 }
             }

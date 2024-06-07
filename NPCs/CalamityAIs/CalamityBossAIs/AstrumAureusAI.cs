@@ -41,6 +41,7 @@ namespace CalamityMod.NPCs.CalamityAIs.CalamityBossAIs
             // Variables
             bool bossRush = BossRushEvent.BossRushActive;
             bool expertMode = Main.expertMode || bossRush;
+            bool masterMode = Main.masterMode || bossRush;
             bool revenge = CalamityWorld.revenge || bossRush;
             bool death = CalamityWorld.death || bossRush;
 
@@ -58,13 +59,6 @@ namespace CalamityMod.NPCs.CalamityAIs.CalamityBossAIs
             calamityGlobalNPC.DR = exhausted ? 0.25f : 0.5f;
             npc.defense = exhausted ? npc.defDefense / 2 : npc.defDefense;
 
-            // Don't fire projectiles and don't increment phase timers for 4 seconds after the teleport phase to avoid cheap bullshit
-            float noProjectileOrPhaseIncrementTime = 240f;
-
-            bool dontAttack = npc.localAI[3] > 0f;
-            if (dontAttack)
-                npc.localAI[3] -= 1f;
-
             // Get a target
             if (npc.target < 0 || npc.target == Main.maxPlayers || Main.player[npc.target].dead || !Main.player[npc.target].active)
                 npc.TargetClosest();
@@ -74,6 +68,19 @@ namespace CalamityMod.NPCs.CalamityAIs.CalamityBossAIs
                 npc.TargetClosest();
 
             Player player = Main.player[npc.target];
+
+            // Don't fire projectiles and don't increment phase timers for 4 seconds after the teleport phase to avoid cheap bullshit
+            float noProjectileOrPhaseIncrementTime = 240f;
+
+            bool dontAttack = npc.localAI[3] > 0f;
+            if (dontAttack)
+            {
+                npc.localAI[3] -= 1f;
+                if (npc.justHit)
+                    npc.localAI[3] -= masterMode ? 7f : expertMode ? 5f : 3f;
+                if (npc.Distance(player.Center) < 240f)
+                    npc.localAI[3] -= masterMode ? 4f : expertMode ? 2f : 1f;
+            }
 
             float enrageScale = bossRush ? 1f : 0f;
             if ((Main.IsItDay() && !player.Calamity().ZoneAstral) || bossRush)
@@ -336,6 +343,11 @@ namespace CalamityMod.NPCs.CalamityAIs.CalamityBossAIs
 
                 // Stay vulnerable for 3 seconds
                 npc.ai[1] += 1f;
+                if (npc.justHit)
+                    npc.ai[1] += masterMode ? 7f : expertMode ? 5f : 3f;
+                if (npc.Distance(player.Center) < 240f)
+                    npc.ai[1] += masterMode ? 4f : expertMode ? 2f : 1f;
+
                 if (npc.ai[1] >= 180f || bossRush)
                 {
                     // Set AI to random state and reset other AI arrays
@@ -442,7 +454,11 @@ namespace CalamityMod.NPCs.CalamityAIs.CalamityBossAIs
 
                 // Walk for a maximum of 6 seconds
                 if (!dontAttack)
+                {
                     npc.ai[1] += 1f;
+                    if (npc.Distance(player.Center) < 240f)
+                        npc.ai[1] += masterMode ? 4f : expertMode ? 2f : 1f;
+                }
 
                 if (npc.ai[1] >= ((bossRush ? 270f : 360f) - (death ? 90f * (1f - lifeRatio) : 0f)))
                 {

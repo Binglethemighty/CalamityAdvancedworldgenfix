@@ -92,10 +92,7 @@ namespace CalamityMod.NPCs.VanillaNPCAIOverrides.Bosses
 
             // Return to ground phase, with less time spent in later phases
             if (calamityGlobalNPC.newAI[3] >= FlightPhaseResetGateValue)
-            {
                 calamityGlobalNPC.newAI[3] = flightPhaseTimerSetValue;
-                npc.TargetClosest();
-            }
 
             // Spawn DR check
             bool hasSpawnDR = calamityGlobalNPC.newAI[1] < DRIncreaseTime && calamityGlobalNPC.newAI[1] > 60f;
@@ -123,10 +120,6 @@ namespace CalamityMod.NPCs.VanillaNPCAIOverrides.Bosses
 
             bool increaseSpeed = Vector2.Distance(player.Center, npc.Center) > CalamityGlobalNPC.CatchUpDistance200Tiles;
             bool increaseSpeedMore = Vector2.Distance(player.Center, npc.Center) > CalamityGlobalNPC.CatchUpDistance350Tiles;
-
-            // Get a new target if current target is too far away
-            if (increaseSpeedMore && npc.type == NPCID.TheDestroyer)
-                npc.TargetClosest();
 
             float enrageScale = bossRush ? 1f : 0f;
             if (Main.IsItDay() || bossRush)
@@ -1144,7 +1137,7 @@ namespace CalamityMod.NPCs.VanillaNPCAIOverrides.Bosses
             if (npc.ai[3] > 0f)
                 npc.realLife = (int)npc.ai[3];
 
-            if (npc.target < 0 || npc.target == Main.maxPlayers || Main.player[npc.target].dead)
+            if (npc.target < 0 || npc.target == Main.maxPlayers || Main.player[npc.target].dead || !Main.player[npc.target].active)
                 npc.TargetClosest();
 
             if (npc.type >= NPCID.TheDestroyer && npc.type <= NPCID.TheDestroyerTail)
@@ -1546,7 +1539,6 @@ namespace CalamityMod.NPCs.VanillaNPCAIOverrides.Bosses
             {
                 if (!flag2)
                 {
-                    npc.TargetClosest();
                     npc.velocity.Y += 0.15f;
                     if (Main.masterMode && npc.velocity.Y > 0f)
                         npc.velocity.Y += 0.05f;

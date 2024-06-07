@@ -40,7 +40,6 @@ namespace CalamityMod.Items.Weapons.Summon
             if (player.altFunctionUse != 2)
             {
                 float speed = Item.shootSpeed;
-                player.itemTime = Item.useTime;
                 Vector2 spawnPos = player.RotatedRelativePoint(player.MountedCenter, true);
                 float xPos = (float)Main.mouseX + Main.screenPosition.X - spawnPos.X;
                 float yPos = (float)Main.mouseY + Main.screenPosition.Y - spawnPos.Y;

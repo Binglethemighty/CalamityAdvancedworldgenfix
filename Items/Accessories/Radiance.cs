@@ -33,7 +33,7 @@ namespace CalamityMod.Items.Accessories
         public override void UpdateAccessory(Player player, bool hideVisual)
         {
             CalamityPlayer modPlayer = player.Calamity();
-            player.statLifeMax2 += 100;
+            player.statLifeMax2 += 70;
 
             // Abyss light, debuff near-immunity, life regen effects, and massively enhances debuff halving
             modPlayer.purity = true;

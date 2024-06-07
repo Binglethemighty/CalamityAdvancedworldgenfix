@@ -14,7 +14,7 @@ namespace CalamityMod.Items.Weapons.Melee
         {
             Item.width = 50;
             Item.height = 50;
-            Item.damage = 26;
+            Item.damage = 29;
             Item.DamageType = DamageClass.Melee;
             Item.useAnimation = 24;
             Item.useStyle = ItemUseStyleID.Swing;
@@ -26,7 +26,7 @@ namespace CalamityMod.Items.Weapons.Melee
             Item.value = CalamityGlobalItem.RarityOrangeBuyPrice;
             Item.rare = ItemRarityID.Orange;
             Item.shoot = ModContent.ProjectileType<DarkBall>();
-            Item.shootSpeed = 12f;
+            Item.shootSpeed = 14.5f;
         }
         public override void OnHitNPC(Player player, NPC target, NPC.HitInfo hit, int damageDone)
         {

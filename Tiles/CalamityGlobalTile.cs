@@ -63,11 +63,6 @@ namespace CalamityMod.Tiles
             Main.tileOreFinderPriority[TileID.LunarOre] = 900;
         }
 
-        public override bool PreHitWire(int i, int j, int type)
-        {
-            return !BossRushEvent.BossRushActive;
-        }
-
         public override bool TileFrame(int i, int j, int type, ref bool resetFrame, ref bool noBreak)
         {
             // Custom plant framing

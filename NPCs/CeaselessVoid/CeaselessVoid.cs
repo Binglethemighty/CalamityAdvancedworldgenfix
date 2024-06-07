@@ -146,6 +146,12 @@ namespace CalamityMod.NPCs.CeaselessVoid
             return minDist <= 50f;
         }
 
+        public override void OnHitPlayer(Player target, Player.HurtInfo hurtInfo)
+        {
+            if (hurtInfo.Damage > 0)
+                target.AddBuff(BuffID.VortexDebuff, 60, true);
+        }
+
         public override bool PreDraw(SpriteBatch spriteBatch, Vector2 screenPos, Color drawColor)
         {
             SpriteEffects spriteEffects = SpriteEffects.None;

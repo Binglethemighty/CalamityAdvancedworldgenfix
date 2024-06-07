@@ -281,7 +281,6 @@ namespace CalamityMod.NPCs.NormalNPCs
                     {
                         NPC.ai[2] = 0f;
                         NPC.ai[1] = 1f;
-                        NPC.TargetClosest();
                         NPC.netUpdate = true;
                     }
                     else if (shouldSpinAround || NPC.ai[1] != 4f)
@@ -294,7 +293,6 @@ namespace CalamityMod.NPCs.NormalNPCs
 
                         NPC.ai[2] = 0f;
                         NPC.ai[1] = shouldSpinAround ? 5f : 1f;
-                        NPC.TargetClosest();
                         NPC.netUpdate = true;
                     }
                 }
@@ -438,7 +436,6 @@ namespace CalamityMod.NPCs.NormalNPCs
 
                     if (NPC.ai[2] >= (phaseTimer - (death ? 60f * (1f - lifeRatio) : 0f)))
                     {
-                        NPC.TargetClosest();
                         NPC.ai[2] = 0f;
                         NPC.ai[1] = 4f;
                         NPC.localAI[0] = 0f;
@@ -697,7 +694,6 @@ namespace CalamityMod.NPCs.NormalNPCs
                                 calamityGlobalNPC.newAI[0] = 0f;
                                 NPC.SyncVanillaLocalAI();
                                 NPC.SyncExtraAI();
-                                NPC.TargetClosest();
                                 NPC.netUpdate = true;
                             }
                         }
@@ -775,7 +771,6 @@ namespace CalamityMod.NPCs.NormalNPCs
                                 NPC.localAI[0] = 0f;
                                 NPC.SyncVanillaLocalAI();
                                 NPC.SyncExtraAI();
-                                NPC.TargetClosest();
                                 NPC.netUpdate = true;
                             }
                         }

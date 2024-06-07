@@ -102,13 +102,13 @@ namespace CalamityMod.Projectiles.Ranged
                 for (int b = 0; b < 3; b++)
                 {
                     Vector2 velocity = Vector2.UnitY.RotatedByRandom(0.8f) * Main.rand.NextFloat(-3.5f, -3f);
-                    Projectile shrapnel = Projectile.NewProjectileDirect(Projectile.GetSource_FromThis(), Projectile.Center, velocity, ModContent.ProjectileType<CinderArrowProj>(), (int)(Projectile.damage * 0.1f), 0f, Projectile.owner, ai2: 1f);
+                    Projectile shrapnel = Projectile.NewProjectileDirect(Projectile.GetSource_FromThis(), Projectile.Center, velocity, ModContent.ProjectileType<CinderArrowProj>(), (int)(Projectile.damage * 0.06f), 0f, Projectile.owner, ai2: 1f);
                     shrapnel.timeLeft = 300;
                     shrapnel.arrow = false;
                     shrapnel.MaxUpdates = 4;
                 }
 
-                Projectile.damage = (int)(Projectile.damage * 0.5f);
+                Projectile.damage = (int)(Projectile.damage * 0.4f);
                 Projectile.penetrate = -1;
                 Projectile.ExpandHitboxBy(110);
                 Projectile.Damage();

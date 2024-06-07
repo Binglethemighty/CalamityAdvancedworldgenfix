@@ -60,7 +60,7 @@ namespace CalamityMod.Projectiles.Magic
                 Dust.NewDust(Projectile.position, Projectile.width, Projectile.height, DustID.Demonite, 0, 0, 0, default, 0.5f);
             }
 
-            target.AddBuff(ModContent.BuffType<BrainRot>(), 90);
+            target.AddBuff(ModContent.BuffType<BrainRot>(), 120);
         }
     }
 }

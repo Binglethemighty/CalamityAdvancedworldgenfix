@@ -256,7 +256,7 @@ namespace CalamityMod.Projectiles.BaseProjectiles
             writer.Write(Projectile.rotation);
             writer.Write(KeepRefreshingLifetime);
             writer.Write(OffsetLengthFromArm);
-            writer.Write(Projectile.spriteDirection);
+            writer.Write7BitEncodedInt(Projectile.spriteDirection);
             SendExtraAIHoldout(writer);
         }
 
@@ -265,7 +265,7 @@ namespace CalamityMod.Projectiles.BaseProjectiles
             Projectile.rotation = reader.ReadSingle();
             KeepRefreshingLifetime = reader.ReadBoolean();
             OffsetLengthFromArm = reader.ReadSingle();
-            Projectile.spriteDirection = reader.ReadInt32();
+            Projectile.spriteDirection = reader.Read7BitEncodedInt();
             ReceiveExtraAIHoldout(reader);
         }
 

@@ -108,10 +108,8 @@ namespace CalamityMod.NPCs.CalClone
                 start = false;
             }
 
-            NPC.TargetClosest();
-
             float projectileSpeed = 9f;
-            Vector2 velocity = Main.player[NPC.target].Center - NPC.Center;
+            Vector2 velocity = Main.player[parent.target].Center - NPC.Center;
             velocity.Normalize();
             velocity *= projectileSpeed;
             NPC.rotation = velocity.ToRotation() + MathHelper.Pi;
@@ -126,7 +124,7 @@ namespace CalamityMod.NPCs.CalClone
 
                     int type = ModContent.ProjectileType<BrimstoneBarrage>();
                     int damage = NPC.GetProjectileDamage(type);
-                    Projectile.NewProjectile(NPC.GetSource_FromAI(), NPC.Center, velocity, type, damage, 1f, NPC.target, 1f, 0f, projectileSpeed * 2f);
+                    Projectile.NewProjectile(NPC.GetSource_FromAI(), NPC.Center, velocity, type, damage, 1f, parent.target, 1f, 0f, projectileSpeed * 2f);
                 }
                 timer = 0;
             }

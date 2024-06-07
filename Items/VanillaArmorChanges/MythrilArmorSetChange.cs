@@ -20,7 +20,7 @@ namespace CalamityMod.Items.VanillaArmorChanges
 
         public const int MaxManaBoost = 20;
         public const int FlareFrameSpawnDelay = 12;
-        public const int FlareDamageSoftcap = 50;
+        public const int FlareDamageSoftcap = 40;
 
         public override void UpdateSetBonusText(ref string setBonusText)
         {
@@ -51,7 +51,7 @@ namespace CalamityMod.Items.VanillaArmorChanges
             // Reset the spawn delay.
             owner.Calamity().MythrilFlareSpawnCountdown = FlareFrameSpawnDelay;
 
-            int flareDamage = CalamityUtils.DamageSoftCap(originalDamage * 0.4, FlareDamageSoftcap);
+            int flareDamage = CalamityUtils.DamageSoftCap(originalDamage * 0.3, FlareDamageSoftcap);
             flareDamage = owner.ApplyArmorAccDamageBonusesTo(flareDamage);
 
             Vector2 flareSpawnPosition = victim.Center + Main.rand.NextVector2Circular(10f, 10f);

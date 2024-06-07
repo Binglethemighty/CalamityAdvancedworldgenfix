@@ -16,7 +16,7 @@ namespace CalamityMod.Projectiles.Magic
             Projectile.width = 112;
             Projectile.height = 112;
             Projectile.friendly = true;
-            Projectile.DamageType = RogueDamageClass.Instance;
+            Projectile.DamageType = DamageClass.Magic;
             Projectile.ignoreWater = true;
             Projectile.tileCollide = false;
             Projectile.penetrate = -1;

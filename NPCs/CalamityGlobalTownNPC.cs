@@ -94,6 +94,7 @@ namespace CalamityMod.NPCs
         {
             "Tavish DeGroot", // <@!442447226992721930> (magicoal)
             "Fimmy", // <@!407348617079160832> (darkmega5)
+            "Dorira", // <@!215269032360804352> (crimsoncb)
         };
         private static readonly string[] DryadNames =
         {

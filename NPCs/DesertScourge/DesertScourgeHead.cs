@@ -183,10 +183,6 @@ namespace CalamityMod.NPCs.DesertScourge
             if (NPC.target < 0 || NPC.target == Main.maxPlayers || Main.player[NPC.target].dead || !Main.player[NPC.target].active)
                 NPC.TargetClosest();
 
-            // Despawn safety, make sure to target another player if the current player target is too far away
-            if (Vector2.Distance(Main.player[NPC.target].Center, NPC.Center) > CalamityGlobalNPC.CatchUpDistance200Tiles)
-                NPC.TargetClosest();
-
             Player player = Main.player[NPC.target];
 
             // Enrage
@@ -261,47 +257,6 @@ namespace CalamityMod.NPCs.DesertScourge
                 speed *= 1.1f;
                 turnSpeed *= 1.2f;
             }
-
-            // Projectile spit (unused, for now)
-            /*if ((phase2 || death) && revenge && NPC.Distance(Main.player[NPC.target].Center) > 400f && (Main.player[NPC.target].Center - NPC.Center).SafeNormalize(Vector2.UnitY).ToRotation().AngleTowards(NPC.velocity.ToRotation(), MathHelper.PiOver4) == NPC.velocity.ToRotation())
-            {
-                if (NPC.Calamity().newAI[0] % (death ? SpitGateValue_Death : SpitGateValue) == 0f)
-                {
-                    SoundEngine.PlaySound(SoundID.NPCDeath11, NPC.Center);
-                    if (Main.netMode != NetmodeID.MultiplayerClient)
-                    {
-                        Vector2 projectileVelocity = (Main.player[NPC.target].Center - NPC.Center).SafeNormalize(Vector2.UnitY) * (masterMode ? 10f : 8f);
-                        int numProj = death ? 9 : 6;
-                        int spread = masterMode ? 49 : 35;
-                        if (masterMode)
-                        {
-                            numProj += 3;
-                            spread += 14;
-                        }
-
-                        float rotation = MathHelper.ToRadians(spread);
-                        int type = ModContent.ProjectileType<DesertScourgeSpit>();
-                        int damage = NPC.GetProjectileDamage(type);
-                        for (int i = 0; i < numProj; i++)
-                        {
-                            Vector2 perturbedSpeed = projectileVelocity.RotatedBy(MathHelper.Lerp(-rotation, rotation, i / (float)(numProj - 1)));
-
-                            for (int k = 0; k < 10; k++)
-                            {
-                                int dust = Dust.NewDust(NPC.Center + Vector2.Normalize(perturbedSpeed) * 5f, 10, 10, (int)CalamityDusts.SulphurousSeaAcid);
-                                Main.dust[dust].velocity = perturbedSpeed;
-                            }
-
-                            if (Main.netMode != NetmodeID.MultiplayerClient)
-                            {
-                                int proj = Projectile.NewProjectile(NPC.GetSource_FromAI(), NPC.Center + perturbedSpeed.SafeNormalize(Vector2.UnitY) * 5f, perturbedSpeed, type, damage, 0f, Main.myPlayer);
-                                Main.projectile[proj].aiStyle = -1;
-                                Main.projectile[proj].netUpdate = true;
-                            }
-                        }
-                    }
-                }
-            }*/
 
             // Sand splash
             if (!quickFall)
@@ -595,7 +550,7 @@ namespace CalamityMod.NPCs.DesertScourge
             float targetDistance = (float)Math.Sqrt((double)(playerX * playerX + targettingPosition * targettingPosition));
 
             // Lunge up towards target
-            if (burrow && NPC.Center.Y >= burrowTarget - 16f)
+            if (burrow && NPC.Center.Y >= burrowTarget - 16f && !lungeUpward && !quickFall)
             {
                 NPC.Calamity().newAI[1] = 1f;
                 NPC.localAI[3] = 0f;
@@ -607,7 +562,7 @@ namespace CalamityMod.NPCs.DesertScourge
             }
 
             // Quickly fall back down once above target
-            if (lungeUpward && NPC.Center.Y <= NPC.Calamity().newAI[3] + LungeUpwardDistanceOffset - LungeUpwardCutoffDistance && Math.Abs(NPC.Center.X - player.Center.X) < 480f)
+            if (lungeUpward && NPC.Center.Y <= NPC.Calamity().newAI[3] + LungeUpwardDistanceOffset - LungeUpwardCutoffDistance && Math.Abs(NPC.Center.X - player.Center.X) < 480f && !quickFall)
             {
                 // Spit a huge spread of sand upwards that falls down
                 SoundEngine.PlaySound(SoundID.NPCDeath13, NPC.Center);
@@ -660,7 +615,9 @@ namespace CalamityMod.NPCs.DesertScourge
             {
                 NPC.Calamity().newAI[0] = 0f;
                 NPC.Calamity().newAI[1] = 0f;
+                NPC.Calamity().newAI[3] = 0f;
                 NPC.localAI[3] = 0f;
+                playRoarSound = false;
             }
 
             if (hide && !player.dead)
@@ -669,8 +626,14 @@ namespace CalamityMod.NPCs.DesertScourge
             }
             else if (!shouldFly)
             {
-                NPC.TargetClosest();
                 NPC.velocity.Y += 0.15f;
+                if (NPC.Center.Y - player.Center.Y < -180f)
+                {
+                    NPC.velocity.Y += 0.05f;
+                    if (NPC.velocity.Y > 0f)
+                        NPC.velocity.Y += 0.05f;
+                }
+
                 if (NPC.velocity.Y > maxChaseSpeed)
                     NPC.velocity.Y = maxChaseSpeed;
 

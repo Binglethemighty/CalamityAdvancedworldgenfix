@@ -61,6 +61,13 @@ namespace CalamityMod.Items.Weapons.Melee
                 {
                     SoundEngine.PlaySound(SoundID.Item71, player.Center);
                 }
+
+                // force clones to shoot regardless of health
+                foreach (Projectile p in Main.ActiveProjectiles)
+                {
+                    if (p.type == ModContent.ProjectileType<DarkMasterClone>() && p.owner == player.whoAmI)
+                        p.ai[1] = 1f;
+                }
             }
             else
             {
@@ -72,7 +79,9 @@ namespace CalamityMod.Items.Weapons.Melee
                     // summon the clones. position is determined by ai[0]
                     for (int i = 0; i < 3; i++)
                     {
-                        Projectile.NewProjectile(Item.GetSource_FromThis(), player.Center.X, player.Center.Y, 0, 0, ModContent.ProjectileType<DarkMasterClone>(), damage, knockback, player.whoAmI, i);
+                        // Stats are set to dynamically update, so damage, kb, crit have to be feeded
+                        Projectile clone = Projectile.NewProjectileDirect(Item.GetSource_FromThis(), player.Center, Vector2.Zero, ModContent.ProjectileType<DarkMasterClone>(), Item.damage, Item.knockBack, player.whoAmI, i);
+                        clone.OriginalCritChance = Item.crit;
                     }
                 }
             }

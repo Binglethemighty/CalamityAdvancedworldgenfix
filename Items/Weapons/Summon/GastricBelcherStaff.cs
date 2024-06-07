@@ -34,7 +34,6 @@ namespace CalamityMod.Items.Weapons.Summon
         {
             if (player.altFunctionUse != 2)
             {
-                player.itemTime = Item.useTime;
                 Vector2 playerPos = player.RotatedRelativePoint(player.MountedCenter, true);
                 float directionX = Main.mouseX + Main.screenPosition.X - playerPos.X;
                 float directionY = Main.mouseY + Main.screenPosition.Y - playerPos.Y;

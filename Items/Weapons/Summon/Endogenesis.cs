@@ -49,7 +49,6 @@ namespace CalamityMod.Items.Weapons.Summon
         {
             if (player.altFunctionUse != 2)
             {
-                player.itemTime = Item.useTime;
                 CalamityUtils.KillShootProjectileMany(player, new int[]
                 {
                     type,

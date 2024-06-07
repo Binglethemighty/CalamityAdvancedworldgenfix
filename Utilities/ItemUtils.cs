@@ -132,11 +132,11 @@ namespace CalamityMod
             }
 
             // MELEE (includes tools and whips)
-            else if (item.CountsAsClass<MeleeDamageClass>() || item.CountsAsClass<SummonMeleeSpeedDamageClass>())
+            else if (item.CountsAsClass<MeleeDamageClass>() || item.CountsAsClass<MeleeRangedHybridDamageClass>() || item.CountsAsClass<SummonMeleeSpeedDamageClass>())
             {
                 // Terrarian (has its own special "Legendary" for marketing reasons)
                 // Other items that want to use Legendary2 are also compatible
-                if (item.type == ItemID.Terrarian || PrefixLegacy.ItemSets.ItemsThatCanHaveLegendary2[item.type])
+                if (PrefixLegacy.ItemSets.ItemsThatCanHaveLegendary2[item.type])
                 {
                     int[][] terrarianReforgeTiers = new int[][]
                     {
@@ -148,26 +148,8 @@ namespace CalamityMod
                     prefix = IteratePrefix(rand, terrarianReforgeTiers, currentPrefix);
                 }
 
-                // Yoyos, Flails, Spears, etc.
-                // Spears actually work fine with Legendary, but vanilla doesn't give it to them, so we won't either.
-                // Rapiers, whips, and other specific vanilla weapons (ie. Zenith or Excalibur) are specifically excluded from this, so they get broadsword reforges despite not scaling with melee speed.
-                //
-                // 18FEB2024: Ozzatron: removed the (item.channel || item.noMelee) because vanilla lets Burning Sky get Legendary
-                // 12MAY2024: Shade: added item.useStyle != ItemUseStyleID.Shoot because vanilla lets Sahara Slicers and Death's Ascension get Legendary
-                else if (item.channel && item.useStyle != ItemUseStyleID.Rapier && !item.CountsAsClass<SummonMeleeSpeedDamageClass>() && !PrefixLegacy.ItemSets.SwordsHammersAxesPicks[item.type] && item.useStyle != ItemUseStyleID.Shoot)
-                {
-                    int[][] meleeNoSpeedReforgeTiers = new int[][]
-                    {
-                        /* 0 */ new int[] { PrefixID.Keen, PrefixID.Forceful, PrefixID.Strong },
-                        /* 1 */ new int[] { PrefixID.Hurtful, PrefixID.Ruthless, PrefixID.Zealous },
-                        /* 2 */ new int[] { PrefixID.Superior, PrefixID.Demonic },
-                        /* 3 */ new int[] { PrefixID.Godly }
-                    };
-                    prefix = IteratePrefix(rand, meleeNoSpeedReforgeTiers, currentPrefix);
-                }
-
-                // All other melee weapons
-                else
+                // Swords, Whips, Tools, other items that support the Legendary modifier
+                else if (PrefixLegacy.ItemSets.SwordsHammersAxesPicks[item.type] || (item.ModItem != null && item.ModItem.MeleePrefix()))
                 {
                     int[][] meleeReforgeTiers = new int[][]
                     {
@@ -180,7 +162,7 @@ namespace CalamityMod
                     };
                     int[][] toolReforgeTiers = new int[][]
                     {
-                        /* 0 */ new int[] { PrefixID.Keen, PrefixID.Nimble, PrefixID.Nasty, PrefixID.Heavy, PrefixID.Light, PrefixID.Forceful, PrefixID.Strong },
+                        /* 0 */ new int[] { PrefixID.Keen, PrefixID.Nimble, PrefixID.Nasty, PrefixID.Heavy, PrefixID.Forceful, PrefixID.Strong },
                         /* 1 */ new int[] { PrefixID.Hurtful, PrefixID.Ruthless, PrefixID.Zealous, PrefixID.Quick, PrefixID.Pointy, PrefixID.Bulky },
                         /* 2 */ new int[] { PrefixID.Murderous, PrefixID.Agile, PrefixID.Large, PrefixID.Dangerous, PrefixID.Sharp },
                         /* 3 */ new int[] { PrefixID.Massive, PrefixID.Unpleasant, PrefixID.Savage, PrefixID.Superior },
@@ -190,6 +172,20 @@ namespace CalamityMod
 
                     var tierListToUse = (item.pick > 0 || item.axe > 0 || item.hammer > 0) ? toolReforgeTiers : meleeReforgeTiers;
                     prefix = IteratePrefix(rand, tierListToUse, currentPrefix);
+                }
+
+                // Yoyos, Flails, Spears, etc.
+                // Spears actually work fine with Legendary, but vanilla doesn't give it to them, so we won't either.
+                else
+                {
+                    int[][] meleeNoSpeedReforgeTiers = new int[][]
+                    {
+                        /* 0 */ new int[] { PrefixID.Keen, PrefixID.Forceful, PrefixID.Strong },
+                        /* 1 */ new int[] { PrefixID.Hurtful, PrefixID.Ruthless, PrefixID.Zealous },
+                        /* 2 */ new int[] { PrefixID.Superior, PrefixID.Demonic },
+                        /* 3 */ new int[] { PrefixID.Godly }
+                    };
+                    prefix = IteratePrefix(rand, meleeNoSpeedReforgeTiers, currentPrefix);
                 }
             }
 

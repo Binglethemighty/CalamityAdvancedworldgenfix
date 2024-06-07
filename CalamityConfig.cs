@@ -175,6 +175,27 @@ namespace CalamityMod
         public float FlightBarPosY { get; set; }
         #endregion
 
+        #region Music Events
+        [Header("MusicEvents")]
+
+        [BackgroundColor(192, 54, 64, 192)]
+        [DefaultValue(true)]
+        public bool Interlude1 { get; set; }
+
+        [BackgroundColor(192, 54, 64, 192)]
+        [DefaultValue(true)]
+        public bool Interlude2 { get; set; }
+
+        [BackgroundColor(192, 54, 64, 192)]
+        [DefaultValue(true)]
+        public bool Interlude3 { get; set; }
+
+        [BackgroundColor(192, 54, 64, 192)]
+        [DefaultValue(true)]
+        public bool DevourerofGodsEulogy { get; set; }
+
+        #endregion
+
         #region General Gameplay Changes
         [Header("Gameplay")]
 

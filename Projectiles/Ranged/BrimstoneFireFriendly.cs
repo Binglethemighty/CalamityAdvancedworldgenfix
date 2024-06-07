@@ -15,7 +15,7 @@ namespace CalamityMod.Projectiles.Ranged
         public override string Texture => "CalamityMod/Projectiles/FireProj";
 
         public static int Lifetime => 60;
-        public static int Fadetime => 80;
+        public static int Fadetime => 50;
         public ref float Time => ref Projectile.ai[0];
         public int MistType = -1;
 

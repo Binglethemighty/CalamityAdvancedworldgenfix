@@ -9,13 +9,12 @@ using Terraria.ModLoader;
 
 namespace CalamityMod.Tiles
 {
-    public class AstralBrick : ModTile, IMergeableTile
+    public class AstralBrick : ModTile
     {
         private const short subsheetWidth = 324;
         private const short subsheetHeight = 90;
 
-        List<TileFraming.MergeFrameData> IMergeableTile.TileAdjacencies { get; } = [];
-        
+
         public override void SetStaticDefaults()
         {
             Main.tileSolid[Type] = true;

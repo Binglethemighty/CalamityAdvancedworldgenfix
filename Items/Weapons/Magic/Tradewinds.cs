@@ -13,7 +13,7 @@ namespace CalamityMod.Items.Weapons.Magic
         {
             Item.width = 28;
             Item.height = 30;
-            Item.damage = 23;
+            Item.damage = 27;
             Item.DamageType = DamageClass.Magic;
             Item.mana = 5;
             Item.useTime = 12;
@@ -26,7 +26,7 @@ namespace CalamityMod.Items.Weapons.Magic
             Item.UseSound = SoundID.Item7;
             Item.autoReuse = true;
             Item.shoot = ModContent.ProjectileType<TradewindsProjectile>();
-            Item.shootSpeed = 20f;
+            Item.shootSpeed = 25.5f;
         }
 
         public override void AddRecipes()

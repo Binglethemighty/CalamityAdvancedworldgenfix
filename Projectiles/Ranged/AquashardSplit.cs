@@ -17,18 +17,19 @@ namespace CalamityMod.Projectiles.Ranged
             Projectile.friendly = true;
             Projectile.DamageType = DamageClass.Ranged;
             Projectile.penetrate = 1;
-            Projectile.timeLeft = 180;
+            Projectile.timeLeft = 300;
+            Projectile.extraUpdates = 1;
             Projectile.aiStyle = ProjAIStyleID.Arrow;
         }
 
-        public override bool? CanHitNPC(NPC target) => Projectile.timeLeft < 150 && target.CanBeChasedBy(Projectile);
+        public override bool? CanHitNPC(NPC target) => Projectile.timeLeft < 280 && target.CanBeChasedBy(Projectile);
 
         public override void AI()
         {
             Projectile.velocity.X *= 0.9995f;
             Projectile.velocity.Y += 0.01f;
 
-            if (Projectile.timeLeft < 150)
+            if (Projectile.timeLeft < 280)
                 CalamityUtils.HomeInOnNPC(Projectile, !Projectile.tileCollide, 450f, Projectile.ai[1] == 1f ? 8f : 6f, 20f);
         }
 

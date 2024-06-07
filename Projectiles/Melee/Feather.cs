@@ -23,6 +23,7 @@ namespace CalamityMod.Projectiles.Melee
             Projectile.penetrate = 1;
             Projectile.timeLeft = TimeLeft;
             Projectile.aiStyle = ProjAIStyleID.Arrow;
+            Projectile.extraUpdates = 1;
         }
 
         public override void AI()

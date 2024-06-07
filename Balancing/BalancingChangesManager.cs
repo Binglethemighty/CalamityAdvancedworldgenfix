@@ -264,6 +264,9 @@ namespace CalamityMod.Balancing
             // 50% resist to true melee.
             NPCSpecificBalancingChanges.AddRange(Bundle(CalamityLists.AstrumDeusIDs, Do(ResistTrueMelee(0.5f))));
 
+            // 35% resist to Ballistic Poison Bomb's clouds.
+            NPCSpecificBalancingChanges.AddRange(Bundle(CalamityLists.AstrumDeusIDs, Do(new ProjectileResistBalancingRule(0.65f, ProjectileType<BallisticPoisonCloud>()))));
+
             // 35% resist to Icicle Arrows.
             NPCSpecificBalancingChanges.AddRange(Bundle(CalamityLists.AstrumDeusIDs, Do(new ProjectileResistBalancingRule(0.65f, ProjectileType<IcicleArrowProj>()))));
 

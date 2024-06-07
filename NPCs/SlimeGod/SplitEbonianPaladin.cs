@@ -780,8 +780,6 @@ namespace CalamityMod.NPCs.SlimeGod
             npcLoot.Add(ItemID.Gel, 1, 32, 48);
         }
 
-        public override bool CheckActive() => NPC.ai[0] == 4f;
-
         public override void HitEffect(NPC.HitInfo hit)
         {
             Color dustColor = Color.Lavender;

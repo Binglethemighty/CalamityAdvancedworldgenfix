@@ -27,7 +27,7 @@ namespace CalamityMod.Projectiles.Ranged
             Projectile.extraUpdates = 6;
             Projectile.timeLeft = 1000;
             Projectile.usesLocalNPCImmunity = true;
-            Projectile.localNPCHitCooldown = 15 * Projectile.extraUpdates;
+            Projectile.localNPCHitCooldown = 15 * Projectile.MaxUpdates;
             Projectile.Calamity().pointBlankShotDuration = CalamityGlobalProjectile.DefaultPointBlankDuration;
         }
 
@@ -119,10 +119,10 @@ namespace CalamityMod.Projectiles.Ranged
         public override void ModifyHitNPC(NPC target, ref NPC.HitModifiers modifiers)
         {
             if (falling)
-                modifiers.SourceDamage *= 1.35f;
+                modifiers.SourceDamage *= 1.1f;
 
             if (Projectile.numHits > 1 && falling)
-                Projectile.damage = (int)(Projectile.damage * 0.6f);
+                Projectile.damage = (int)(Projectile.damage * 0.5f);
             if (Projectile.damage < 1)
                 Projectile.damage = 1;
         }
@@ -149,6 +149,7 @@ namespace CalamityMod.Projectiles.Ranged
                     dust2.noGravity = false;
                 }
                 Projectile.velocity = new Vector2(0, -6.5f).RotatedByRandom(0.25f) * Main.rand.NextFloat(0.75f, 1.1f);
+                Projectile.tileCollide = false;
                 return false;
             }
             else

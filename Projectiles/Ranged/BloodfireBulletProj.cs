@@ -81,8 +81,8 @@ namespace CalamityMod.Projectiles.Ranged
         // Returns the amount of bonus damage that should be dealt. Boosts life regeneration appropriately as a side effect.
         private int OnHitEffect(Player owner)
         {
-            // Adds 2 frames to lifeRegenTime on every hit. This increased value is used for the damage calculation.
-            owner.lifeRegenTime += 2;
+            // Adds 3 frames to lifeRegenTime on every hit. This increased value is used for the damage calculation.
+            owner.lifeRegenTime += 3;
 
             // Deals (1.00 + (0.1 * current lifeRegen))% of current lifeRegenTime as flat bonus damage on hit.
             // For example, at 0 life regen, you get 1% of lifeRegenTime as bonus damage.
@@ -91,15 +91,16 @@ namespace CalamityMod.Projectiles.Ranged
             int regenForCalc = owner.lifeRegen > 0 ? owner.lifeRegen : 0;
             float regenDamageRatio = (1f + 0.1f * regenForCalc) / 100f;
 
-            // For the sake of bonus damage, life regen time caps at 3600, aka 60 seconds. This is its natural cap in vanilla. This then gets divided by 2 for computing final damage.
-            int regenTimeForCalc = (int)MathHelper.Clamp(owner.lifeRegenTime, 0f, 3600f) / 2;
+            // For the sake of bonus damage, life regen time caps at 3600, aka 60 seconds. This is its natural cap in vanilla. 75% of this is taken for computing the final damage.
+            int regenTimeForCalc = (int)(MathHelper.Clamp(owner.lifeRegenTime, 0f, 3600f) * 0.75f);
 
             int finalDamageBoost = (int)(regenDamageRatio * regenTimeForCalc);
-            // Damage boost has a cap of 25 to prevent it from getting too crazy.
-            if (finalDamageBoost > 25)
-                finalDamageBoost = 25;
+            // Damage boost has a cap of 35 to prevent it from getting too crazy.
+            int damageCap = 35;
+            if (finalDamageBoost > damageCap)
+                finalDamageBoost = damageCap;
 
-            if (finalDamageBoost == 25) // Special hit visual if youre at max bonus damage
+            if (finalDamageBoost == damageCap) // Special hit visual if the bonus damage is at the cap.
             {
                 for (int k = 0; k < 3; k++)
                 {

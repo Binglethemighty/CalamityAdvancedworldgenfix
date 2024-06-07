@@ -10,7 +10,7 @@ namespace CalamityMod.Items.Ammo
     {
         public new string LocalizationCategory => "Items.Ammo";
 
-        public static int SplitBulletBonusDamage = 10;
+        public static int SplitBulletBonusDamage = 16;
 
         public override void SetStaticDefaults()
         {

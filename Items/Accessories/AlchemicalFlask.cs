@@ -23,15 +23,15 @@ namespace CalamityMod.Items.Accessories
         {
             CalamityPlayer modPlayer = player.Calamity();
             modPlayer.alchFlask = true;
-            player.buffImmune[ModContent.BuffType<Plague>()] = true;
         }
 
         public override void AddRecipes()
         {
             CreateRecipe().
                 AddIngredient(ItemID.BottledWater).
-                AddIngredient(ItemID.BeeWax, 5).
-                AddIngredient<PlagueCellCanister>(10).
+                AddIngredient(ItemID.HoneyComb).
+                AddIngredient(ItemID.BeeWax, 8).
+                AddIngredient<PlagueCellCanister>(15).
                 AddTile(TileID.MythrilAnvil).
                 Register();
         }

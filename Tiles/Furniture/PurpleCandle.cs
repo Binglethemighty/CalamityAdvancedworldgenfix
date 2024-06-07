@@ -2,9 +2,9 @@
 using CalamityMod.Items.Placeables.Furniture;
 using Microsoft.Xna.Framework;
 using Terraria;
-using Terraria.DataStructures;
+using Terraria.Audio;
+using Terraria.GameContent.ObjectInteractions;
 using Terraria.ID;
-using Terraria.Localization;
 using Terraria.ModLoader;
 using Terraria.ObjectData;
 
@@ -12,6 +12,9 @@ namespace CalamityMod.Tiles.Furniture
 {
     public class PurpleCandle : ModTile
     {
+        // TODO -- Unique sounds for each Cirrus Candle.
+        public static readonly SoundStyle ActivationSound = new("CalamityMod/Sounds/Item/LouderPhantomPhoenix2");
+
         public override void SetStaticDefaults()
         {
             Main.tileLighted[Type] = true;
@@ -22,7 +25,37 @@ namespace CalamityMod.Tiles.Furniture
             AdjTiles = new int[] { TileID.Candles };
             AddToArray(ref TileID.Sets.RoomNeeds.CountsAsTorch);
             AddMapEntry(new Color(238, 145, 105), CalamityUtils.GetItemName<ResilientCandle>());
+            TileID.Sets.HasOutlines[Type] = true;
             AnimationFrameHeight = 18;
+        }
+
+        public override bool HasSmartInteract(int i, int j, SmartInteractScanSettings settings) => true;
+
+        public override bool RightClick(int i, int j)
+        {
+            Player p = Main.LocalPlayer;
+
+            // Forcibly remove all candle buffs.
+            p.ClearBuff(ModContent.BuffType<CirrusBlueCandleBuff>());
+            p.ClearBuff(ModContent.BuffType<CirrusPurpleCandleBuff>());
+            p.ClearBuff(ModContent.BuffType<CirrusPinkCandleBuff>());
+            p.ClearBuff(ModContent.BuffType<CirrusYellowCandleBuff>());
+
+            // 108000 is the duration used by Ammo Box.
+            p.AddBuff(ModContent.BuffType<CirrusPurpleCandleBuff>(), 108000);
+
+            // Play a sound.
+            SoundEngine.PlaySound(ActivationSound, new Vector2(i * 16, j * 16));
+
+            return true;
+        }
+
+        public override void MouseOver(int i, int j)
+        {
+            Player player = Main.LocalPlayer;
+            player.noThrow = 2;
+            player.cursorItemIconEnabled = true;
+            player.cursorItemIconID = ModContent.ItemType<ResilientCandle>();
         }
 
         public override void AnimateTile(ref int frame, ref int frameCounter)
@@ -33,15 +66,6 @@ namespace CalamityMod.Tiles.Furniture
                 frame = (frame + 1) % 5;
                 frameCounter = 0;
             }
-        }
-
-        public override void NearbyEffects(int i, int j, bool closer)
-        {
-            Player player = Main.LocalPlayer;
-            if (player is null)
-                return;
-            if (!player.dead && player.active)
-                player.AddBuff(ModContent.BuffType<CirrusPurpleCandleBuff>(), 20);
         }
 
         public override void ModifyLight(int i, int j, ref float r, ref float g, ref float b)

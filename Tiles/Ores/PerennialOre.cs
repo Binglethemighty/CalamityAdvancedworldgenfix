@@ -11,11 +11,9 @@ using Terraria.ModLoader;
 
 namespace CalamityMod.Tiles.Ores
 {
-    public class PerennialOre : ModTile, IMergeableTile
+    public class PerennialOre : ModTile
     {
         internal static Texture2D GlowTexture;
-
-        List<TileFraming.MergeFrameData> IMergeableTile.TileAdjacencies { get; } = [];
 
         public override void SetStaticDefaults()
         {

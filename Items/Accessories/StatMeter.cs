@@ -213,7 +213,7 @@ namespace CalamityMod.Items.Accessories
             string stats3 = "\n" + this.GetLocalization("GenericStats").Format(
                 player.GetCurrentDefense(false),
                 TwoPlaces(100f * player.endurance),
-                player.lifeRegen, // Normally we'd divide this by 2 in Expert without Well Fed, but we disable that shit
+                OnePlace((float)player.lifeRegen / 2f), // Divided by 2 to show HP/s, because vanilla! Also normally we'd divide this by 2 in Expert without Well Fed, but we disable that shit
                 Sign(moveSpeedBoost) + TwoPlaces(100f * moveSpeedBoost),
                 TwoPlaces(20f * player.GetJumpBoost()));
             // Show wing stats only if over 0 flight time

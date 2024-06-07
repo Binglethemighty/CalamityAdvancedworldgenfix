@@ -68,7 +68,7 @@ namespace CalamityMod.NPCs.VanillaNPCAIOverrides.Bosses
                 if (Main.netMode != NetmodeID.MultiplayerClient)
                 {
                     npc.netUpdate = true;
-                    npc.TargetClosest(faceTarget: false);
+                    npc.TargetClosest(false);
                     Vector2 vectorAimedAheadOfTarget = Main.player[npc.target].Center + new Vector2((float)Math.Round(Main.player[npc.target].velocity.X), 0f).SafeNormalize(Vector2.Zero) * 800f;
                     Point predictiveTeleportPoint = vectorAimedAheadOfTarget.ToTileCoordinates();
                     int randomTeleportOffset = 5;
@@ -404,6 +404,7 @@ namespace CalamityMod.NPCs.VanillaNPCAIOverrides.Bosses
 
                         npc.netUpdate = true;
                         npc.TargetClosest();
+
                         if (npc.ai[2] == 3f)
                         {
                             npc.velocity.Y = -13f * speedMult;
@@ -1252,6 +1253,7 @@ namespace CalamityMod.NPCs.VanillaNPCAIOverrides.Bosses
 
                         npc.netUpdate = true;
                         npc.TargetClosest();
+
                         if (npc.ai[2] == 3f)
                         {
                             npc.velocity.Y = -13f;
@@ -1629,8 +1631,6 @@ namespace CalamityMod.NPCs.VanillaNPCAIOverrides.Bosses
             float flyAcceleration = bossRush ? 0.3f : death ? (masterMode ? 0.18f : 0.14f) : (masterMode ? 0.16f : 0.12f);
             float flyDistanceY = masterMode ? 350f : 450f;
 
-            npc.TargetClosest();
-
             Vector2 desiredVelocity = npc.Center;
 
             if (npc.timeLeft > 10)
@@ -1698,7 +1698,6 @@ namespace CalamityMod.NPCs.VanillaNPCAIOverrides.Bosses
             float num = Main.masterMode ? 18f : Main.expertMode ? 15f : 12f;
             float num2 = Main.masterMode ? 0.12f : Main.expertMode ? 0.1f : 0.085f;
             float num3 = 250f;
-            npc.TargetClosest();
             Vector2 desiredVelocity = npc.Center;
             if (npc.timeLeft > 10)
             {

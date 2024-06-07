@@ -901,9 +901,9 @@ namespace CalamityMod
             enemyImmunityList = new List<int>()
             {
                 NPCID.KingSlime,
-                NPCType<KingSlimeJewel>(),
-                NPCType<KingSlimeJewel2>(),
-                NPCType<KingSlimeJewel3>(),
+                NPCType<KingSlimeJewelRuby>(),
+                NPCType<KingSlimeJewelSapphire>(),
+                NPCType<KingSlimeJewelEmerald>(),
                 NPCID.EaterofWorldsHead,
                 NPCID.EaterofWorldsBody,
                 NPCID.EaterofWorldsTail,
@@ -1943,6 +1943,7 @@ namespace CalamityMod
                 ProjectileType<PrismaticBeam>(),
                 ProjectileType<RancorLaserbeam>(),
                 ProjectileType<ReaperProjectile>(),
+                ProjectileType<RespiteblockHoldout>(),
                 ProjectileType<SacrificeProjectile>(),
                 ProjectileType<SnapClamProj>(),
                 ProjectileType<SnapClamStealth>(),
@@ -2428,9 +2429,9 @@ namespace CalamityMod
                 { NPCID.UmbrellaSlime, 5400 },
                 { NPCID.RainbowSlime, 30000 },
                 { NPCID.Pinky, 15000 },
-                { NPCType<KingSlimeJewel>(), 21000 },
-                { NPCType<KingSlimeJewel2>(), 18000 },
-                { NPCType<KingSlimeJewel3>(), 24000 },
+                { NPCType<KingSlimeJewelRuby>(), 21000 },
+                { NPCType<KingSlimeJewelSapphire>(), 18000 },
+                { NPCType<KingSlimeJewelEmerald>(), 24000 },
 
                 { NPCID.EyeofCthulhu, 450000 }, // 30 seconds
                 { NPCID.ServantofCthulhu, 6000 },

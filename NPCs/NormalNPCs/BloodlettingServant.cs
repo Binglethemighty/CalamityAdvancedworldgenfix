@@ -248,7 +248,7 @@ namespace CalamityMod.NPCs.NormalNPCs
             {
                 Texture2D npcTexture = TextureAssets.Npc[NPC.type].Value;
                 Color originalColor = NPC.GetAlpha(drawColor);
-                Color newColor = new Color(255, 128, 128, 255 - NPC.alpha);
+                Color newColor = new Color(255, 192, 192, 255 - NPC.alpha);
                 Vector2 drawPosition = NPC.Center - screenPos + new Vector2(0, NPC.gfxOffY);
                 Vector2 origin = NPC.frame.Size() / 2;
 
@@ -284,7 +284,7 @@ namespace CalamityMod.NPCs.NormalNPCs
             return true;
         }
 
-        public override Color? GetAlpha(Color drawColor) => new Color(128, 0, 0, 255 - NPC.alpha);
+        public override Color? GetAlpha(Color drawColor) => new Color(192, 0, 0, 255 - NPC.alpha);
 
         public override void HitEffect(NPC.HitInfo hit)
         {

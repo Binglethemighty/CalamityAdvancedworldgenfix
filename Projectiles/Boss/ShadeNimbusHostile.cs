@@ -53,7 +53,7 @@ namespace CalamityMod.Projectiles.Boss
                     Projectile.ai[0] = 0f;
                     int rainSpawnX = (int)(Projectile.position.X + 14f + (float)Main.rand.Next(Projectile.width - 28));
                     int rainSpawnY = (int)(Projectile.position.Y + (float)Projectile.height + 4f);
-                    Projectile.NewProjectile(Projectile.GetSource_FromThis(), (float)rainSpawnX, (float)rainSpawnY, 0f, 4f, ModContent.ProjectileType<ShaderainHostile>(), Projectile.damage, 0f, Main.myPlayer, 0f, 0f);
+                    Projectile.NewProjectile(Projectile.GetSource_FromThis(), (float)rainSpawnX, (float)rainSpawnY, 0f, 8f, ModContent.ProjectileType<ShaderainHostile>(), Projectile.damage, 0f, Main.myPlayer);
                 }
             }
         }
@@ -63,7 +63,7 @@ namespace CalamityMod.Projectiles.Boss
             if (info.Damage <= 0)
                 return;
 
-            target.AddBuff(ModContent.BuffType<BrainRot>(), 360);
+            target.AddBuff(ModContent.BuffType<BrainRot>(), 240);
         }
     }
 }

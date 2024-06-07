@@ -26,7 +26,7 @@ namespace CalamityMod.Projectiles.Ranged
             Projectile.MaxUpdates = 3;
             Projectile.timeLeft = Lifetime; // 20 effectively
             Projectile.usesIDStaticNPCImmunity = true;
-            Projectile.idStaticNPCHitCooldown = 15;
+            Projectile.idStaticNPCHitCooldown = 10;
         }
 
         public override void AI()

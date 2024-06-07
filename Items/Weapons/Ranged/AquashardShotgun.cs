@@ -28,7 +28,7 @@ namespace CalamityMod.Items.Weapons.Ranged
             Item.UseSound = SoundID.Item61;
             Item.autoReuse = true;
             Item.shoot = ModContent.ProjectileType<Aquashard>();
-            Item.shootSpeed = 22f;
+            Item.shootSpeed = 30f;
             Item.useAmmo = AmmoID.Bullet;
             Item.Calamity().canFirePointBlankShots = true;
         }

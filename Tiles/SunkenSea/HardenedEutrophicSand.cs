@@ -8,10 +8,8 @@ using Terraria.ModLoader;
 
 namespace CalamityMod.Tiles.SunkenSea
 {
-    public class HardenedEutrophicSand : ModTile, IMergeableTile
+    public class HardenedEutrophicSand : ModTile
     {
-        List<TileFraming.MergeFrameData> IMergeableTile.TileAdjacencies { get; } = [];
-
         public override void SetStaticDefaults()
         {
             Main.tileSolid[Type] = true;

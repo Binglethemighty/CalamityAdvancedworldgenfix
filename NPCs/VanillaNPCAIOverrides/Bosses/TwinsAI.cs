@@ -25,10 +25,6 @@ namespace CalamityMod.NPCs.VanillaNPCAIOverrides.Bosses
             if (npc.target < 0 || npc.target == Main.maxPlayers || Main.player[npc.target].dead || !Main.player[npc.target].active)
                 npc.TargetClosest();
 
-            // Despawn safety, make sure to target another player if the current player target is too far away
-            if (Vector2.Distance(Main.player[npc.target].Center, npc.Center) > CalamityGlobalNPC.CatchUpDistance200Tiles)
-                npc.TargetClosest();
-
             float enrageScale = bossRush ? 0.5f : masterMode ? 0.4f : 0f;
             if (Main.IsItDay() || bossRush)
             {
@@ -382,13 +378,13 @@ namespace CalamityMod.NPCs.VanillaNPCAIOverrides.Bosses
                     {
                         npc.ai[3] += 1f;
                         npc.ai[2] = 0f;
-                        npc.TargetClosest();
                         npc.rotation = retinazerHoverRotation;
                         float totalCharges = death ? 6f : 5f;
                         if (npc.ai[3] >= totalCharges)
                         {
                             npc.ai[1] = 0f;
                             npc.ai[3] = 0f;
+                            npc.TargetClosest();
                         }
                         else
                             npc.ai[1] = 1f;
@@ -895,13 +891,13 @@ namespace CalamityMod.NPCs.VanillaNPCAIOverrides.Bosses
 
                             npc.ai[3] += chargeIncrement;
 
-                            npc.TargetClosest();
                             npc.rotation = retinazerHoverRotation;
                             float maxChargeAmt = spazAlive ? 2f : 4f;
                             if (npc.ai[3] >= maxChargeAmt)
                             {
                                 npc.ai[1] = 0f;
                                 npc.ai[3] = 0f;
+                                npc.TargetClosest();
                             }
                             else
                                 npc.ai[1] = 4f;
@@ -974,7 +970,6 @@ namespace CalamityMod.NPCs.VanillaNPCAIOverrides.Bosses
                         npc.ai[2] += 1f;
                         if (npc.ai[2] >= (spazAlive ? 75f : 60f) - (death ? 20f * ((phase2LifeRatio - lifeRatio) / phase2LifeRatio) : 0f))
                         {
-                            npc.TargetClosest();
                             npc.ai[1] = 2f;
                             npc.ai[2] = 0f;
                             npc.netUpdate = true;
@@ -996,10 +991,6 @@ namespace CalamityMod.NPCs.VanillaNPCAIOverrides.Bosses
 
             // Get a target
             if (npc.target < 0 || npc.target == Main.maxPlayers || Main.player[npc.target].dead || !Main.player[npc.target].active)
-                npc.TargetClosest();
-
-            // Despawn safety, make sure to target another player if the current player target is too far away
-            if (Vector2.Distance(Main.player[npc.target].Center, npc.Center) > CalamityGlobalNPC.CatchUpDistance200Tiles)
                 npc.TargetClosest();
 
             float enrageScale = bossRush ? 0.5f : masterMode ? 0.4f : 0f;
@@ -1261,7 +1252,6 @@ namespace CalamityMod.NPCs.VanillaNPCAIOverrides.Bosses
                         npc.ai[1] = 1f;
                         npc.ai[2] = 0f;
                         npc.ai[3] = 0f;
-                        npc.TargetClosest();
                         npc.netUpdate = true;
                     }
                     else
@@ -1367,7 +1357,6 @@ namespace CalamityMod.NPCs.VanillaNPCAIOverrides.Bosses
                         // Reset AI array and go to cursed fireball phase
                         npc.ai[3] += 1f;
                         npc.ai[2] = 0f;
-                        npc.TargetClosest();
                         npc.rotation = spazmatismRotation;
                         float totalCharges = 8f;
                         if (death)
@@ -1584,7 +1573,6 @@ namespace CalamityMod.NPCs.VanillaNPCAIOverrides.Bosses
                         npc.ai[1] = (!retAlive || finalPhase) ? 5f : 1f;
                         npc.ai[2] = 0f;
                         npc.ai[3] = 0f;
-                        npc.TargetClosest();
                         npc.netUpdate = true;
                     }
 
@@ -1744,7 +1732,6 @@ namespace CalamityMod.NPCs.VanillaNPCAIOverrides.Bosses
                         {
                             npc.ai[3] += 1f;
                             npc.ai[2] = 0f;
-                            npc.TargetClosest();
                             npc.rotation = spazmatismRotation;
                             if (npc.ai[3] >= 5f)
                             {
@@ -1766,7 +1753,6 @@ namespace CalamityMod.NPCs.VanillaNPCAIOverrides.Bosses
                         float secondFastCharge = 4f;
                         if (npc.ai[3] >= (retAlive ? secondFastCharge : secondFastCharge + 1f))
                         {
-                            npc.TargetClosest();
                             npc.ai[1] = retAlive ? 0f : 5f;
                             npc.ai[2] = 0f;
                             npc.ai[3] = 0f;
@@ -1996,7 +1982,6 @@ namespace CalamityMod.NPCs.VanillaNPCAIOverrides.Bosses
                         // Take 3 seconds to get in position, then charge
                         if (npc.ai[2] >= (retAlive ? 180f : 135f) - (death ? 45f * ((phase2LifeRatio - lifeRatio) / phase2LifeRatio) : 0f))
                         {
-                            npc.TargetClosest();
                             npc.ai[1] = 3f;
                             npc.ai[2] = -1f;
                             npc.ai[3] = 0f;
@@ -2196,7 +2181,7 @@ namespace CalamityMod.NPCs.VanillaNPCAIOverrides.Bosses
                         npc.ai[1] = 1f;
                         npc.ai[2] = 0f;
                         npc.ai[3] = 0f;
-                        npc.target = Main.maxPlayers;
+                        npc.TargetClosest();
                         npc.netUpdate = true;
                     }
                     else if (npc.position.Y + (float)npc.height < Main.player[npc.target].position.Y && num425 < (Main.masterMode ? 720f : Main.expertMode ? 560f : 400f))
@@ -2299,11 +2284,11 @@ namespace CalamityMod.NPCs.VanillaNPCAIOverrides.Bosses
                     {
                         npc.ai[3] += 1f;
                         npc.ai[2] = 0f;
-                        npc.target = Main.maxPlayers;
                         npc.rotation = num414;
                         float numCharges = Main.masterMode ? 6f : Main.expertMode ? 5f : 4f;
                         if (npc.ai[3] >= numCharges)
                         {
+                            npc.TargetClosest();
                             npc.ai[1] = 0f;
                             npc.ai[3] = 0f;
                         }
@@ -2318,6 +2303,7 @@ namespace CalamityMod.NPCs.VanillaNPCAIOverrides.Bosses
                     npc.ai[1] = 0f;
                     npc.ai[2] = 0f;
                     npc.ai[3] = 0f;
+                    npc.TargetClosest();
                     npc.netUpdate = true;
                 }
 
@@ -2748,7 +2734,6 @@ namespace CalamityMod.NPCs.VanillaNPCAIOverrides.Bosses
                     // Avoid cheap bullshit
                     npc.damage = 0;
 
-                    npc.TargetClosest();
                     float num463 = 12f;
                     float num464 = 0.4f;
                     if (Main.expertMode)
@@ -2838,7 +2823,6 @@ namespace CalamityMod.NPCs.VanillaNPCAIOverrides.Bosses
                         npc.ai[1] = 1f;
                         npc.ai[2] = 0f;
                         npc.ai[3] = 0f;
-                        npc.target = Main.maxPlayers;
                         npc.netUpdate = true;
                     }
                     else
@@ -2942,7 +2926,6 @@ namespace CalamityMod.NPCs.VanillaNPCAIOverrides.Bosses
                     {
                         npc.ai[3] += 1f;
                         npc.ai[2] = 0f;
-                        npc.target = Main.maxPlayers;
                         npc.rotation = num458;
                         float numCharges = Main.masterMode ? 6f : Main.expertMode ? 8f : 10f;
                         if (npc.ai[3] >= numCharges)
@@ -3130,7 +3113,6 @@ namespace CalamityMod.NPCs.VanillaNPCAIOverrides.Bosses
                     npc.ai[1] = 1f;
                     npc.ai[2] = 0f;
                     npc.ai[3] = 0f;
-                    npc.target = Main.maxPlayers;
                     npc.netUpdate = true;
                 }
 
@@ -3274,7 +3256,6 @@ namespace CalamityMod.NPCs.VanillaNPCAIOverrides.Bosses
                 {
                     npc.ai[3] += 1f;
                     npc.ai[2] = 0f;
-                    npc.target = Main.maxPlayers;
                     npc.rotation = num458;
                     float numCharges = Main.masterMode ? Main.rand.Next(4, 7) : 6f;
                     if (npc.ai[3] >= numCharges)
